@@ -46,8 +46,9 @@ export function evaluateGuess(guessWord: string, secretWord: string): LetterEval
  * Validates whether a word is in our 5-letter dictionary.
  */
 export function isValidWord(word: string): boolean {
-  if (!word || word.length !== 5) return false;
+  if (!word || typeof word !== 'string') return false;
   const clean = word.trim().toLowerCase();
+  if (clean.length !== 5) return false;
   return GUESS_WORDS.includes(clean);
 }
 

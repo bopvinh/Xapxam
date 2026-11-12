@@ -9,6 +9,7 @@ import {
   calculateKeyboardLetterStates,
   validateHardModeGuess
 } from './game/engine';
+import { soundManager } from './game/audio';
 import { Header } from './components/Header';
 import { MainMenu } from './components/MainMenu';
 import { GameBoard } from './components/GameBoard';
@@ -40,7 +41,9 @@ export const App: React.FC = () => {
   // Settings state
   const [colorBlindMode, setColorBlindMode] = useState<boolean>(false);
   const [hardMode, setHardMode] = useState<boolean>(false);
+  const [soundEnabled, setSoundEnabled] = useState<boolean>(soundManager.isEnabled());
   const [timerDuration] = useState<number>(60);
+  const [showConfetti, setShowConfetti] = useState<boolean>(false);
 
   // Player Stats state
   const [stats, setStats] = useState<PlayerStats>(DEFAULT_STATS);
@@ -103,6 +106,22 @@ export const App: React.FC = () => {
     setHardMode(next);
     localStorage.setItem('wordplusplus_hardmode', String(next));
     showToast(next ? '⚡ Hard Mode enabled (Strict clues)' : 'Standard Mode enabled');
+  };
+
+  // Switch Sound
+  const handleToggleSound = () => {
+    const next = soundManager.toggle();
+    setSoundEnabled(next);
+    showToast(next ? '🔊 Sound enabled' : '🔇 Sound muted');
+  };
+
+  // Trigger Victory FX & Confetti
+  const triggerVictory = () => {
+    soundManager.playWin();
+    setShowConfetti(true);
+    setTimeout(() => {
+      setShowConfetti(false);
+    }, 4000);
   };
 
   // Reset Stats
@@ -232,9 +251,12 @@ export const App: React.FC = () => {
     }
 
     const evaluation = evaluateGuess(formattedGuess, secretWord);
-    const newGuesses = [...players[activePlayerIndex].guesses, { word: formattedGuess, evaluation }];
-    
+    soundManager.playFlip();
     const isWon = formattedGuess === secretWord;
+    if (isWon) {
+      triggerVictory();
+    }
+    const newGuesses = [...players[activePlayerIndex].guesses, { word: formattedGuess, evaluation }];
     const isOutOfAttempts = newGuesses.length >= 6;
 
     const updatedPlayers = players.map((p, idx) => {
@@ -472,10 +494,19 @@ export const App: React.FC = () => {
           onToggleColorBlind={handleToggleColorBlind}
           hardMode={hardMode}
           onToggleHardMode={handleToggleHardMode}
+          soundEnabled={soundEnabled}
+          onToggleSound={handleToggleSound}
         />
       )}
 
       <main className="app-main-content">
+        {showConfetti && (
+          <div className="confetti-container" aria-hidden="true">
+            {Array.from({ length: 30 }).map((_, i) => (
+              <div key={i} className={`confetti-piece p-${i % 6}`} style={{ left: `${(i * 3.33) + 1}%`, animationDelay: `${(i % 5) * 0.2}s` }} />
+            ))}
+          </div>
+        )}
         {toastMessage && (
           <div className="toast-notification animate-fade-in">
             {toastMessage}

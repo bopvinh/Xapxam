@@ -1,15 +1,29 @@
 import { describe, test, expect } from 'vitest';
-import { evaluateGuess, isValidWord, getDailySecretWord, validateHardModeGuess } from '../src/game/engine';
+import { 
+  evaluateGuess, 
+  isValidWord, 
+  getRandomSecretWord, 
+  getDailySecretWord, 
+  calculateKeyboardLetterStates, 
+  validateHardModeGuess 
+} from '../src/game/engine';
 
 describe('Word++ Game Engine Tests', () => {
-  test('evaluateGuess: Basic Single occurrences and exact matches', () => {
-    // Secret: SLATE, Guess: STARE
-    const res = evaluateGuess('STARE', 'SLATE');
-    expect(res[0]).toEqual({ letter: 'S', state: 'correct' }); // S correct position
-    expect(res[1]).toEqual({ letter: 'T', state: 'present' }); // T present elsewhere
-    expect(res[2]).toEqual({ letter: 'A', state: 'correct' }); // A correct position
-    expect(res[3]).toEqual({ letter: 'R', state: 'absent' });  // R absent
-    expect(res[4]).toEqual({ letter: 'E', state: 'correct' }); // E correct position
+  test('evaluateGuess: Case insensitivity and mixed case handling', () => {
+    const res = evaluateGuess('stare', 'slate');
+    expect(res[0]).toEqual({ letter: 'S', state: 'correct' });
+    expect(res[1]).toEqual({ letter: 'T', state: 'present' });
+    expect(res[2]).toEqual({ letter: 'A', state: 'correct' });
+    expect(res[3]).toEqual({ letter: 'R', state: 'absent' });
+    expect(res[4]).toEqual({ letter: 'E', state: 'correct' });
+  });
+
+  test('evaluateGuess: All correct and all absent edge cases', () => {
+    const allCorrect = evaluateGuess('SLATE', 'SLATE');
+    allCorrect.forEach(r => expect(r.state).toBe('correct'));
+
+    const allAbsent = evaluateGuess('MIGHT', 'CLOUD');
+    allAbsent.forEach(r => expect(r.state).toBe('absent'));
   });
 
   test('evaluateGuess: Duplicate Letter Scenarios (Phase 4 requirement)', () => {
@@ -82,18 +96,64 @@ describe('Word++ Game Engine Tests', () => {
     expect(res[4]).toEqual({ letter: 'E', state: 'correct' });
   });
 
-  test('isValidWord: Dictionary containment', () => {
+  test('isValidWord: Dictionary containment and edge cases', () => {
     expect(isValidWord('slate')).toBe(true);
+    expect(isValidWord('  SLATE  ')).toBe(true);
     expect(isValidWord('abcde')).toBe(false);
+    expect(isValidWord('')).toBe(false);
+    expect(isValidWord('toolong')).toBe(false);
+    expect(isValidWord('cat')).toBe(false);
+    expect(isValidWord(null as unknown as string)).toBe(false);
+    expect(isValidWord(undefined as unknown as string)).toBe(false);
   });
 
-  test('getDailySecretWord: Stability', () => {
+  test('getRandomSecretWord: Returns valid uppercase 5-letter secret word', () => {
+    const word = getRandomSecretWord();
+    expect(typeof word).toBe('string');
+    expect(word.length).toBe(5);
+    expect(word).toBe(word.toUpperCase());
+    expect(isValidWord(word)).toBe(true);
+  });
+
+  test('getDailySecretWord: Daily hashing stability and default date fallback', () => {
     const word1 = getDailySecretWord('2026-11-15');
     const word2 = getDailySecretWord('2026-11-15');
     const word3 = getDailySecretWord('2026-11-16');
+    const defaultWord = getDailySecretWord();
+
     expect(word1).toBe(word2);
     expect(word1.length).toBe(5);
     expect(word3.length).toBe(5);
+    expect(typeof defaultWord).toBe('string');
+    expect(defaultWord.length).toBe(5);
+    // Hash determinism check for same date inputs
+    expect(getDailySecretWord('2026-01-01')).toBe(getDailySecretWord('2026-01-01'));
+  });
+
+  test('calculateKeyboardLetterStates: Aggregates letter state priority (correct > present > absent)', () => {
+    const guesses = [
+      {
+        word: 'STARE',
+        evaluation: evaluateGuess('STARE', 'SLATE')
+      },
+      {
+        word: 'SLATE',
+        evaluation: evaluateGuess('SLATE', 'SLATE')
+      }
+    ];
+
+    const states = calculateKeyboardLetterStates(guesses);
+    expect(states['S']).toBe('correct');
+    expect(states['L']).toBe('correct');
+    expect(states['A']).toBe('correct');
+    expect(states['T']).toBe('correct');
+    expect(states['E']).toBe('correct');
+    expect(states['R']).toBe('absent');
+  });
+
+  test('validateHardModeGuess: Handles empty previous guesses and edge cases', () => {
+    expect(validateHardModeGuess('SLATE', [])).toBe(null);
+    expect(validateHardModeGuess('SLATE', null as unknown as [])).toBe(null);
   });
 
   test('validateHardModeGuess: Enforces green and yellow letter reuse', () => {
@@ -114,5 +174,36 @@ describe('Word++ Game Engine Tests', () => {
 
     // Valid: keeps S at 0, A at 2, E at 4, and includes T
     expect(validateHardModeGuess('SPATE', prevGuesses)).toBe(null);
+  });
+
+  test('validateHardModeGuess: Enforces positional green constraints for all indices (2nd, 3rd, 4th, 5th)', () => {
+    // Secret: SLATE
+    // Guess 1: CLASH -> C(absent), L(correct pos 1), A(correct pos 2), S(present), H(absent)
+    const prevGuesses = [
+      {
+        word: 'CLASH',
+        evaluation: evaluateGuess('CLASH', 'SLATE')
+      }
+    ];
+
+    // Violates 2nd letter (pos 1 must be L)
+    expect(validateHardModeGuess('CRAZE', prevGuesses)).toBe('2nd letter must be L');
+
+    // Violates 3rd letter (pos 2 must be A)
+    expect(validateHardModeGuess('FLUTE', prevGuesses)).toBe('3rd letter must be A');
+
+    // Test 4th letter violation: Secret SLATE, Guess CRATE -> T is correct at pos 3
+    const prevGuesses4 = [
+      {
+        word: 'CRATE',
+        evaluation: evaluateGuess('CRATE', 'SLATE')
+      }
+    ];
+    // Violates 4th letter (pos 3 must be T)
+    expect(validateHardModeGuess('SLAPE', prevGuesses4)).toBe('4th letter must be T');
+
+    // Test 5th letter violation: Secret SLATE, Guess CRATE -> E is correct at pos 4
+    // Violates 5th letter (pos 4 must be E)
+    expect(validateHardModeGuess('SLATS', prevGuesses4)).toBe('5th letter must be E');
   });
 });

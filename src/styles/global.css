@@ -931,3 +931,43 @@ button {
   font-size: 14px;
 }
 
+/* Confetti Celebration Animation */
+.confetti-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 9999;
+  overflow: hidden;
+}
+
+.confetti-piece {
+  position: absolute;
+  width: 10px;
+  height: 20px;
+  top: -20px;
+  opacity: 0.9;
+  animation: confetti-fall 3.5s linear forwards;
+}
+
+.confetti-piece.p-0 { background-color: #ef4444; } /* Red */
+.confetti-piece.p-1 { background-color: #3b82f6; } /* Blue */
+.confetti-piece.p-2 { background-color: #10b981; } /* Green */
+.confetti-piece.p-3 { background-color: #f59e0b; } /* Yellow/Orange */
+.confetti-piece.p-4 { background-color: #ec4899; } /* Pink */
+.confetti-piece.p-5 { background-color: #8b5cf6; } /* Purple */
+
+@keyframes confetti-fall {
+  0% {
+    transform: translateY(0) rotate(0deg) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(105vh) rotate(720deg) scale(0.8);
+    opacity: 0;
+  }
+}
+
+
