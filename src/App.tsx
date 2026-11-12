@@ -6,7 +6,8 @@ import {
   isValidWord,
   getRandomSecretWord,
   getDailySecretWord,
-  calculateKeyboardLetterStates
+  calculateKeyboardLetterStates,
+  validateHardModeGuess
 } from './game/engine';
 import { Header } from './components/Header';
 import { MainMenu } from './components/MainMenu';
@@ -14,6 +15,7 @@ import { GameBoard } from './components/GameBoard';
 import { Keyboard } from './components/Keyboard';
 import { HelpModal } from './components/HelpModal';
 import { StatsModal } from './components/StatsModal';
+import { DefinitionModal } from './components/DefinitionModal';
 import { MultiplayerSetup } from './components/MultiplayerSetup';
 import { Scoreboard } from './components/Scoreboard';
 import { Timer } from './components/Timer';
@@ -31,11 +33,13 @@ export const App: React.FC = () => {
   const [activeMode, setActiveMode] = useState<GameMode | null>(null);
   const [isHelpOpen, setIsHelpOpen] = useState<boolean>(false);
   const [isStatsOpen, setIsStatsOpen] = useState<boolean>(false);
+  const [isDefinitionOpen, setIsDefinitionOpen] = useState<boolean>(false);
   const [showMultiplayerSetup, setShowMultiplayerSetup] = useState<boolean>(false);
   const [showScoreboard, setShowScoreboard] = useState<boolean>(false);
 
   // Settings state
   const [colorBlindMode, setColorBlindMode] = useState<boolean>(false);
+  const [hardMode, setHardMode] = useState<boolean>(false);
   const [timerDuration] = useState<number>(60);
 
   // Player Stats state
@@ -72,6 +76,10 @@ export const App: React.FC = () => {
     if (cbMode === 'true') {
       setColorBlindMode(true);
     }
+    const hmMode = localStorage.getItem('wordplusplus_hardmode');
+    if (hmMode === 'true') {
+      setHardMode(true);
+    }
   }, []);
 
   // Show Toast
@@ -87,6 +95,14 @@ export const App: React.FC = () => {
     const next = !colorBlindMode;
     setColorBlindMode(next);
     localStorage.setItem('wordplusplus_colorblind', String(next));
+  };
+
+  // Switch Hard Mode
+  const handleToggleHardMode = () => {
+    const next = !hardMode;
+    setHardMode(next);
+    localStorage.setItem('wordplusplus_hardmode', String(next));
+    showToast(next ? '⚡ Hard Mode enabled (Strict clues)' : 'Standard Mode enabled');
   };
 
   // Reset Stats
@@ -203,6 +219,16 @@ export const App: React.FC = () => {
       showToast('Not in word list');
       triggerShake();
       return;
+    }
+
+    // Hard Mode Check
+    if (hardMode && players[activePlayerIndex]?.guesses.length > 0) {
+      const violation = validateHardModeGuess(formattedGuess, players[activePlayerIndex].guesses);
+      if (violation) {
+        showToast(`⚡ Hard Mode: ${violation}`);
+        triggerShake();
+        return;
+      }
     }
 
     const evaluation = evaluateGuess(formattedGuess, secretWord);
@@ -444,6 +470,8 @@ export const App: React.FC = () => {
           onHomeClick={handleHomeClick}
           colorBlindMode={colorBlindMode}
           onToggleColorBlind={handleToggleColorBlind}
+          hardMode={hardMode}
+          onToggleHardMode={handleToggleHardMode}
         />
       )}
 
@@ -514,8 +542,11 @@ export const App: React.FC = () => {
                   <button className="btn-primary" onClick={() => startSinglePlayerGame(activeMode)}>
                     Play Again
                   </button>
+                  <button className="btn-secondary" onClick={() => setIsDefinitionOpen(true)}>
+                    📖 Meaning
+                  </button>
                   <button className="btn-secondary" onClick={handleShareEmoji}>
-                    Share Result
+                    Share
                   </button>
                 </div>
               </div>
@@ -549,6 +580,7 @@ export const App: React.FC = () => {
       {/* Modals */}
       <HelpModal isOpen={isHelpOpen} onClose={() => setIsHelpOpen(false)} />
       <StatsModal isOpen={isStatsOpen} onClose={() => setIsStatsOpen(false)} stats={stats} onReset={handleResetStats} />
+      <DefinitionModal isOpen={isDefinitionOpen} onClose={() => setIsDefinitionOpen(false)} word={secretWord} />
     </div>
   );
 };

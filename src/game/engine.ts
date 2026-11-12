@@ -101,3 +101,39 @@ export function calculateKeyboardLetterStates(guesses: GuessResult[]): Record<st
 
   return states;
 }
+
+/**
+ * Validates whether a guess satisfies Hard Mode constraints based on previous guesses.
+ * Returns null if valid, or an error message describing the violation.
+ */
+export function validateHardModeGuess(
+  currentGuess: string,
+  previousGuesses: GuessResult[]
+): string | null {
+  if (!previousGuesses || previousGuesses.length === 0) return null;
+  const guess = currentGuess.toUpperCase();
+
+  // Aggregate required correct letters by index and present letters
+  for (const prev of previousGuesses) {
+    for (let i = 0; i < 5; i++) {
+      const prevEval = prev.evaluation[i];
+      if (prevEval.state === 'correct') {
+        if (guess[i] !== prevEval.letter) {
+          const ordinal = ['1st', '2nd', '3rd', '4th', '5th'][i];
+          return `${ordinal} letter must be ${prevEval.letter}`;
+        }
+      }
+    }
+
+    for (let i = 0; i < 5; i++) {
+      const prevEval = prev.evaluation[i];
+      if (prevEval.state === 'present') {
+        if (!guess.includes(prevEval.letter)) {
+          return `Guess must contain ${prevEval.letter}`;
+        }
+      }
+    }
+  }
+
+  return null;
+}

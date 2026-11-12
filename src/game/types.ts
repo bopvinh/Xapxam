@@ -34,6 +34,7 @@ export interface Player {
 export interface GameSettings {
   timedDuration: 60 | 90; // 60s or 90s
   colorBlindMode: boolean;
+  hardMode: boolean;
 }
 
 export interface GameState {

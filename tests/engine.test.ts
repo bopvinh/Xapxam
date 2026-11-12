@@ -1,5 +1,5 @@
 import { describe, test, expect } from 'vitest';
-import { evaluateGuess, isValidWord, getDailySecretWord } from '../src/game/engine';
+import { evaluateGuess, isValidWord, getDailySecretWord, validateHardModeGuess } from '../src/game/engine';
 
 describe('Word++ Game Engine Tests', () => {
   test('evaluateGuess: Basic Single occurrences and exact matches', () => {
@@ -94,5 +94,25 @@ describe('Word++ Game Engine Tests', () => {
     expect(word1).toBe(word2);
     expect(word1.length).toBe(5);
     expect(word3.length).toBe(5);
+  });
+
+  test('validateHardModeGuess: Enforces green and yellow letter reuse', () => {
+    // Previous guess: STARE against secret SLATE
+    // S=correct (pos 0), T=present, A=correct (pos 2), R=absent, E=correct (pos 4)
+    const prevGuesses = [
+      {
+        word: 'STARE',
+        evaluation: evaluateGuess('STARE', 'SLATE')
+      }
+    ];
+
+    // Invalid: missing 'S' in position 0
+    expect(validateHardModeGuess('CRANE', prevGuesses)).toBe('1st letter must be S');
+
+    // Invalid: missing 'T' (which was present)
+    expect(validateHardModeGuess('SPARE', prevGuesses)).toBe('Guess must contain T');
+
+    // Valid: keeps S at 0, A at 2, E at 4, and includes T
+    expect(validateHardModeGuess('SPATE', prevGuesses)).toBe(null);
   });
 });

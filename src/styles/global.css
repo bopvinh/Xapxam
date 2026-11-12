@@ -842,3 +842,92 @@ button {
   gap: 8px;
   justify-content: center;
 }
+
+/* Hard Mode Badges & Toggles */
+.badge-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 2px;
+}
+
+.hard-badge {
+  font-size: 10px;
+  background-color: rgba(239, 68, 68, 0.2);
+  color: #ef4444;
+  border: 1px solid #ef4444;
+  padding: 1px 6px;
+  border-radius: 12px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+}
+
+.icon-btn.toggle-hard-btn.hard-active {
+  color: #f59e0b;
+  background-color: rgba(245, 158, 11, 0.15);
+}
+
+/* Definition Modal */
+.def-title-group {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+}
+
+.phonetic-tag {
+  color: var(--text-secondary);
+  font-size: 14px;
+  font-style: italic;
+}
+
+.meanings-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.meaning-block {
+  background-color: var(--bg-elevated);
+  padding: 12px 16px;
+  border-radius: 8px;
+}
+
+.pos-badge {
+  display: inline-block;
+  background-color: var(--bg-card);
+  color: var(--accent);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  padding: 2px 8px;
+  border-radius: 4px;
+  margin-bottom: 8px;
+}
+
+.def-ol {
+  margin-left: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.def-li {
+  font-size: 13.5px;
+  line-height: 1.4;
+}
+
+.def-example {
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-style: italic;
+  margin-top: 2px;
+}
+
+.def-loading, .def-error {
+  text-align: center;
+  padding: 24px;
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+

@@ -8,6 +8,8 @@ interface HeaderProps {
   onHomeClick: () => void;
   colorBlindMode: boolean;
   onToggleColorBlind: () => void;
+  hardMode: boolean;
+  onToggleHardMode: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -16,7 +18,9 @@ export const Header: React.FC<HeaderProps> = ({
   onOpenStats,
   onHomeClick,
   colorBlindMode,
-  onToggleColorBlind
+  onToggleColorBlind,
+  hardMode,
+  onToggleHardMode
 }) => {
   return (
     <header className="app-header">
@@ -40,10 +44,24 @@ export const Header: React.FC<HeaderProps> = ({
         <h1 className="logo-title" onClick={onHomeClick}>
           WORD<span className="plus-accent">++</span>
         </h1>
-        {mode && <span className="mode-badge">{mode.replace('_', ' ')}</span>}
+        {mode && (
+          <div className="badge-row">
+            <span className="mode-badge">{mode.replace('_', ' ')}</span>
+            {hardMode && <span className="hard-badge">HARD</span>}
+          </div>
+        )}
       </div>
 
       <div className="header-right">
+        <button 
+          className={`icon-btn toggle-hard-btn ${hardMode ? 'active hard-active' : ''}`}
+          onClick={onToggleHardMode}
+          title={hardMode ? "Hard Mode: ON (Strict clues)" : "Hard Mode: OFF"}
+        >
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+          </svg>
+        </button>
         <button 
           className={`icon-btn toggle-cb-btn ${colorBlindMode ? 'active' : ''}`}
           onClick={onToggleColorBlind}
