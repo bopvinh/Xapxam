@@ -1,5 +1,6 @@
-import React from 'react';
-import { GameMode } from '../game/types';
+import React, { useState } from 'react';
+import { GameMode, LetterEvaluation } from '../game/types';
+import { evaluateGuess, getRandomSecretWord, isValidWord } from '../game/engine';
 
 interface MainMenuProps {
   onSelectMode: (mode: GameMode) => void;
@@ -75,6 +76,50 @@ export const MainMenu: React.FC<MainMenuProps> = ({
   onOpenHelp,
   onOpenStats,
 }) => {
+  const [miniGuess, setMiniGuess] = useState('');
+  const [miniEvaluation, setMiniEvaluation] = useState<LetterEvaluation[] | null>(null);
+  const [miniResult, setMiniResult] = useState<'idle' | 'won' | 'lost' | 'invalid'>('idle');
+
+  // Pick a secret word once per page load for the mini guess
+  const miniSecret = getRandomSecretWord();
+
+  const handleMiniSubmit = () => {
+    const guess = miniGuess.trim().toUpperCase();
+    if (guess.length !== 5) {
+      setMiniResult('invalid');
+      setTimeout(() => setMiniResult('idle'), 1500);
+      return;
+    }
+    if (!isValidWord(guess)) {
+      setMiniResult('invalid');
+      setTimeout(() => setMiniResult('idle'), 1500);
+      return;
+    }
+    const evaluation = evaluateGuess(guess, miniSecret);
+    setMiniEvaluation(evaluation);
+    if (guess === miniSecret) {
+      setMiniResult('won');
+    } else {
+      setMiniResult('lost');
+      setTimeout(() => setMiniResult('idle'), 2000);
+    }
+  };
+
+  const handleMiniKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') handleMiniSubmit();
+    else if (/^[a-z]$/i.test(e.key) && miniGuess.length < 5) {
+      setMiniGuess((prev) => prev + e.key.toUpperCase());
+    } else if (e.key === 'Backspace') {
+      setMiniGuess((prev) => prev.slice(0, -1));
+    }
+  };
+
+  const resetMini = () => {
+    setMiniGuess('');
+    setMiniEvaluation(null);
+    setMiniResult('idle');
+  };
+
   return (
     <div className="main-menu-container animate-scale">
       {/* ── Hero ─────────────────────────────────────────── */}
@@ -97,6 +142,49 @@ export const MainMenu: React.FC<MainMenuProps> = ({
           Play Now
         </button>
         <span className="hero-cta-label">Classic · 5 letters · 6 guesses</span>
+      </div>
+
+      {/* ── Live Mini Guess (Conversion Hook) ────────────── */}
+      <div className="mini-guess-section">
+        <p className="mini-guess-label">Try a guess — no commitment</p>
+        <div className="mini-guess-row" role="grid" aria-label="Mini word guess">
+          {[0, 1, 2, 3, 4].map((i) => (
+            <div
+              key={i}
+              className={`mini-cell ${miniEvaluation?.[i]?.state || 'empty'}`}
+              role="gridcell"
+            >
+              {miniGuess[i] || ''}
+            </div>
+          ))}
+        </div>
+        <input
+          type="text"
+          maxLength={5}
+          value={miniGuess}
+          onChange={(e) =>
+            setMiniGuess(e.target.value.replace(/[^A-Za-z]/g, '').toUpperCase())
+          }
+          onKeyDown={handleMiniKeyDown}
+          placeholder="_____"
+          aria-label="Enter a 5-letter word"
+          disabled={miniResult !== 'idle'}
+          className="mini-input"
+        />
+        <div className="mini-guess-actions">
+          <button className="btn-secondary" onClick={handleMiniSubmit} disabled={miniGuess.length !== 5 || miniResult !== 'idle'}>
+            Guess
+          </button>
+          {miniResult === 'won' && <span className="mini-status won">🎉 Solved it!</span>}
+          {miniResult === 'lost' && <span className="mini-status lost">Not quite — the word was {miniSecret}</span>}
+          {miniResult === 'invalid' && <span className="mini-status invalid">Enter a valid 5-letter word</span>}
+          <button className="btn-secondary mini-reset" onClick={resetMini} aria-label="Reset mini guess">
+            ↻
+          </button>
+        </div>
+        <p className="mini-guest-hint">
+          {miniResult === 'won' ? 'Ready for the full game?' : ''}
+        </p>
       </div>
 
       {/* ── Modes grid ───────────────────────────────────── */}
