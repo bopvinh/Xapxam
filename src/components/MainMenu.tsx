@@ -101,17 +101,19 @@ export const MainMenu: React.FC<MainMenuProps> = ({
       setMiniResult('won');
     } else {
       setMiniResult('lost');
-      setTimeout(() => setMiniResult('idle'), 2000);
     }
   };
 
   const handleMiniKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') handleMiniSubmit();
-    else if (/^[a-z]$/i.test(e.key) && miniGuess.length < 5) {
-      setMiniGuess((prev) => prev + e.key.toUpperCase());
-    } else if (e.key === 'Backspace') {
-      setMiniGuess((prev) => prev.slice(0, -1));
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleMiniSubmit();
     }
+  };
+
+  const handleMiniInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value.replace(/[^A-Za-z]/g, '').toUpperCase().slice(0, 5);
+    setMiniGuess(val);
   };
 
   const resetMini = () => {
@@ -162,13 +164,11 @@ export const MainMenu: React.FC<MainMenuProps> = ({
           type="text"
           maxLength={5}
           value={miniGuess}
-          onChange={(e) =>
-            setMiniGuess(e.target.value.replace(/[^A-Za-z]/g, '').toUpperCase())
-          }
+          onChange={handleMiniInputChange}
           onKeyDown={handleMiniKeyDown}
-          placeholder="_____"
+          placeholder="TYPE 5-LETTER WORD"
           aria-label="Enter a 5-letter word"
-          disabled={miniResult !== 'idle'}
+          disabled={miniResult === 'won'}
           className="mini-input"
         />
         <div className="mini-guess-actions">
