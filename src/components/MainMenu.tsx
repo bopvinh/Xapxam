@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { GameMode, LetterEvaluation } from '../game/types';
 import { evaluateGuess, getRandomSecretWord, isValidWord } from '../game/engine';
 
@@ -83,6 +83,33 @@ export const MainMenu: React.FC<MainMenuProps> = ({
   // Pick a secret word once per page load for the mini guess
   const miniSecret = getRandomSecretWord();
 
+  // ── Streak Shield (retention hook) ──────────────────────
+  const [streak, setStreak] = useState<number>(0);
+  const [streakShieldActive, setStreakShieldActive] = useState<boolean>(false);
+
+  useEffect(() => {
+    const saved = localStorage.getItem('wordplusplus_streak');
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        setStreak(parsed.count || 0);
+        setStreakShieldActive(parsed.active || false);
+      } catch (e) {
+        setStreak(0);
+      }
+    } else {
+      setStreak(0);
+    }
+  }, []);
+
+  const handleClaimStreakShield = () => {
+    setStreakShieldActive(true);
+    localStorage.setItem(
+      'wordplusplus_streak',
+      JSON.stringify({ count: streak, active: true })
+    );
+  };
+
   const handleMiniSubmit = () => {
     const guess = miniGuess.trim().toUpperCase();
     if (guess.length !== 5) {
@@ -132,6 +159,31 @@ export const MainMenu: React.FC<MainMenuProps> = ({
         </h1>
         <p className="hero-subtitle">The Ultimate Word Challenge</p>
       </section>
+
+      {/* ── Streak Shield (Retention Hook) ────────────────── */}
+      <div className="streak-shield-section">
+        <div className={`streak-shield-card ${streakShieldActive ? 'active' : ''}`}>
+          <span className="shield-icon">
+            {streakShieldActive ? '🛡️' : '🔓'}
+          </span>
+          <div className="streak-shield-info">
+            <p className="streak-label">
+              {streakShieldActive ? 'STREAK PROTECTED' : 'STREAK EXPOSED'}
+            </p>
+            <p className="streak-value">
+              {streak} day streak
+            </p>
+          </div>
+          <button
+            className={`streak-shield-btn ${streakShieldActive ? 'claimed' : ''}`}
+            onClick={handleClaimStreakShield}
+            disabled={streakShieldActive}
+            aria-label="Activate Streak Shield"
+          >
+            {streakShieldActive ? 'ACTIVE' : 'PROTECT STREAK'}
+          </button>
+        </div>
+      </div>
 
       {/* ── Primary CTA ──────────────────────────────────── */}
       <div className="hero-cta">
