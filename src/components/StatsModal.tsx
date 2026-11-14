@@ -33,7 +33,7 @@ export const StatsModal: React.FC<StatsModalProps> = ({ isOpen, onClose, stats, 
               <span className="stat-val">{winPercent}%</span>
               <span className="stat-label">Win %</span>
             </div>
-            <div className="stat-card">
+            <div className={`stat-card ${stats.currentStreak > 0 ? 'has-streak' : ''}`}>
               <span className="stat-val">{stats.currentStreak}</span>
               <span className="stat-label">Streak</span>
             </div>
