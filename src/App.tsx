@@ -535,11 +535,6 @@ export const App: React.FC = () => {
             onSelectMode={handleSelectMode}
             onOpenHelp={() => setIsHelpOpen(true)}
             onOpenStats={() => setIsStatsOpen(true)}
-            onOpenDailyChest={() => setShowDailyChest(true)}
-            onOpenMentor={() => setShowMentor(true)}
-            onOpenBlitz={() => setShowBlitz(true)}
-            onOpenLeaderboard={() => setShowLeaderboard(true)}
-            onOpenMastery={() => setShowMastery(true)}
           />
         )}
 
