@@ -2354,6 +2354,35 @@ body::before {
   100% { border-color: rgba(245, 158, 11, 0.85); box-shadow: 0 6px 22px rgba(245, 158, 11, 0.35), inset 0 1px 1px rgba(245, 158, 11, 0.35); }
 }
 
+/* ── Mode Category Micro-Badge ───────────────────────────── */
+.mode-category-tag {
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  padding: 1px 5px;
+  border-radius: 6px;
+  border: 1px solid currentColor;
+  flex-shrink: 0;
+}
+
+/* ── Interactive Spring Hover Dynamics on Mode Cards ─────── */
+.menu-card .card-icon-wrap svg {
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.3s ease;
+}
+
+.menu-card:hover .card-icon-wrap svg {
+  transform: scale(1.18) rotate(5deg);
+  filter: drop-shadow(0 0 6px currentColor);
+}
+
+.menu-card:hover .card-arrow {
+  opacity: 1;
+  transform: translateX(0);
+  color: var(--accent-bright);
+}
+
+
 
 
 

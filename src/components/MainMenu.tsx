@@ -66,6 +66,8 @@ interface ModeConfig {
   icon: React.ReactNode;
   label: string;
   description: string;
+  tag: string;
+  tagColor: string;
 }
 
 const MODES: ModeConfig[] = [
@@ -73,37 +75,49 @@ const MODES: ModeConfig[] = [
     mode: 'CLASSIC',
     icon: <ClassicIcon />,
     label: 'Classic Play',
-    description: 'One secret five-letter word. Six attempts.',
+    description: 'One secret 5-letter word. Six attempts.',
+    tag: 'SOLO',
+    tagColor: '#818cf8',
   },
   {
     mode: 'DAILY',
     icon: <DailyIcon />,
     label: 'Daily Challenge',
-    description: 'Same word for everyone today. Keep your streak!',
+    description: 'Same word for everyone. Keep streak!',
+    tag: 'DAILY',
+    tagColor: '#f59e0b',
   },
   {
     mode: 'PARTY',
     icon: <PartyIcon />,
     label: 'Multiplayer Party',
     description: '2–4 players. Host rotating word challenge.',
+    tag: 'PARTY',
+    tagColor: '#ec4899',
   },
   {
     mode: 'FAST',
     icon: <FastIcon />,
     label: 'Fast Mode',
-    description: 'Solve first to end the round and score a point.',
+    description: 'Solve first to end round and score point.',
+    tag: 'SPEED',
+    tagColor: '#facc15',
   },
   {
     mode: 'TIMED',
     icon: <TimedIcon />,
     label: 'Timed Mode',
-    description: 'Beat the 60 or 90-second countdown clock!',
+    description: 'Beat the 60 or 90s countdown clock!',
+    tag: 'TIMED',
+    tagColor: '#f43f5e',
   },
   {
     mode: 'TEAM',
     icon: <TeamIcon />,
     label: 'Team Challenge',
-    description: 'Combine forces. Work together to find the word.',
+    description: 'Combine forces. Work together to solve.',
+    tag: 'CO-OP',
+    tagColor: '#06b6d4',
   },
 ];
 
@@ -208,7 +222,7 @@ export const MainMenu: React.FC<MainMenuProps> = ({
           aria-label="Game modes"
           style={{ marginTop: '12px' }}
         >
-          {MODES.map(({ mode, icon, label, description }) => {
+          {MODES.map(({ mode, icon, label, description, tag, tagColor }) => {
             const isDaily = mode === 'DAILY';
             return (
               <button
@@ -226,11 +240,16 @@ export const MainMenu: React.FC<MainMenuProps> = ({
                   {icon}
                 </div>
                 <div className="card-body">
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <h3>{label}</h3>
-                    {isDaily && (
-                      <span className="daily-pulse-badge">FEATURED</span>
-                    )}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px', justifyContent: 'space-between' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <h3>{label}</h3>
+                      {isDaily && (
+                        <span className="daily-pulse-badge">FEATURED</span>
+                      )}
+                    </div>
+                    <span className="mode-category-tag" style={{ color: tagColor, borderColor: tagColor, background: `${tagColor}15` }}>
+                      {tag}
+                    </span>
                   </div>
                   <p>{description}</p>
                   {isDaily && (
