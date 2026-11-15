@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { GameMode } from '../game/types';
+import { soundManager } from '../game/audio';
 
 interface MainMenuProps {
   onSelectMode: (mode: GameMode) => void;
@@ -128,14 +129,42 @@ export const MainMenu: React.FC<MainMenuProps> = ({
   onOpenHelp,
   onOpenStats,
 }) => {
+  const [flippedTile, setFlippedTile] = useState<number | null>(null);
+
+  const handleTileClick = (index: number) => {
+    soundManager.playFlip();
+    setFlippedTile(index);
+    setTimeout(() => setFlippedTile(null), 800);
+  };
+
+  const handleHover = () => {
+    soundManager.playPop();
+  };
+
+  const tiles = ['W', 'O', 'R', 'D', '++'];
+
   return (
     <div className="main-menu-container animate-scale">
       {/* ── Hero ─────────────────────────────────────────── */}
       <section className="hero-section" aria-label="Game title">
-        <p className="hero-eyebrow">Word Game</p>
-        <h1 className="hero-logo">
-          WORD<span className="plus-accent">++</span>
-        </h1>
+        <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', marginBottom: '8px', padding: '4px 12px', background: 'rgba(245, 158, 11, 0.1)', border: '1px solid rgba(245, 158, 11, 0.3)', borderRadius: '20px' }}>
+          <span style={{ fontSize: '10px', fontWeight: 800, color: '#f59e0b', letterSpacing: '1px', textTransform: 'uppercase' }}>👑 IMPERIAL EDITION</span>
+        </div>
+        <div className="hero-tiles-row" style={{ display: 'flex', justifyContent: 'center', gap: '8px', marginBottom: '8px' }}>
+          {tiles.map((letter, idx) => (
+            <div
+              key={idx}
+              className={`hero-interactive-tile ${flippedTile === idx ? 'tile-flip' : ''}`}
+              onClick={() => handleTileClick(idx)}
+              onMouseEnter={handleHover}
+              title="Click to flip!"
+              role="button"
+              tabIndex={0}
+            >
+              <span className="hero-tile-letter">{letter}</span>
+            </div>
+          ))}
+        </div>
         <p className="hero-subtitle">The Ultimate Word Challenge</p>
       </section>
 
@@ -143,7 +172,11 @@ export const MainMenu: React.FC<MainMenuProps> = ({
       <div className="hero-cta">
         <button
           className="btn-play-now"
-          onClick={() => onSelectMode('CLASSIC')}
+          onClick={() => {
+            soundManager.playFlip();
+            onSelectMode('CLASSIC');
+          }}
+          onMouseEnter={handleHover}
           aria-label="Play Classic mode"
         >
           <span className="btn-play-now-icon" aria-hidden="true">▶</span>
