@@ -247,6 +247,14 @@ export const MainMenu: React.FC<MainMenuProps> = ({
         </div>
       </div>
 
+      {/* ── Social Proof & Community Activity Ticker ──────── */}
+      <div className="social-proof-ticker" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', fontSize: '11px', color: 'var(--text-secondary)', background: 'rgba(99, 102, 241, 0.08)', border: '1px solid rgba(99, 102, 241, 0.2)', padding: '6px 14px', borderRadius: '20px', marginTop: '12px' }}>
+        <span className="live-dot" style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#22d3a0', boxShadow: '0 0 8px #22d3a0' }} />
+        <span><strong style={{ color: 'var(--text-primary)' }}>1,428 Solvers</strong> online</span>
+        <span style={{ opacity: 0.4 }}>•</span>
+        <span><strong style={{ color: '#f59e0b' }}>8,920</strong> Puzzles Solved Today</span>
+      </div>
+
       {/* ── Footer ───────────────────────────────────────── */}
       <div className="menu-footer">
         <button className="btn-secondary" onClick={onOpenHelp}>
