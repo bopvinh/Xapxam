@@ -45,16 +45,9 @@ export const GameBoard: React.FC<GameBoardProps> = ({
       }
 
       cells.push(
-        <div 
-          key={c} 
-          className={`board-cell ${state} ${char ? 'has-letter' : ''} ${isSubmittedRow ? 'submitted animate-flip' : ''} ${isCurrentRow ? 'active-tile' : ''}`}
-          style={{ 
-            animationDelay: isSubmittedRow 
-              ? `${c * 150}ms` 
-              : isCurrentRow 
-                ? `${c * 75}ms` 
-                : '0ms' 
-          }}
+        <div
+          key={c}
+          className={`board-cell ${state} ${char ? 'has-letter' : ''} ${isSubmittedRow ? 'submitted animate-flip tile-enhance-enter' : ''} ${isCurrentRow ? 'active-tile animate-stagger-enter' : ''}`}
         >
           <span className="letter-text">{char}</span>
           {symbol && <span className="cb-badge">{symbol}</span>}

@@ -299,6 +299,7 @@ export const App: React.FC = () => {
         setStatus('ROUND_OVER');
         updateStats(false, 6);
         showToast(`😔 Game over! The word was ${secretWord}`);
+        triggerShake(5);
       }
       return;
     }
@@ -350,8 +351,11 @@ export const App: React.FC = () => {
     return -1;
   };
 
-  const triggerShake = () => {
-    setInvalidRowIndex(players[activePlayerIndex]?.guesses.length || 0);
+  const triggerShake = (rowIndex?: number) => {
+    const target = typeof rowIndex === 'number'
+      ? rowIndex
+      : Math.min(players[activePlayerIndex]?.guesses.length || 0, 5);
+    setInvalidRowIndex(target);
     setTimeout(() => {
       setInvalidRowIndex(null);
     }, 500);

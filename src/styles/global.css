@@ -308,8 +308,9 @@ button:focus-visible {
    TOAST NOTIFICATIONS
    ============================================================ */
 .toast-notification {
-  position: absolute;
-  top: 20px;
+  position: fixed;
+  bottom: 24px;
+  top: auto;
   left: 50%;
   transform: translateX(-50%);
   background: var(--text-primary);
@@ -321,12 +322,12 @@ button:focus-visible {
   z-index: 1000;
   box-shadow: var(--shadow-lg);
   white-space: nowrap;
-  animation: toast-in 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+  animation: toast-slide-bottom 0.3s cubic-bezier(0.25, 1, 0.5, 1) forwards;
 }
 
-@keyframes toast-in {
-  from { opacity: 0; transform: translateX(-50%) translateY(-8px) scale(0.9); }
-  to   { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
+@keyframes toast-slide-bottom {
+  0% { opacity: 0; transform: translateX(-50%) translateY(24px); }
+  100% { opacity: 1; transform: translateX(-50%) translateY(0); }
 }
 
 /* ============================================================
@@ -464,12 +465,13 @@ button:focus-visible {
 }
 
 .btn-play-now:hover {
-  transform: translateY(-2px) scale(1.02);
+  transform: scale(1.02);
   box-shadow: 0 8px 32px rgba(99,102,241,0.55), 0 1px 0 rgba(255,255,255,0.15) inset;
 }
 
 .btn-play-now:active {
-  transform: translateY(0) scale(0.98);
+  transform: scale(0.98);
+  box-shadow: 0 0 12px var(--accent-glow);
 }
 
 .btn-play-now-icon {
@@ -785,7 +787,7 @@ button:focus-visible {
 }
 
 .key-btn:hover { background: var(--bg-elevated-2); }
-.key-btn:active { transform: scale(0.94); }
+.key-btn:active { transform: scale(1.05); }
 
 .key-btn.special-key {
   flex: 1.5;
@@ -830,10 +832,10 @@ button:focus-visible {
   justify-content: center;
   z-index: 2000;
   padding: var(--space-4);
-  animation: fade-in 0.2s ease;
+  animation: backdrop-fade 0.25s ease forwards;
 }
 
-@keyframes fade-in {
+@keyframes backdrop-fade {
   from { opacity: 0; }
   to   { opacity: 1; }
 }
@@ -849,12 +851,12 @@ button:focus-visible {
   display: flex;
   flex-direction: column;
   box-shadow: var(--shadow-xl);
-  animation: modal-in 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  animation: modal-slide-bottom 0.25s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
 
-@keyframes modal-in {
-  from { opacity: 0; transform: scale(0.9) translateY(16px); }
-  to   { opacity: 1; transform: scale(1) translateY(0); }
+@keyframes modal-slide-bottom {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
 .modal-header {
@@ -1398,23 +1400,27 @@ body::before {
     transform: rotateX(0deg);
     background-color: var(--bg-card);
     border-color: var(--empty-border);
+    box-shadow: 0 0 0 rgba(0, 0, 0, 0);
   }
   45% {
     transform: rotateX(90deg);
     background-color: var(--bg-card);
     border-color: var(--empty-border);
+    box-shadow: 0 0 0 rgba(0, 0, 0, 0);
   }
   55% {
     transform: rotateX(90deg);
     background-color: var(--correct);
     border-color: var(--correct);
     color: white;
+    box-shadow: 0 0 20px var(--correct-glow);
   }
   100% {
     transform: rotateX(0deg);
     background-color: var(--correct);
     border-color: var(--correct);
     color: white;
+    box-shadow: 0 0 15px var(--correct-glow);
   }
 }
 
@@ -1423,23 +1429,27 @@ body::before {
     transform: rotateX(0deg);
     background-color: var(--bg-card);
     border-color: var(--empty-border);
+    box-shadow: 0 0 0 rgba(0, 0, 0, 0);
   }
   45% {
     transform: rotateX(90deg);
     background-color: var(--bg-card);
     border-color: var(--empty-border);
+    box-shadow: 0 0 0 rgba(0, 0, 0, 0);
   }
   55% {
     transform: rotateX(90deg);
     background-color: var(--present);
     border-color: var(--present);
     color: white;
+    box-shadow: 0 0 16px var(--present-glow);
   }
   100% {
     transform: rotateX(0deg);
     background-color: var(--present);
     border-color: var(--present);
     color: white;
+    box-shadow: 0 0 10px var(--present-glow);
   }
 }
 
@@ -1448,23 +1458,27 @@ body::before {
     transform: rotateX(0deg);
     background-color: var(--bg-card);
     border-color: var(--empty-border);
+    box-shadow: 0 0 0 rgba(0, 0, 0, 0);
   }
   45% {
     transform: rotateX(90deg);
     background-color: var(--bg-card);
     border-color: var(--empty-border);
+    box-shadow: 0 0 0 rgba(0, 0, 0, 0);
   }
   55% {
     transform: rotateX(90deg);
     background-color: var(--absent);
     border-color: var(--absent);
     color: var(--text-secondary);
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.4);
   }
   100% {
     transform: rotateX(0deg);
     background-color: var(--absent);
     border-color: var(--absent);
     color: var(--text-secondary);
+    box-shadow: none;
   }
 }
 
@@ -1488,28 +1502,45 @@ body::before {
   box-shadow: 0 0 10px var(--present-glow);
 }
 
+.animate-flip {
+  animation: flip-reveal-correct 0.4s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
 .board-cell.submitted.animate-flip.correct {
-  animation: flip-reveal-correct 0.6s cubic-bezier(0.4, 0, 0.2, 1) both,
+  animation: flip-reveal-correct 0.4s cubic-bezier(0.4, 0, 0.2, 1) both,
              correct-bounce 1.1s cubic-bezier(0.25, 1, 0.5, 1) both;
 }
 
 .board-cell.submitted.animate-flip.present {
-  animation: flip-reveal-present 0.6s cubic-bezier(0.4, 0, 0.2, 1) both;
+  animation: flip-reveal-present 0.4s cubic-bezier(0.4, 0, 0.2, 1) both;
 }
 
 .board-cell.submitted.animate-flip.absent {
-  animation: flip-reveal-absent 0.6s cubic-bezier(0.4, 0, 0.2, 1) both;
+  animation: flip-reveal-absent 0.4s cubic-bezier(0.4, 0, 0.2, 1) both;
 }
+
+/* Cell-level pure CSS animation staggering */
+.board-row .board-cell.submitted:nth-child(1) { animation-delay: 0ms; }
+.board-row .board-cell.submitted:nth-child(2) { animation-delay: 80ms; }
+.board-row .board-cell.submitted:nth-child(3) { animation-delay: 160ms; }
+.board-row .board-cell.submitted:nth-child(4) { animation-delay: 240ms; }
+.board-row .board-cell.submitted:nth-child(5) { animation-delay: 320ms; }
+
+.board-row .board-cell.animate-stagger-enter:nth-child(1) { animation-delay: 0ms; }
+.board-row .board-cell.animate-stagger-enter:nth-child(2) { animation-delay: 40ms; }
+.board-row .board-cell.animate-stagger-enter:nth-child(3) { animation-delay: 80ms; }
+.board-row .board-cell.animate-stagger-enter:nth-child(4) { animation-delay: 120ms; }
+.board-row .board-cell.animate-stagger-enter:nth-child(5) { animation-delay: 160ms; }
 
 /* ── Wrong Guess Shake ─────────────────────────────────────── */
 @keyframes shake {
   0%, 100% { transform: translateX(0); }
-  15%, 45%, 75% { transform: translateX(-8px); }
-  30%, 60%, 90% { transform: translateX(8px); }
+  20%, 60% { transform: translateX(-6px); }
+  40%, 80% { transform: translateX(6px); }
 }
 
 .shake-row {
-  animation: shake 0.45s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+  animation: shake 0.4s ease-in-out both;
 }
 
 /* ── Generic Animation Fallbacks ───────────────────────────── */
@@ -1534,6 +1565,12 @@ body::before {
   100% { transform: scale(1); }
 }
 
+@keyframes key-pulse-absent {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.04); }
+  100% { transform: scale(1); }
+}
+
 .key-btn {
   transition: background-color 0.4s cubic-bezier(0.4, 0, 0.2, 1),
               border-color 0.4s cubic-bezier(0.4, 0, 0.2, 1),
@@ -1543,19 +1580,21 @@ body::before {
 }
 
 .key-btn.correct {
-  animation: key-pulse-correct 0.4s cubic-bezier(0.25, 1, 0.5, 1) both;
-  transition-delay: 0.6s;
-  animation-delay: 0.6s;
+  animation: key-pulse-correct 0.3s cubic-bezier(0.25, 1, 0.5, 1) both;
+  transition-delay: 0.4s;
+  animation-delay: 0.4s;
 }
 
 .key-btn.present {
-  animation: key-pulse-present 0.4s cubic-bezier(0.25, 1, 0.5, 1) both;
-  transition-delay: 0.6s;
-  animation-delay: 0.6s;
+  animation: key-pulse-present 0.3s cubic-bezier(0.25, 1, 0.5, 1) both;
+  transition-delay: 0.4s;
+  animation-delay: 0.4s;
 }
 
 .key-btn.absent {
-  transition-delay: 0.6s;
+  animation: key-pulse-absent 0.3s cubic-bezier(0.25, 1, 0.5, 1) both;
+  transition-delay: 0.4s;
+  animation-delay: 0.4s;
 }
 
 /* ── Button & Card Spring Animations ──────────────────────── */
@@ -1616,15 +1655,16 @@ body::before {
 .icon-btn {
   transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1),
               background-color 0.2s ease,
-              color 0.2s ease;
+              color 0.2s ease,
+              box-shadow 0.2s ease;
 }
 
 .icon-btn:hover {
-  transform: scale(1.1);
+  transform: scale(1.02);
 }
 
 .icon-btn:active {
-  transform: scale(0.9);
+  box-shadow: 0 0 12px var(--accent-glow);
 }
 
 .close-btn {
@@ -1642,23 +1682,22 @@ body::before {
 }
 
 /* ── Major Screen Slide & Fade Transitions ────────────────── */
-.main-menu-container,
-.multiplayer-setup-container,
-.setup-form,
-.gameplay-area,
-.scoreboard-container {
-  animation: slide-up-fade 0.5s cubic-bezier(0.25, 1, 0.5, 1) both;
-}
-
-@keyframes slide-up-fade {
+@keyframes screen-fade {
   0% {
     opacity: 0;
-    transform: translateY(16px) scale(0.98);
   }
   100% {
     opacity: 1;
-    transform: translateY(0) scale(1);
   }
+}
+
+.main-menu-container,
+.gameplay-area,
+.game-board-container,
+.multiplayer-setup-container,
+.setup-form,
+.scoreboard-container {
+  animation: screen-fade 0.3s ease forwards;
 }
 
 /* ── Stats Modals Chart & Card Pops ───────────────────────── */
@@ -1721,19 +1760,19 @@ body::before {
 @keyframes toast-lifecycle {
   0% {
     opacity: 0;
-    transform: translateX(-50%) translateY(-20px) scale(0.9);
+    transform: translateX(-50%) translateY(24px) scale(0.95);
   }
-  8% {
+  10% {
     opacity: 1;
     transform: translateX(-50%) translateY(0) scale(1);
   }
-  92% {
+  90% {
     opacity: 1;
     transform: translateX(-50%) translateY(0) scale(1);
   }
   100% {
     opacity: 0;
-    transform: translateX(-50%) translateY(-20px) scale(0.9);
+    transform: translateX(-50%) translateY(24px) scale(0.95);
   }
 }
 
@@ -1943,4 +1982,141 @@ body::before {
 
 .chest-claimed .chest-icon {
   filter: opacity(0.5);
+}
+
+/* ── Animation & Interaction System (TUESDAY) ────────────────────────────── */
+
+/* 1. Letter-tile entrance stagger — cells stagger-in from x-axis (200ms) */
+.animate-stagger-enter {
+  animation: stagger-enter 200ms cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes stagger-enter {
+  0% {
+    transform: translateX(-16px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* 2. Enhanced tile flip reveal — 0.4s cubic-bezier(0.4, 0, 0.2, 1) with shadows */
+.tile-enhance-enter {
+  animation: flip-reveal-correct 0.4s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+/* 3. Keyboard press feedback — scale(1.05) on mousedown, pulse(0.3s) on states */
+.key-press-active,
+.key-btn:active {
+  transform: scale(1.05) !important;
+}
+
+/* 4. Button micro-interactions — scale(1.02) on :hover, accent glow on :active */
+.btn-play-now:hover,
+.app-header .icon-btn:hover,
+.btn-pulse-hover:hover {
+  transform: scale(1.02);
+}
+
+.btn-play-now:active,
+.app-header .icon-btn:active,
+.btn-pulse-hover:active {
+  box-shadow: 0 0 12px var(--accent-glow) !important;
+}
+
+/* 5. Screen transitions — MainMenu -> GameBoard fade (0.3s), modal slide bottom (0.25s) */
+.fade-transition,
+.screen-fade-transition {
+  animation: screen-fade 0.3s ease forwards;
+}
+
+.modal-slide-enter {
+  animation: modal-slide-bottom 0.25s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+/* 6. Win/failure feedback — particle-fall 3.5s linear, shake 0.4s ease-in-out, toast slide-in 0.3s */
+.particle-fall {
+  animation: particle-fall 3.5s linear forwards;
+}
+
+@keyframes particle-fall {
+  0% {
+    transform: translateY(-40px) rotate(0deg) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(105vh) rotate(720deg) scale(0.8);
+    opacity: 0;
+  }
+}
+
+.toast-slide-enter {
+  animation: toast-slide-bottom 0.3s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+
+/* Reduced motion support — eliminate or minimize all animations */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    animation-delay: 0ms !important;
+    transition-duration: 0.01ms !important;
+    transition-delay: 0ms !important;
+  }
+  .animate-stagger-enter,
+  .active-tile {
+    transform: none !important;
+    opacity: 1 !important;
+    animation: none !important;
+  }
+  .tile-enhance-enter,
+  .board-cell.submitted.animate-flip {
+    animation: none !important;
+    transform: none !important;
+    box-shadow: none !important;
+  }
+  .key-press-active,
+  .key-btn,
+  .btn-play-now,
+  .icon-btn,
+  .btn-pulse-hover {
+    transform: none !important;
+    transition: none !important;
+    animation: none !important;
+  }
+  .fade-transition,
+  .screen-fade-transition,
+  .main-menu-container,
+  .gameplay-area {
+    animation: none !important;
+    opacity: 1 !important;
+  }
+  .modal-overlay {
+    animation: none !important;
+    opacity: 1 !important;
+  }
+  .modal-content,
+  .modal-slide-enter {
+    animation: none !important;
+    transform: none !important;
+    opacity: 1 !important;
+  }
+  .particle-fall,
+  .confetti-piece,
+  .confetti-container {
+    display: none !important;
+    animation: none !important;
+  }
+  .shake-row {
+    animation: none !important;
+    transform: none !important;
+  }
+  .toast-notification,
+  .toast-slide-enter {
+    animation: none !important;
+    transform: translateX(-50%) !important;
+    opacity: 1 !important;
+  }
 }
