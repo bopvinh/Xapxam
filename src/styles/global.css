@@ -2136,3 +2136,37 @@ body::before {
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
 }
 
+/* ── Tactical Vector Corner Accents for Board Cells ──────── */
+.tile-vector-accent {
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  width: calc(100% - 8px);
+  height: calc(100% - 8px);
+  pointer-events: none;
+  opacity: 0.15;
+  transition: all 0.25s ease;
+}
+
+/* Brighten on focus or state */
+.board-cell.has-letter .tile-vector-accent {
+  opacity: 0.4;
+  color: var(--text-secondary);
+}
+
+.board-cell.correct .tile-vector-accent {
+  opacity: 0.8;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.board-cell.present .tile-vector-accent {
+  opacity: 0.8;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.board-cell.absent .tile-vector-accent {
+  opacity: 0.3;
+  color: var(--text-muted);
+}
+
+

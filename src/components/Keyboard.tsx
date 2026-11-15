@@ -41,6 +41,27 @@ export const Keyboard: React.FC<KeyboardProps> = ({
             const isSpecial = key === 'ENTER' || key === 'DEL';
             const state = isSpecial ? '' : letterStates[key] || '';
 
+            let label: React.ReactNode = key;
+            if (key === 'ENTER') {
+              label = (
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                    <polyline points="9 10 4 15 9 20"/>
+                    <path d="M20 4v7a4 4 0 0 1-4 4H4"/>
+                  </svg>
+                  <span>ENTER</span>
+                </span>
+              );
+            } else if (key === 'DEL') {
+              label = (
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-label="Delete">
+                  <path d="M21 4H8l-7 8 7 8h13a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z"/>
+                  <line x1="18" y1="9" x2="12" y2="15"/>
+                  <line x1="12" y1="9" x2="18" y2="15"/>
+                </svg>
+              );
+            }
+
             return (
               <button
                 key={key}
@@ -49,7 +70,7 @@ export const Keyboard: React.FC<KeyboardProps> = ({
                 onClick={() => handleClick(key)}
                 disabled={disabled}
               >
-                {key === 'DEL' ? '⌫' : key}
+                {label}
               </button>
             );
           })}

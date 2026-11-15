@@ -49,6 +49,13 @@ export const GameBoard: React.FC<GameBoardProps> = ({
           key={c}
           className={`board-cell ${state} ${char ? 'has-letter' : ''} ${isSubmittedRow ? 'submitted animate-flip tile-enhance-enter' : ''} ${isCurrentRow ? 'active-tile animate-stagger-enter' : ''}`}
         >
+          {/* Custom tactical vector corner ticks to elevate visual cosmetics */}
+          <svg className="tile-vector-accent" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M0,8 L0,0 L8,0" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
+            <path d="M92,0 L100,0 L100,8" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
+            <path d="M100,92 L100,100 L92,100" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
+            <path d="M8,100 L0,100 L0,92" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
+          </svg>
           <span className="letter-text">{char}</span>
           {symbol && <span className="cb-badge">{symbol}</span>}
         </div>

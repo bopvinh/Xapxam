@@ -127,8 +127,12 @@ export const Header: React.FC<HeaderProps> = ({
           tabIndex={0}
           onKeyDown={(e) => e.key === 'Enter' && onHomeClick()}
           aria-label="Word++ — go to main menu"
+          style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', justifyContent: 'center' }}
         >
-          WORD<span className="plus-accent">++</span>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ color: 'var(--accent-bright)' }} aria-hidden="true">
+            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+          </svg>
+          <span>WORD<span className="plus-accent">++</span></span>
         </h1>
         {mode && (
           <div className="badge-row" aria-live="polite">
