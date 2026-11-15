@@ -99,14 +99,20 @@ export const MainMenu: React.FC<MainMenuProps> = ({
     soundManager.playHover();
   };
 
-  const tiles = ['W', 'O', 'R', 'D', '++'];
+  const tiles = [
+    { letter: 'W', state: 'correct', color: '#22d3a0' },
+    { letter: 'O', state: 'present', color: '#f59e0b' },
+    { letter: 'R', state: 'absent', color: '#3b4760' },
+    { letter: 'D', state: 'correct', color: '#22d3a0' },
+    { letter: '++', state: 'brand', color: '#06b6d4' },
+  ];
 
   return (
     <div className="main-menu-container animate-scale">
       {/* ── Hero ─────────────────────────────────────────── */}
       <section className="hero-section" aria-label="Game title">
         <div className="hero-tiles-row" style={{ display: 'flex', justifyContent: 'center', gap: '8px', marginBottom: '8px' }}>
-          {tiles.map((letter, idx) => (
+          {tiles.map(({ letter, color }, idx) => (
             <div
               key={idx}
               className={`hero-interactive-tile ${flippedTile === idx ? 'tile-flip' : ''}`}
@@ -115,8 +121,14 @@ export const MainMenu: React.FC<MainMenuProps> = ({
               title="Click to flip!"
               role="button"
               tabIndex={0}
+              style={{
+                borderColor: color,
+                boxShadow: `0 8px 20px rgba(0, 0, 0, 0.4), 0 0 12px ${color}33`,
+              }}
             >
-              <span className="hero-tile-letter">{letter}</span>
+              <span className="hero-tile-letter" style={{ color: letter === 'R' ? 'var(--text-secondary)' : '#ffffff' }}>
+                {letter}
+              </span>
             </div>
           ))}
         </div>
@@ -135,7 +147,7 @@ export const MainMenu: React.FC<MainMenuProps> = ({
           aria-label="Play Classic mode"
         >
           <div className="btn-play-now-glow" />
-          <span style={{ position: 'relative', zIndex: 2 }}>Play Now</span>
+          <span style={{ position: 'relative', zIndex: 2 }}>⚡ Play Now</span>
         </button>
         <span className="hero-cta-label">Classic · 5 letters · 6 guesses</span>
       </div>
@@ -162,16 +174,18 @@ export const MainMenu: React.FC<MainMenuProps> = ({
                 onMouseEnter={handleHover}
                 role="listitem"
                 aria-label={`${label} — ${description}`}
+                style={{ '--card-accent': tagColor } as React.CSSProperties}
               >
                 <div className="card-body">
                   <div style={{ display: 'flex', alignItems: 'center', gap: '6px', justifyContent: 'space-between' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <span className="mode-accent-dot" style={{ background: tagColor, boxShadow: `0 0 6px ${tagColor}` }} />
                       <h3>{label}</h3>
                       {isDaily && (
                         <span className="daily-pulse-badge">FEATURED</span>
                       )}
                     </div>
-                    <span className="mode-category-tag" style={{ color: tagColor, borderColor: tagColor, background: `${tagColor}15` }}>
+                    <span className="mode-category-tag" style={{ color: tagColor, borderColor: tagColor, background: `${tagColor}18` }}>
                       {tag}
                     </span>
                   </div>
