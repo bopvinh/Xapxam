@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { GameMode } from '../game/types';
 import { soundManager } from '../game/audio';
 
@@ -130,6 +130,22 @@ export const MainMenu: React.FC<MainMenuProps> = ({
   onOpenStats,
 }) => {
   const [flippedTile, setFlippedTile] = useState<number | null>(null);
+  const [dailyCountdown, setDailyCountdown] = useState<string>('00:00:00');
+
+  useEffect(() => {
+    const calcCountdown = () => {
+      const now = new Date();
+      const tomorrow = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + 1));
+      const diffMs = Math.max(0, tomorrow.getTime() - now.getTime());
+      const h = String(Math.floor(diffMs / 3600000)).padStart(2, '0');
+      const m = String(Math.floor((diffMs % 3600000) / 60000)).padStart(2, '0');
+      const s = String(Math.floor((diffMs % 60000) / 1000)).padStart(2, '0');
+      setDailyCountdown(`${h}:${m}:${s}`);
+    };
+    calcCountdown();
+    const interval = setInterval(calcCountdown, 1000);
+    return () => clearInterval(interval);
+  }, []);
 
   const handleTileClick = (index: number) => {
     soundManager.playFlip();
@@ -191,26 +207,43 @@ export const MainMenu: React.FC<MainMenuProps> = ({
           aria-label="Game modes"
           style={{ marginTop: '12px' }}
         >
-          {MODES.map(({ mode, icon, label, description }) => (
-            <button
-              key={mode}
-              className="menu-card"
-              onClick={() => onSelectMode(mode)}
-              role="listitem"
-              aria-label={`${label} — ${description}`}
-            >
-              <div className="card-icon-wrap" aria-hidden="true">
-                {icon}
-              </div>
-              <div className="card-body">
-                <h3>{label}</h3>
-                <p>{description}</p>
-              </div>
-              <span className="card-arrow" aria-hidden="true">
-                <ChevronRight />
-              </span>
-            </button>
-          ))}
+          {MODES.map(({ mode, icon, label, description }) => {
+            const isDaily = mode === 'DAILY';
+            return (
+              <button
+                key={mode}
+                className={`menu-card ${isDaily ? 'daily-highlight-card' : ''}`}
+                onClick={() => {
+                  soundManager.playFlip();
+                  onSelectMode(mode);
+                }}
+                onMouseEnter={handleHover}
+                role="listitem"
+                aria-label={`${label} — ${description}`}
+              >
+                <div className="card-icon-wrap" aria-hidden="true">
+                  {icon}
+                </div>
+                <div className="card-body">
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <h3>{label}</h3>
+                    {isDaily && (
+                      <span className="daily-pulse-badge">FEATURED</span>
+                    )}
+                  </div>
+                  <p>{description}</p>
+                  {isDaily && (
+                    <div className="daily-timer-ticker">
+                      <span>⏳ Resets in {dailyCountdown}</span>
+                    </div>
+                  )}
+                </div>
+                <span className="card-arrow" aria-hidden="true">
+                  <ChevronRight />
+                </span>
+              </button>
+            );
+          })}
         </div>
       </div>
 
