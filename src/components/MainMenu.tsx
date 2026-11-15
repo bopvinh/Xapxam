@@ -6,6 +6,7 @@ interface MainMenuProps {
   onSelectMode: (mode: GameMode) => void;
   onOpenHelp: () => void;
   onOpenStats: () => void;
+  onOpenDailyChest: () => void;
 }
 
 // ── Mode Icon SVG Components ─────────────────────────────────
@@ -123,6 +124,7 @@ export const MainMenu: React.FC<MainMenuProps> = ({
   onSelectMode,
   onOpenHelp,
   onOpenStats,
+  onOpenDailyChest,
 }) => {
   const [miniGuess, setMiniGuess] = useState('');
   const [miniEvaluation, setMiniEvaluation] = useState<LetterEvaluation[] | null>(null);
@@ -285,6 +287,9 @@ export const MainMenu: React.FC<MainMenuProps> = ({
         <p className="mini-guest-hint">
           {miniResult === 'won' ? 'Ready for the full game?' : ''}
         </p>
+        <button className="btn-secondary mini-chest-btn" onClick={onOpenDailyChest} aria-label="Open Daily Chest">
+          🎁 Daily Chest
+        </button>
       </div>
 
       {/* ── Modes grid ───────────────────────────────────── */}

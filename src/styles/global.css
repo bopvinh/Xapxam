@@ -1864,3 +1864,83 @@ body::before {
   color: white;
   cursor: default;
 }
+
+/* ── Daily Chest Modal ────────────────────────────── */
+.chest-closed, .chest-claimed, .chest-revealed {
+  text-align: center;
+  margin: 20px 0;
+}
+
+.chest-icon {
+  font-size: 48px;
+  margin-bottom: 16px;
+  display: block;
+}
+
+.chest-icon.rare { filter: drop-shadow(0 0 8px rgba(245, 158, 11, 0.6)); }
+.chest-icon.epic { filter: drop-shadow(0 0 10px rgba(139, 92, 246, 0.7)); }
+
+.chest-closed h3 {
+  font-size: var(--text-xl);
+  font-weight: 800;
+  margin-bottom: 8px;
+  color: var(--text-primary);
+}
+
+.chest-closed p {
+  color: var(--text-secondary);
+  margin-bottom: 20px;
+}
+
+.chest-revealed h3 {
+  font-size: var(--text-xl);
+  font-weight: 800;
+  margin-bottom: 8px;
+  color: var(--text-primary);
+}
+
+.chest-revealed p {
+  color: var(--text-secondary);
+  margin-bottom: 12px;
+}
+
+.chest-rarity {
+  display: inline-block;
+  font-size: var(--text-xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 4px 10px;
+  border-radius: 6px;
+}
+
+.chest-rarity.common {
+  background: rgba(100, 116, 139, 0.2);
+  color: var(--text-secondary);
+}
+
+.chest-rarity.rare {
+  background: rgba(245, 158, 11, 0.2);
+  color: #f59e0b;
+}
+
+.chest-rarity.epic {
+  background: rgba(139, 92, 246, 0.2);
+  color: #a855f7;
+}
+
+.chest-claimed h3 {
+  font-size: var(--text-xl);
+  font-weight: 800;
+  margin-bottom: 8px;
+  color: var(--text-primary);
+}
+
+.chest-claimed p {
+  color: var(--text-secondary);
+  margin-bottom: 20px;
+}
+
+.chest-claimed .chest-icon {
+  filter: opacity(0.5);
+}

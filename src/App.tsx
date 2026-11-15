@@ -20,6 +20,7 @@ import { DefinitionModal } from './components/DefinitionModal';
 import { MultiplayerSetup } from './components/MultiplayerSetup';
 import { Scoreboard } from './components/Scoreboard';
 import { Timer } from './components/Timer';
+import { DailyChestModal } from './components/DailyChestModal';
 
 const DEFAULT_STATS: PlayerStats = {
   gamesPlayed: 0,
@@ -37,6 +38,7 @@ export const App: React.FC = () => {
   const [isDefinitionOpen, setIsDefinitionOpen] = useState<boolean>(false);
   const [showMultiplayerSetup, setShowMultiplayerSetup] = useState<boolean>(false);
   const [showScoreboard, setShowScoreboard] = useState<boolean>(false);
+  const [showDailyChest, setShowDailyChest] = useState<boolean>(false);
 
   // Settings state
   const [colorBlindMode, setColorBlindMode] = useState<boolean>(false);
@@ -518,6 +520,7 @@ export const App: React.FC = () => {
             onSelectMode={handleSelectMode}
             onOpenHelp={() => setIsHelpOpen(true)}
             onOpenStats={() => setIsStatsOpen(true)}
+            onOpenDailyChest={() => setShowDailyChest(true)}
           />
         )}
 
@@ -612,6 +615,17 @@ export const App: React.FC = () => {
       <HelpModal isOpen={isHelpOpen} onClose={() => setIsHelpOpen(false)} />
       <StatsModal isOpen={isStatsOpen} onClose={() => setIsStatsOpen(false)} stats={stats} onReset={handleResetStats} />
       <DefinitionModal isOpen={isDefinitionOpen} onClose={() => setIsDefinitionOpen(false)} word={secretWord} />
+      <DailyChestModal
+        isOpen={showDailyChest}
+        onClose={() => setShowDailyChest(false)}
+        onClaim={(reward) => {
+          setShowDailyChest(false);
+          if (reward.id === 'streak-shield') {
+            // Grant streak shield to player stats
+          }
+          showToast(`🎁 Claimed: ${reward.label}`);
+        }}
+      />
     </div>
   );
 };
