@@ -131,20 +131,17 @@ html, body, #root {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Page-level ambient glow & vector texture backdrop */
+/* Page-level ambient glow & clean backdrop */
 body::before {
   content: '';
   position: fixed;
   inset: -10px;
   background: 
-    /* 1. Tactical Vector Dot Matrix Grid */
-    radial-gradient(circle at 1px 1px, rgba(99, 102, 241, 0.22) 1.5px, transparent 0) 0 0 / 28px 28px,
-    /* 2. Micro Coordinate Grid Lines */
-    linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px) 0 0 / 56px 56px,
-    linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px) 0 0 / 56px 56px,
-    /* 3. Deep Radial Vignette & Indigo Light Cone */
-    radial-gradient(ellipse 90% 65% at 50% -5%, rgba(99, 102, 241, 0.28) 0%, rgba(13, 17, 23, 0.95) 75%, #07090d 100%);
-  animation: aurora-pulse 10s ease-in-out infinite alternate;
+    /* 1. Subtle Ambient Dot Grid */
+    radial-gradient(circle at 1px 1px, rgba(99, 102, 241, 0.10) 1.2px, transparent 0) 0 0 / 32px 32px,
+    /* 2. Deep Radial Vignette & Gentle Indigo Light Cone */
+    radial-gradient(ellipse 90% 65% at 50% -5%, rgba(99, 102, 241, 0.22) 0%, rgba(13, 17, 23, 0.96) 75%, #07090d 100%);
+  animation: aurora-pulse 12s ease-in-out infinite alternate;
   pointer-events: none;
   z-index: 0;
 }
@@ -377,7 +374,7 @@ button:focus-visible {
 }
 
 /* ============================================================
-   MAIN MENU — premium hero layout & vector texture container
+   MAIN MENU — premium hero layout & clean glass container
    ============================================================ */
 .main-menu-container {
   width: 100%;
@@ -388,33 +385,29 @@ button:focus-visible {
   justify-content: space-between;
   gap: var(--space-3);
   position: relative;
-  background: radial-gradient(135% 100% at 50% 0%, rgba(22, 27, 36, 0.85) 0%, rgba(13, 17, 23, 0.96) 100%);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-  border: 1.5px solid rgba(99, 102, 241, 0.3);
+  background: rgba(13, 17, 23, 0.94);
+  backdrop-filter: blur(28px);
+  -webkit-backdrop-filter: blur(28px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: var(--radius-xl);
-  padding: 16px 22px;
+  padding: 18px 24px;
   box-shadow: 
-    0 24px 60px -12px rgba(0, 0, 0, 0.85),
-    0 0 40px rgba(99, 102, 241, 0.18),
-    inset 0 1px 2px rgba(255, 255, 255, 0.15);
+    0 24px 60px -12px rgba(0, 0, 0, 0.9),
+    0 0 35px rgba(99, 102, 241, 0.15),
+    inset 0 1px 1px rgba(255, 255, 255, 0.2);
   overflow: hidden;
 }
 
-/* Vector Geometric Texture Overlay */
+/* Clean Editorial Ambient Glow Overlay (Zero Distracting Shapes) */
 .main-menu-container::before {
   content: '';
   position: absolute;
   inset: 0;
   background-image: 
-    url("../assets/wordpp-crest.svg"),
-    radial-gradient(circle at 50% 0%, rgba(129, 140, 248, 0.12) 0%, transparent 65%),
-    url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%236366f1' fill-opacity='0.035' fill-rule='evenodd'%3E%3Cpath d='M0 40L40 0H20L0 20M40 40V20L20 40'/%3E%3C/g%3E%3C/svg%3E");
-  background-repeat: no-repeat, no-repeat, repeat;
-  background-position: center 25%, center center, center center;
-  background-size: 85% auto, cover, auto;
+    radial-gradient(ellipse 80% 50% at 50% -10%, rgba(99, 102, 241, 0.14) 0%, transparent 70%),
+    radial-gradient(ellipse 60% 40% at 50% 110%, rgba(6, 182, 212, 0.08) 0%, transparent 70%);
   pointer-events: none;
-  opacity: 0.85;
+  opacity: 1;
   z-index: 0;
 }
 
