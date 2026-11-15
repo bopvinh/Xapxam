@@ -147,9 +147,6 @@ export const MainMenu: React.FC<MainMenuProps> = ({
     <div className="main-menu-container animate-scale">
       {/* ── Hero ─────────────────────────────────────────── */}
       <section className="hero-section" aria-label="Game title">
-        <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', marginBottom: '8px', padding: '4px 12px', background: 'rgba(245, 158, 11, 0.1)', border: '1px solid rgba(245, 158, 11, 0.3)', borderRadius: '20px' }}>
-          <span style={{ fontSize: '10px', fontWeight: 800, color: '#f59e0b', letterSpacing: '1px', textTransform: 'uppercase' }}>👑 IMPERIAL EDITION</span>
-        </div>
         <div className="hero-tiles-row" style={{ display: 'flex', justifyContent: 'center', gap: '8px', marginBottom: '8px' }}>
           {tiles.map((letter, idx) => (
             <div
