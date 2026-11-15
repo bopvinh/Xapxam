@@ -1,12 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { GameMode, LetterEvaluation } from '../game/types';
 import { evaluateGuess, getRandomSecretWord, isValidWord } from '../game/engine';
+import { ThemeCustomizer } from './ThemeCustomizer';
 
 interface MainMenuProps {
   onSelectMode: (mode: GameMode) => void;
   onOpenHelp: () => void;
   onOpenStats: () => void;
-  onOpenDailyChest: () => void;
+  onOpenDailyChest?: () => void;
+  onOpenMentor?: () => void;
+  onOpenBlitz?: () => void;
+  onOpenLeaderboard?: () => void;
+  onOpenMastery?: () => void;
 }
 
 // ── Mode Icon SVG Components ─────────────────────────────────
@@ -125,6 +130,10 @@ export const MainMenu: React.FC<MainMenuProps> = ({
   onOpenHelp,
   onOpenStats,
   onOpenDailyChest,
+  onOpenMentor,
+  onOpenBlitz,
+  onOpenLeaderboard,
+  onOpenMastery,
 }) => {
   const [miniGuess, setMiniGuess] = useState('');
   const [miniEvaluation, setMiniEvaluation] = useState<LetterEvaluation[] | null>(null);
@@ -287,9 +296,31 @@ export const MainMenu: React.FC<MainMenuProps> = ({
         <p className="mini-guest-hint">
           {miniResult === 'won' ? 'Ready for the full game?' : ''}
         </p>
-        <button className="btn-secondary mini-chest-btn" onClick={onOpenDailyChest} aria-label="Open Daily Chest">
-          🎁 Daily Chest
-        </button>
+        <div style={{ display: 'flex', gap: '8px', justifyContent: 'center', marginTop: '10px', flexWrap: 'wrap' }}>
+          <button className="btn-secondary mini-chest-btn" onClick={onOpenDailyChest} aria-label="Open Daily Chest">
+            🎁 Daily Chest
+          </button>
+          {onOpenMentor && (
+            <button className="btn-secondary mini-chest-btn" onClick={onOpenMentor} aria-label="Open Word Mentor">
+              🧙‍♂️ Word Mentor
+            </button>
+          )}
+          {onOpenBlitz && (
+            <button className="btn-secondary mini-chest-btn" onClick={onOpenBlitz} aria-label="Open Speed Blitz">
+              ⚡ Speed Blitz
+            </button>
+          )}
+          {onOpenLeaderboard && (
+            <button className="btn-secondary mini-chest-btn" onClick={onOpenLeaderboard} aria-label="Open Leaderboard">
+              🏆 Hall of Fame
+            </button>
+          )}
+          {onOpenMastery && (
+            <button className="btn-secondary mini-chest-btn" onClick={onOpenMastery} aria-label="Open Mastery XP">
+              🎖️ Mastery XP
+            </button>
+          )}
+        </div>
       </div>
 
       {/* ── Modes grid ───────────────────────────────────── */}
@@ -322,6 +353,11 @@ export const MainMenu: React.FC<MainMenuProps> = ({
             </button>
           ))}
         </div>
+      </div>
+
+      {/* ── Theme Customizer ─────────────────────────────── */}
+      <div style={{ display: 'flex', justifyContent: 'center', marginTop: '16px' }}>
+        <ThemeCustomizer />
       </div>
 
       {/* ── Footer ───────────────────────────────────────── */}

@@ -21,6 +21,11 @@ import { MultiplayerSetup } from './components/MultiplayerSetup';
 import { Scoreboard } from './components/Scoreboard';
 import { Timer } from './components/Timer';
 import { DailyChestModal } from './components/DailyChestModal';
+import { WordMentorModal } from './components/WordMentorModal';
+import { SpeedBlitzModal } from './components/SpeedBlitzModal';
+import { ShareModal } from './components/ShareModal';
+import { MasteryStatsModal } from './components/MasteryStatsModal';
+import { LeaderboardModal } from './components/LeaderboardModal';
 
 const DEFAULT_STATS: PlayerStats = {
   gamesPlayed: 0,
@@ -39,6 +44,11 @@ export const App: React.FC = () => {
   const [showMultiplayerSetup, setShowMultiplayerSetup] = useState<boolean>(false);
   const [showScoreboard, setShowScoreboard] = useState<boolean>(false);
   const [showDailyChest, setShowDailyChest] = useState<boolean>(false);
+  const [showMentor, setShowMentor] = useState<boolean>(false);
+  const [showBlitz, setShowBlitz] = useState<boolean>(false);
+  const [showShare, setShowShare] = useState<boolean>(false);
+  const [showMastery, setShowMastery] = useState<boolean>(false);
+  const [showLeaderboard, setShowLeaderboard] = useState<boolean>(false);
 
   // Settings state
   const [colorBlindMode, setColorBlindMode] = useState<boolean>(false);
@@ -295,6 +305,7 @@ export const App: React.FC = () => {
         setStatus('ROUND_OVER');
         updateStats(true, newGuesses.length);
         showToast('🎉 Brilliant! You solved the word!');
+        setTimeout(() => setShowShare(true), 1500);
       } else if (isOutOfAttempts) {
         setStatus('ROUND_OVER');
         updateStats(false, 6);
@@ -525,6 +536,10 @@ export const App: React.FC = () => {
             onOpenHelp={() => setIsHelpOpen(true)}
             onOpenStats={() => setIsStatsOpen(true)}
             onOpenDailyChest={() => setShowDailyChest(true)}
+            onOpenMentor={() => setShowMentor(true)}
+            onOpenBlitz={() => setShowBlitz(true)}
+            onOpenLeaderboard={() => setShowLeaderboard(true)}
+            onOpenMastery={() => setShowMastery(true)}
           />
         )}
 
@@ -625,10 +640,46 @@ export const App: React.FC = () => {
         onClaim={(reward) => {
           setShowDailyChest(false);
           if (reward.id === 'streak-shield') {
-            // Grant streak shield to player stats
+            const saved = localStorage.getItem('wordplusplus_streak');
+            let count = 0;
+            if (saved) {
+              try { count = JSON.parse(saved).count || 0; } catch (e) {}
+            }
+            localStorage.setItem('wordplusplus_streak', JSON.stringify({ count, active: true }));
+            window.location.reload(); // Refresh to update main menu display instantly!
           }
           showToast(`🎁 Claimed: ${reward.label}`);
         }}
+      />
+      <WordMentorModal
+        isOpen={showMentor}
+        onClose={() => setShowMentor(false)}
+        word={secretWord || 'CLIMB'}
+      />
+      <SpeedBlitzModal
+        isOpen={showBlitz}
+        onClose={() => setShowBlitz(false)}
+        onStartBlitz={(seconds) => {
+          setShowBlitz(false);
+          handleSelectMode('FAST');
+          showToast(`⏱️ Speed Rush mode activated: ${seconds} seconds limit!`);
+        }}
+      />
+      <ShareModal
+        isOpen={showShare}
+        onClose={() => setShowShare(false)}
+        word={secretWord}
+        attemptsUsed={players[activePlayerIndex]?.guesses.length}
+        solved={players[activePlayerIndex]?.solved}
+      />
+      <MasteryStatsModal
+        isOpen={showMastery}
+        onClose={() => setShowMastery(false)}
+        stats={stats}
+      />
+      <LeaderboardModal
+        isOpen={showLeaderboard}
+        onClose={() => setShowLeaderboard(false)}
       />
     </div>
   );
