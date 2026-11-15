@@ -131,12 +131,19 @@ html, body, #root {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Page-level ambient glow */
+/* Page-level ambient glow & vector texture backdrop */
 body::before {
   content: '';
   position: fixed;
   inset: 0;
-  background: var(--gradient-bg);
+  background: 
+    /* 1. Tactical Vector Dot Matrix Grid */
+    radial-gradient(circle at 1px 1px, rgba(99, 102, 241, 0.22) 1.5px, transparent 0) 0 0 / 28px 28px,
+    /* 2. Micro Coordinate Grid Lines */
+    linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px) 0 0 / 56px 56px,
+    linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px) 0 0 / 56px 56px,
+    /* 3. Deep Radial Vignette & Indigo Light Cone */
+    radial-gradient(ellipse 90% 65% at 50% -5%, rgba(99, 102, 241, 0.28) 0%, rgba(13, 17, 23, 0.95) 75%, #07090d 100%);
   pointer-events: none;
   z-index: 0;
 }
@@ -363,7 +370,7 @@ button:focus-visible {
 }
 
 /* ============================================================
-   MAIN MENU — premium hero layout
+   MAIN MENU — premium hero layout & vector texture container
    ============================================================ */
 .main-menu-container {
   width: 100%;
@@ -371,6 +378,36 @@ button:focus-visible {
   display: flex;
   flex-direction: column;
   gap: var(--space-6);
+  position: relative;
+  background: radial-gradient(135% 100% at 50% 0%, rgba(22, 27, 36, 0.75) 0%, rgba(13, 17, 23, 0.92) 100%);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1.5px solid rgba(99, 102, 241, 0.25);
+  border-radius: var(--radius-xl);
+  padding: var(--space-6);
+  box-shadow: 
+    0 24px 60px -12px rgba(0, 0, 0, 0.8),
+    0 0 30px rgba(99, 102, 241, 0.12),
+    inset 0 1px 2px rgba(255, 255, 255, 0.12);
+  overflow: hidden;
+}
+
+/* Vector Geometric Texture Overlay */
+.main-menu-container::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: 
+    radial-gradient(circle at 50% 0%, rgba(129, 140, 248, 0.12) 0%, transparent 65%),
+    url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%236366f1' fill-opacity='0.035' fill-rule='evenodd'%3E%3Cpath d='M0 40L40 0H20L0 20M40 40V20L20 40'/%3E%3C/g%3E%3C/svg%3E");
+  pointer-events: none;
+  opacity: 0.85;
+  z-index: 0;
+}
+
+.main-menu-container > * {
+  position: relative;
+  z-index: 1;
 }
 
 /* Hero section */
