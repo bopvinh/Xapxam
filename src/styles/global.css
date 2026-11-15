@@ -315,7 +315,7 @@ button:focus-visible {
   justify-content: center;
   padding: var(--space-4);
   position: relative;
-  max-width: 600px;
+  max-width: 840px;
   width: 100%;
   margin: 0 auto;
 }
@@ -390,16 +390,16 @@ button:focus-visible {
   justify-content: space-between;
   gap: var(--space-3);
   position: relative;
-  background: rgba(13, 17, 23, 0.94);
-  backdrop-filter: blur(28px);
-  -webkit-backdrop-filter: blur(28px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(13, 17, 23, 0.80);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: var(--radius-xl);
   padding: 18px 24px;
   box-shadow: 
     0 24px 60px -12px rgba(0, 0, 0, 0.9),
-    0 0 35px rgba(99, 102, 241, 0.15),
-    inset 0 1px 1px rgba(255, 255, 255, 0.2);
+    0 0 40px rgba(99, 102, 241, 0.20),
+    inset 0 1px 1px rgba(255, 255, 255, 0.22);
   overflow: hidden;
 }
 
@@ -2387,6 +2387,75 @@ button:focus-visible {
   transform: translateX(0);
   color: var(--accent-bright);
 }
+
+/* ============================================================
+   VECTOR BACKGROUND LAYER & ANIMATED FLOATING GLYPHS
+   ============================================================ */
+.vector-background-root {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.vector-grid-overlay {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.floating-vector-letter {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-weight: 800;
+  border: 1.5px solid;
+  border-radius: 8px;
+  background: rgba(13, 17, 23, 0.55);
+  backdrop-filter: blur(4px);
+  user-select: none;
+  animation: float-drift infinite ease-in-out alternate;
+  opacity: 0.38;
+  transition: opacity 0.3s ease;
+}
+
+@keyframes float-drift {
+  0% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-22px) rotate(6deg);
+  }
+  100% {
+    transform: translateY(-44px) rotate(-4deg);
+  }
+}
+
+/* Tactical Vector Corner Ticks */
+.vector-corner-tl, .vector-corner-tr, .vector-corner-bl, .vector-corner-br {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  border-color: var(--accent-bright);
+  pointer-events: none;
+  opacity: 0.75;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.vector-corner-tl { top: 6px; left: 6px; border-top: 2px solid; border-left: 2px solid; }
+.vector-corner-tr { top: 6px; right: 6px; border-top: 2px solid; border-right: 2px solid; }
+.vector-corner-bl { bottom: 6px; left: 6px; border-bottom: 2px solid; border-left: 2px solid; }
+.vector-corner-br { bottom: 6px; right: 6px; border-bottom: 2px solid; border-right: 2px solid; }
+
+.main-menu-container:hover .vector-corner-tl { transform: translate(-2px, -2px); opacity: 1; }
+.main-menu-container:hover .vector-corner-tr { transform: translate(2px, -2px); opacity: 1; }
+.main-menu-container:hover .vector-corner-bl { transform: translate(-2px, 2px); opacity: 1; }
+.main-menu-container:hover .vector-corner-br { transform: translate(2px, 2px); opacity: 1; }
 
 
 

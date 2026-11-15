@@ -188,6 +188,12 @@ export const MainMenu: React.FC<MainMenuProps> = ({
 
   return (
     <div className="main-menu-container animate-scale">
+      {/* ── Precision Vector Corner Reticle Brackets ───────── */}
+      <div className="vector-corner-tl" aria-hidden="true" />
+      <div className="vector-corner-tr" aria-hidden="true" />
+      <div className="vector-corner-bl" aria-hidden="true" />
+      <div className="vector-corner-br" aria-hidden="true" />
+
       {/* ── Top Ribbon Stats ─────────────────────────────── */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '11px', color: 'var(--text-secondary)', padding: '0 4px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>

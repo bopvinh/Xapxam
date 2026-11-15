@@ -26,6 +26,7 @@ import { SpeedBlitzModal } from './components/SpeedBlitzModal';
 import { ShareModal } from './components/ShareModal';
 import { MasteryStatsModal } from './components/MasteryStatsModal';
 import { LeaderboardModal } from './components/LeaderboardModal';
+import { VectorBackground } from './components/VectorBackground';
 
 const DEFAULT_STATS: PlayerStats = {
   gamesPlayed: 0,
@@ -501,6 +502,7 @@ export const App: React.FC = () => {
 
   return (
     <div className={`app-container ${colorBlindMode ? 'cb-theme' : ''}`}>
+      <VectorBackground />
       {activeMode && (
         <Header
           mode={activeMode}
