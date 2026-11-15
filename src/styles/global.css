@@ -398,8 +398,12 @@ button:focus-visible {
   position: absolute;
   inset: 0;
   background-image: 
+    url("../assets/wordpp-crest.svg"),
     radial-gradient(circle at 50% 0%, rgba(129, 140, 248, 0.12) 0%, transparent 65%),
     url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%236366f1' fill-opacity='0.035' fill-rule='evenodd'%3E%3Cpath d='M0 40L40 0H20L0 20M40 40V20L20 40'/%3E%3C/g%3E%3C/svg%3E");
+  background-repeat: no-repeat, no-repeat, repeat;
+  background-position: center 25%, center center, center center;
+  background-size: 85% auto, cover, auto;
   pointer-events: none;
   opacity: 0.85;
   z-index: 0;
