@@ -154,7 +154,7 @@ export const MainMenu: React.FC<MainMenuProps> = ({
   };
 
   const handleHover = () => {
-    soundManager.playPop();
+    soundManager.playHover();
   };
 
   const tiles = ['W', 'O', 'R', 'D', '++'];
@@ -192,8 +192,9 @@ export const MainMenu: React.FC<MainMenuProps> = ({
           onMouseEnter={handleHover}
           aria-label="Play Classic mode"
         >
+          <div className="btn-play-now-glow" />
           <span className="btn-play-now-icon" aria-hidden="true">▶</span>
-          Play Now
+          <span style={{ position: 'relative', zIndex: 2 }}>Play Now</span>
         </button>
         <span className="hero-cta-label">Classic · 5 letters · 6 guesses</span>
       </div>

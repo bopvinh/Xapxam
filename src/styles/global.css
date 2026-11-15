@@ -477,38 +477,49 @@ button:focus-visible {
   align-items: center;
   justify-content: center;
   gap: var(--space-2);
-  padding: 16px 48px;
+  padding: 16px 54px;
   font-family: var(--font-display);
   font-weight: 800;
   font-size: var(--text-md);
   letter-spacing: 0.5px;
   color: white;
   background: var(--gradient-hero);
-  border: none;
+  border: 1.5px solid rgba(255, 255, 255, 0.25);
   border-radius: var(--radius-pill);
   cursor: pointer;
   transition: var(--transition-spring);
-  box-shadow: 0 4px 24px rgba(99,102,241,0.45), 0 1px 0 rgba(255,255,255,0.15) inset;
+  box-shadow: 0 8px 30px rgba(99, 102, 241, 0.5), inset 0 1px 2px rgba(255, 255, 255, 0.4);
   overflow: hidden;
-  min-width: 220px;
+  min-width: 240px;
 }
 
-.btn-play-now::before {
-  content: '';
+/* Continuous Subtle Shimmer Light Sweep */
+.btn-play-now-glow {
   position: absolute;
-  inset: 0;
-  background: linear-gradient(to bottom, rgba(255,255,255,0.12) 0%, transparent 60%);
+  top: 0;
+  left: -100%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.35), transparent);
+  transform: skewX(-20deg);
+  animation: shimmer-sweep 3.5s infinite ease-in-out;
   pointer-events: none;
+  z-index: 1;
+}
+
+@keyframes shimmer-sweep {
+  0% { left: -100%; }
+  35%, 100% { left: 200%; }
 }
 
 .btn-play-now:hover {
-  transform: scale(1.02);
-  box-shadow: 0 8px 32px rgba(99,102,241,0.55), 0 1px 0 rgba(255,255,255,0.15) inset;
+  transform: translateY(-3px) scale(1.04);
+  box-shadow: 0 12px 36px rgba(99, 102, 241, 0.65), 0 0 20px rgba(129, 140, 248, 0.4), inset 0 1px 2px rgba(255, 255, 255, 0.5);
 }
 
 .btn-play-now:active {
-  transform: scale(0.98);
-  box-shadow: 0 0 12px var(--accent-glow);
+  transform: translateY(0) scale(0.98);
+  box-shadow: 0 4px 16px rgba(99, 102, 241, 0.4);
 }
 
 .btn-play-now-icon {
