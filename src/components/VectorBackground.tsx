@@ -24,15 +24,61 @@ const LETTERS: FloatingLetter[] = [
 export const VectorBackground: React.FC = () => {
   return (
     <div className="vector-background-root" aria-hidden="true">
-      {/* ── Ambient Coordinate Reticles ───────────────────────── */}
+      {/* ── Background Vector Grid Matrix ─────────────────────── */}
       <svg className="vector-grid-overlay" width="100%" height="100%">
         <defs>
-          <pattern id="vector-crosshair-pattern" width="120" height="120" patternUnits="userSpaceOnUse">
-            <path d="M 60 52 L 60 68 M 52 60 L 68 60" stroke="rgba(99, 102, 241, 0.18)" strokeWidth="1.2" />
-            <circle cx="60" cy="60" r="1.5" fill="rgba(129, 140, 248, 0.25)" />
+          <pattern id="vector-crosshair-pattern" width="100" height="100" patternUnits="userSpaceOnUse">
+            <path d="M 50 42 L 50 58 M 42 50 L 58 50" stroke="rgba(99, 102, 241, 0.22)" strokeWidth="1.2" />
+            <circle cx="50" cy="50" r="1.5" fill="rgba(129, 140, 248, 0.35)" />
+            <line x1="0" y1="50" x2="100" y2="50" stroke="rgba(255, 255, 255, 0.015)" strokeWidth="1" />
+            <line x1="50" y1="0" x2="50" y2="100" stroke="rgba(255, 255, 255, 0.015)" strokeWidth="1" />
           </pattern>
         </defs>
         <rect width="100%" height="100%" fill="url(#vector-crosshair-pattern)" />
+      </svg>
+
+      {/* ── Top-Right Animated Vector Astrolabe Compass Ring ───── */}
+      <svg
+        className="vector-astrolabe-tr"
+        width="340"
+        height="340"
+        viewBox="0 0 340 340"
+        style={{
+          position: 'absolute',
+          top: '-70px',
+          right: '-70px',
+          opacity: 0.35,
+          pointerEvents: 'none',
+        }}
+      >
+        <circle cx="170" cy="170" r="150" stroke="rgba(99, 102, 241, 0.3)" strokeWidth="1.5" strokeDasharray="6 6" className="spin-clockwise-slow" />
+        <circle cx="170" cy="170" r="120" stroke="rgba(6, 182, 212, 0.35)" strokeWidth="1" strokeDasharray="12 4" className="spin-counter-slow" />
+        <circle cx="170" cy="170" r="85" stroke="rgba(245, 158, 11, 0.25)" strokeWidth="1.5" />
+        <line x1="170" y1="10" x2="170" y2="330" stroke="rgba(99, 102, 241, 0.2)" strokeWidth="1" />
+        <line x1="10" y1="170" x2="330" y2="170" stroke="rgba(99, 102, 241, 0.2)" strokeWidth="1" />
+        <circle cx="170" cy="20" r="4" fill="#06b6d4" />
+        <circle cx="320" cy="170" r="4" fill="#6366f1" />
+      </svg>
+
+      {/* ── Bottom-Left Animated Vector Orbital Ring ──────────── */}
+      <svg
+        className="vector-astrolabe-bl"
+        width="300"
+        height="300"
+        viewBox="0 0 300 300"
+        style={{
+          position: 'absolute',
+          bottom: '-60px',
+          left: '-60px',
+          opacity: 0.32,
+          pointerEvents: 'none',
+        }}
+      >
+        <circle cx="150" cy="150" r="135" stroke="rgba(129, 140, 248, 0.3)" strokeWidth="1.5" strokeDasharray="8 8" className="spin-counter-slow" />
+        <circle cx="150" cy="150" r="100" stroke="rgba(34, 211, 160, 0.25)" strokeWidth="1" strokeDasharray="4 6" className="spin-clockwise-slow" />
+        <circle cx="150" cy="150" r="65" stroke="rgba(99, 102, 241, 0.2)" strokeWidth="1" />
+        <polygon points="150,40 180,150 150,260 120,150" stroke="rgba(6, 182, 212, 0.2)" fill="none" strokeWidth="1" className="spin-clockwise-slow" />
+        <circle cx="150" cy="15" r="3.5" fill="#22d3a0" />
       </svg>
 
       {/* ── Floating Translucent Letter Tiles ─────────────────── */}

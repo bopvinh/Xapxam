@@ -2407,6 +2407,26 @@ button:focus-visible {
   pointer-events: none;
 }
 
+.spin-clockwise-slow {
+  transform-origin: center center;
+  animation: spin-clockwise 45s linear infinite;
+}
+
+.spin-counter-slow {
+  transform-origin: center center;
+  animation: spin-counter 35s linear infinite;
+}
+
+@keyframes spin-clockwise {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes spin-counter {
+  from { transform: rotate(360deg); }
+  to { transform: rotate(0deg); }
+}
+
 .floating-vector-letter {
   position: absolute;
   display: flex;
@@ -2420,7 +2440,7 @@ button:focus-visible {
   backdrop-filter: blur(4px);
   user-select: none;
   animation: float-drift infinite ease-in-out alternate;
-  opacity: 0.38;
+  opacity: 0.42;
   transition: opacity 0.3s ease;
 }
 
