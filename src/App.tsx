@@ -28,6 +28,7 @@ import { MasteryStatsModal } from './components/MasteryStatsModal';
 import { LeaderboardModal } from './components/LeaderboardModal';
 import { VictoryReveal } from './components/VictoryReveal';
 import { VectorBackground } from './components/VectorBackground';
+import { RowReticle } from './components/RowReticle';
 
 import { FloatingHUD } from './components/FloatingHUD';
 
@@ -53,6 +54,7 @@ export const App: React.FC = () => {
   const [showShare, setShowShare] = useState<boolean>(false);
   const [showMastery, setShowMastery] = useState<boolean>(false);
   const [showLeaderboard, setShowLeaderboard] = useState<boolean>(false);
+  const [isJolting, setIsJolting] = useState<boolean>(false);
 
   // Settings state
   const [colorBlindMode, setColorBlindMode] = useState<boolean>(false);
@@ -268,6 +270,8 @@ export const App: React.FC = () => {
 
     const evaluation = evaluateGuess(formattedGuess, secretWord);
     soundManager.playFlip();
+    setIsJolting(true);
+    setTimeout(() => setIsJolting(false), 600);
     const isWon = formattedGuess === secretWord;
     if (isWon) {
       triggerVictory();
@@ -553,6 +557,12 @@ export const App: React.FC = () => {
 
         {activeMode && !showMultiplayerSetup && !showScoreboard && activePlayer && (
           <div className="gameplay-area animate-scale">
+            {/* Kinetic Row Reticle (Tactical Focus HUD) */}
+            <RowReticle activeRow={activePlayer.guesses.length} />
+
+            {/* Kinetic Viewport Impact Layer (jolt effect) */}
+            <div className={`viewport-impact-layer${isJolting ? ' viewport-impact-jolt' : ''}`} aria-hidden="true" />
+
             {/* Multiplayer Banner */}
             {players.length > 1 && (
               <div className="multiplayer-hud">
@@ -575,6 +585,11 @@ export const App: React.FC = () => {
                 onTimeout={handleTimeout}
                 isActive={isTimerActive && status === 'PLAYING'}
               />
+            )}
+
+            {/* Activity Reticle (kinetic tracking HUD) */}
+            {activePlayer && status === 'PLAYING' && (
+              <RowReticle activeRow={activePlayer.guesses.length} />
             )}
 
             {/* Game Grid */}

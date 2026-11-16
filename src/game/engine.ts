@@ -1,5 +1,6 @@
 import { GameMode, LetterEvaluation, LetterState, GuessResult, PlayerStats } from './types';
 import { GUESS_WORDS, SECRET_WORDS } from './wordlist';
+export type { GameMode, LetterEvaluation, LetterState, GuessResult, PlayerStats };
 
 /**
  * Structured summary of a completed game for VictoryReveal component.

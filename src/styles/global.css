@@ -2643,3 +2643,74 @@ button:focus-visible {
 
 
 
+
+/* ── Kinetic Row Reticle & Viewport Impact ─────── */
+.hud-row-reticle {
+  position: fixed;
+  bottom: 40px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 100;
+  pointer-events: none;
+}
+.reticle-corner {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  border-color: var(--accent-bright);
+  border-style: solid;
+  border-width: 2px;
+  opacity: 0.7;
+  transition: opacity 0.3s ease;
+}
+.reticle-corner.tl { top: -10px; left: -10px; border-top: 2px solid; border-left: 2px solid; }
+.reticle-corner.tr { top: -10px; right: -10px; border-top: 2px solid; border-right: 2px solid; }
+.reticle-corner.bl { bottom: -10px; left: -10px; border-bottom: 2px solid; border-left: 2px solid; }
+.reticle-corner.br { bottom: -10px; right: -10px; border-bottom: 2px solid; border-right: 2px solid; }
+.reticle-label {
+  position: absolute;
+  top: -40px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--accent-bright);
+}
+.reticle-scanline {
+  position: absolute;
+  top: 50%;
+  left: -50%;
+  width: 150%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(99, 102, 241, 0.3), transparent);
+  animation: scanline-sweep 3s infinite;
+}
+@keyframes scanline-sweep {
+  0% { left: -50%; }
+  100% { left: 150%; }
+}
+.viewport-impact-layer {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background: radial-gradient(ellipse 80% 60% at 50% 30%, rgba(99, 102, 241, 0.08) 0%, transparent 70%);
+}
+.viewport-impact-jolt {
+  animation: viewport-impact-jolt 0.6s ease-out;
+}
+@keyframes viewport-impact-jolt {
+  0% { transform: scale(1); }
+  20% { transform: scale(1.02); }
+  100% { transform: scale(1); }
+}
+.viewport-impact-restore {
+  animation: viewport-impact-restore 0.6s ease-out;
+}
+@keyframes viewport-impact-restore {
+  0% { transform: scale(1); }
+  20% { transform: scale(1.02); }
+  100% { transform: scale(1); }
+}
