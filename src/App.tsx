@@ -26,7 +26,10 @@ import { SpeedBlitzModal } from './components/SpeedBlitzModal';
 import { ShareModal } from './components/ShareModal';
 import { MasteryStatsModal } from './components/MasteryStatsModal';
 import { LeaderboardModal } from './components/LeaderboardModal';
+import { VictoryReveal } from './components/VictoryReveal';
 import { VectorBackground } from './components/VectorBackground';
+
+import { FloatingHUD } from './components/FloatingHUD';
 
 const DEFAULT_STATS: PlayerStats = {
   gamesPlayed: 0,
@@ -584,21 +587,50 @@ export const App: React.FC = () => {
 
             {/* Feedback actions if solved / failed */}
             {status === 'ROUND_OVER' && (
-              <div className="reveal-actions-panel animate-scale">
-                <p className="outcome-reveal">
-                  {activePlayer.solved ? '🎉 Word Solved!' : `😔 Answer: ${secretWord}`}
-                </p>
-                <div className="outcome-btns">
-                  <button className="btn-primary" onClick={() => startSinglePlayerGame(activeMode)}>
-                    Play Again
-                  </button>
-                  <button className="btn-secondary" onClick={() => setIsDefinitionOpen(true)}>
-                    📖 Meaning
-                  </button>
-                  <button className="btn-secondary" onClick={handleShareEmoji}>
-                    Share
-                  </button>
-                </div>
+              <div className="reveal-wrapper">
+                {activePlayer.solved ? (
+                  <VictoryReveal
+                    won={true}
+                    finalGuess={secretWord}
+                    finalEvals={
+                      activePlayer.guesses[activePlayer.guesses.length - 1]?.evaluation ?? []
+                    }
+                    mode={activeMode}
+                    attemptsUsed={activePlayer.attemptsUsed}
+                    streak={stats.currentStreak}
+                    winRate={
+                      stats.gamesPlayed > 0
+                        ? Math.round((stats.gamesWon / stats.gamesPlayed) * 100)
+                        : 100
+                    }
+                    onShare={handleShareEmoji}
+                    onPlayAgain={() => startSinglePlayerGame(activeMode)}
+                    onMeaning={() => setIsDefinitionOpen(true)}
+                  />
+                ) : (
+                  <div className="reveal-actions-panel animate-scale">
+                    <p className="outcome-reveal">
+                      😔 Answer: {secretWord}
+                    </p>
+                    <div className="outcome-btns">
+                      <button
+                        className="btn-primary"
+                        onClick={() => startSinglePlayerGame(activeMode)}
+                      >
+                        Play Again
+                      </button>
+                      <button
+                        className="btn-secondary"
+                        onClick={() => setIsDefinitionOpen(true)}
+                      >
+                        📖 Meaning
+                      </button>
+                      <button className="btn-secondary" onClick={handleShareEmoji}>
+                        Share
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
             )}
 
@@ -677,6 +709,10 @@ export const App: React.FC = () => {
       <LeaderboardModal
         isOpen={showLeaderboard}
         onClose={() => setShowLeaderboard(false)}
+      />
+      <FloatingHUD 
+        streak={stats.currentStreak} 
+        winRate={stats.gamesPlayed > 0 ? Math.round((stats.gamesWon / stats.gamesPlayed) * 100) : 100} 
       />
     </div>
   );

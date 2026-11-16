@@ -1,5 +1,47 @@
-import { LetterEvaluation, LetterState, GuessResult } from './types';
+import { GameMode, LetterEvaluation, LetterState, GuessResult, PlayerStats } from './types';
 import { GUESS_WORDS, SECRET_WORDS } from './wordlist';
+
+/**
+ * Structured summary of a completed game for VictoryReveal component.
+ */
+export interface GameSummary {
+  won: boolean;
+  finalGuess: string;
+  finalEvals: LetterEvaluation[];
+  mode: GameMode;
+  attemptsUsed: number;
+  streak: number;
+  winRate: number;
+}
+
+/**
+ * Builds a GameSummary from game state and stats.
+ * Decouples VictoryReveal from App.tsx state management.
+ */
+export function getGameSummary(
+  secretWord: string,
+  guesses: GuessResult[],
+  mode: GameMode,
+  playerStats: PlayerStats
+): GameSummary {
+  const solved = guesses.length > 0 && guesses[guesses.length - 1].evaluation.every(e => e.state === 'correct');
+  const finalEvals = guesses.length > 0 ? guesses[guesses.length - 1].evaluation : [];
+  const attemptsUsed = guesses.length;
+  const streak = playerStats.currentStreak;
+  const winRate = playerStats.gamesPlayed > 0
+    ? Math.round((playerStats.gamesWon / playerStats.gamesPlayed) * 100)
+    : 100;
+
+  return {
+    won: solved,
+    finalGuess: secretWord,
+    finalEvals,
+    mode,
+    attemptsUsed,
+    streak,
+    winRate,
+  };
+}
 
 /**
  * Evaluates a guess word against a secret word with correct two-pass duplicate-letter handling.
