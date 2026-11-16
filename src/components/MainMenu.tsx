@@ -263,7 +263,7 @@ export const MainMenu: React.FC<MainMenuProps> = ({
         <p className="hero-subtitle" style={{ marginTop: '2px', letterSpacing: '3px' }}>The Ultimate Word Challenge</p>
       </section>
 
-      {/* ── Featured Modes: Spotlight Pair (Classic & Daily) + Compact Secondary ── */},old_string:
+      {/* ── Featured Modes: Spotlight Pair (Classic & Daily) + Compact Secondary ── */}
       <div>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
           <p className="menu-section-label" style={{ margin: 0 }} aria-hidden="true">Game Modes</p>
