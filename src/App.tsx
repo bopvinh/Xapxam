@@ -41,6 +41,19 @@ const DEFAULT_STATS: PlayerStats = {
 };
 
 export const App: React.FC = () => {
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      setMousePos({
+        x: (e.clientX / window.innerWidth - 0.5) * 2,
+        y: (e.clientY / window.innerHeight - 0.5) * 2,
+      });
+    };
+    window.addEventListener('mousemove', handleMouseMove);
+    return () => window.removeEventListener('mousemove', handleMouseMove);
+  }, []);
+
   // Navigation / Modals State
   const [activeMode, setActiveMode] = useState<GameMode | null>(null);
   const [isHelpOpen, setIsHelpOpen] = useState<boolean>(false);
@@ -508,7 +521,15 @@ export const App: React.FC = () => {
   };
 
   return (
-    <div className={`app-container ${colorBlindMode ? 'cb-theme' : ''}`}>
+    <div 
+      className={`app-container ${colorBlindMode ? 'cb-theme' : ''}`}
+      style={{
+        '--mx': mousePos.x,
+        '--my': mousePos.y,
+        '--tx': `${mousePos.x * 20}px`,
+        '--ty': `${mousePos.y * 20}px`,
+      } as React.CSSProperties}
+    >
       <VectorBackground />
       {activeMode && (
         <Header

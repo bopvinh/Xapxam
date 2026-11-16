@@ -224,6 +224,17 @@ export const MainMenu: React.FC<MainMenuProps> = ({
         </span>
       </div>
 
+      {/* ── Daily solver ribbon ──────────────────────────── */}
+      <div className="daily-ribbon">
+        <div className="daily-ribbon__inner">
+          <span className="daily-ribbon__label">today's solvers</span>
+          <span className="daily-ribbon__number">2,847</span>
+          <span className="daily-ribbon__streak">
+            🔥 <span className="daily-ribbon__label">streak bonus</span>
+          </span>
+        </div>
+      </div>
+
       {/* ── Hero ─────────────────────────────────────────── */}
       <section className="hero-section" aria-label="Game title" style={{ padding: '4px 0' }}>
         <div className="hero-tiles-row" style={{ display: 'flex', justifyContent: 'center', gap: '8px', marginBottom: '6px' }}>
@@ -252,32 +263,7 @@ export const MainMenu: React.FC<MainMenuProps> = ({
         <p className="hero-subtitle" style={{ marginTop: '2px', letterSpacing: '3px' }}>The Ultimate Word Challenge</p>
       </section>
 
-      {/* ── Primary CTA ──────────────────────────────────── */}
-      <div className="hero-cta" style={{ gap: '6px' }}>
-        <button
-          className="btn-play-now pulse-glow-cta"
-          onClick={() => {
-            soundManager.playFlip();
-            onSelectMode('CLASSIC');
-          }}
-          onMouseEnter={handleHover}
-          aria-label="Play Classic mode"
-          style={{ width: '100%', maxWidth: '380px' }}
-        >
-          <div className="btn-play-now-glow" />
-          <span style={{ position: 'relative', zIndex: 2, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
-            <span>⚡ Quick Match</span>
-            <kbd style={{ fontSize: '10px', padding: '2px 6px', background: 'rgba(0,0,0,0.3)', borderRadius: '4px', border: '1px solid rgba(255,255,255,0.2)' }}>SPACE</kbd>
-          </span>
-        </button>
-        <span className="hero-cta-label">
-          {userStats && userStats.streak > 0 
-            ? `🔥 Streak Active (${userStats.streak}) — Jump right back in!`
-            : 'Classic Solo · 5 Letters · 6 Guesses'}
-        </span>
-      </div>
-
-      {/* ── Featured Modes: Spotlight Pair (Classic & Daily) + Compact Secondary ── */}
+      {/* ── Featured Modes: Spotlight Pair (Classic & Daily) + Compact Secondary ── */},old_string:
       <div>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
           <p className="menu-section-label" style={{ margin: 0 }} aria-hidden="true">Game Modes</p>

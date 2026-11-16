@@ -23,9 +23,9 @@ const LETTERS: FloatingLetter[] = [
 
 export const VectorBackground: React.FC = () => {
   return (
-    <div className="vector-background-root" aria-hidden="true">
+    <div className="vector-background-root kinetic-bg-layer" aria-hidden="true">
       {/* ── Background Vector Grid Matrix ─────────────────────── */}
-      <svg className="vector-grid-overlay" width="100%" height="100%">
+      <svg className="vector-grid-overlay" width="100%" height="100%" style={{ transform: 'translate(calc(var(--tx) * 0.1), calc(var(--ty) * 0.1))' }}>
         <defs>
           <pattern id="vector-crosshair-pattern" width="100" height="100" patternUnits="userSpaceOnUse">
             <path d="M 50 42 L 50 58 M 42 50 L 58 50" stroke="rgba(99, 102, 241, 0.22)" strokeWidth="1.2" />
@@ -49,6 +49,7 @@ export const VectorBackground: React.FC = () => {
           right: '-70px',
           opacity: 0.35,
           pointerEvents: 'none',
+          transform: 'translate(calc(var(--tx) * 0.5), calc(var(--ty) * 0.5))',
         }}
       >
         <circle cx="170" cy="170" r="150" stroke="rgba(99, 102, 241, 0.3)" strokeWidth="1.5" strokeDasharray="6 6" className="spin-clockwise-slow" />
@@ -72,6 +73,7 @@ export const VectorBackground: React.FC = () => {
           left: '-60px',
           opacity: 0.32,
           pointerEvents: 'none',
+          transform: 'translate(calc(var(--tx) * -0.5), calc(var(--ty) * -0.5))',
         }}
       >
         <circle cx="150" cy="150" r="135" stroke="rgba(129, 140, 248, 0.3)" strokeWidth="1.5" strokeDasharray="8 8" className="spin-counter-slow" />
@@ -97,6 +99,7 @@ export const VectorBackground: React.FC = () => {
             borderColor: `${color}40`,
             color: color,
             boxShadow: `0 8px 24px rgba(0, 0, 0, 0.4), 0 0 16px ${color}22`,
+            transform: 'translate(calc(var(--tx) * 0.8), calc(var(--ty) * 0.8))',
           }}
         >
           <span className="floating-char">{char}</span>
