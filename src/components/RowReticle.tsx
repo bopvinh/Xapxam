@@ -18,11 +18,6 @@ export const RowReticle: React.FC<RowReticleProps> = ({ activeRow }) => {
       }}
       aria-hidden="true"
     >
-      <div className="reticle-corner tl" />
-      <div className="reticle-corner tr" />
-      <div className="reticle-corner bl" />
-      <div className="reticle-corner br" />
-      <div className="reticle-label">LOCKED_ON</div>
       <div className="reticle-scanline" />
     </div>
   );
