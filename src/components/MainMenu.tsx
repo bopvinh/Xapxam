@@ -186,8 +186,22 @@ export const MainMenu: React.FC<MainMenuProps> = ({
     </>,
   ];
 
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      const x = (e.clientX / window.innerWidth - 0.5) * 20;
+      const y = (e.clientY / window.innerHeight - 0.5) * 20;
+      setMousePos({ x, y });
+    };
+    window.addEventListener('mousemove', handleMouseMove);
+    return () => window.removeEventListener('mousemove', handleMouseMove);
+  }, []);
+
   return (
-    <div className="main-menu-container animate-scale">
+    <div className="main-menu-container animate-scale" style={{ 
+      transform: `perspective(1000px) rotateY(${mousePos.x * 0.1}deg) rotateX(${-mousePos.y * 0.1}deg)` 
+    }}>
       {/* ── Precision Vector Corner Reticle Brackets ───────── */}
       <div className="vector-corner-tl" aria-hidden="true" />
       <div className="vector-corner-tr" aria-hidden="true" />
