@@ -241,7 +241,7 @@ export const MainMenu: React.FC<MainMenuProps> = ({
       {/* ── Primary CTA ──────────────────────────────────── */}
       <div className="hero-cta" style={{ gap: '6px' }}>
         <button
-          className="btn-play-now"
+          className="btn-play-now pulse-glow-cta"
           onClick={() => {
             soundManager.playFlip();
             onSelectMode('CLASSIC');
@@ -251,12 +251,16 @@ export const MainMenu: React.FC<MainMenuProps> = ({
           style={{ width: '100%', maxWidth: '380px' }}
         >
           <div className="btn-play-now-glow" />
-          <span style={{ position: 'relative', zIndex: 2, display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <span style={{ position: 'relative', zIndex: 2, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
             <span>⚡ Quick Match</span>
             <kbd style={{ fontSize: '10px', padding: '2px 6px', background: 'rgba(0,0,0,0.3)', borderRadius: '4px', border: '1px solid rgba(255,255,255,0.2)' }}>SPACE</kbd>
           </span>
         </button>
-        <span className="hero-cta-label">Classic Solo · 5 Letters · 6 Guesses</span>
+        <span className="hero-cta-label">
+          {userStats && userStats.streak > 0 
+            ? `🔥 Streak Active (${userStats.streak}) — Jump right back in!`
+            : 'Classic Solo · 5 Letters · 6 Guesses'}
+        </span>
       </div>
 
       {/* ── Featured Modes: Spotlight Pair (Classic & Daily) + Compact Secondary ── */}
