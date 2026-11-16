@@ -106,10 +106,6 @@ export const App: React.FC = () => {
         console.error(e);
       }
     }
-    const cbMode = localStorage.getItem('wordplusplus_colorblind');
-    if (cbMode === 'true') {
-      setColorBlindMode(true);
-    }
     const hmMode = localStorage.getItem('wordplusplus_hardmode');
     if (hmMode === 'true') {
       setHardMode(true);
