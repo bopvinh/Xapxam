@@ -37,6 +37,15 @@ export interface GameSettings {
   hardMode: boolean;
 }
 
+export interface BattleState {
+  playerHealth: number;
+  opponentHealth: number;
+  lastAttack?: {
+    type: 'lock_tile' | 'time_penalty' | 'scramble';
+    targetPlayer: 'player' | 'opponent';
+  };
+}
+
 export interface GameState {
   mode: GameMode;
   secretWord: string;
