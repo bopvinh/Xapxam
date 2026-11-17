@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { GameMode, LetterEvaluation } from '../game/types';
 
 interface VictoryRevealProps {
@@ -37,8 +37,27 @@ export const VictoryReveal: React.FC<VictoryRevealProps> = ({
 }) => {
   if (!won) return null;
 
+  const particles = useMemo(() => {
+    return Array.from({ length: 20 }).map((_, i) => {
+      const angle = (Math.PI * 2 * i) / 20;
+      const distance = 100 + Math.random() * 50;
+      const x = Math.cos(angle) * distance;
+      const y = Math.sin(angle) * distance;
+      return {
+        '--x': `${x}px`,
+        '--y': `${y}px`,
+        'animationDelay': `${0.8 + Math.random() * 0.4}s`
+      } as React.CSSProperties;
+    });
+  }, []);
+
   return (
     <div className="victory-reveal animate-scale" role="status" aria-live="polite">
+      <div className="victory-particle-explosion">
+        {particles.map((style, i) => (
+          <div key={i} className="victory-particle" style={style} />
+        ))}
+      </div>
       <div className="victory-emblem">
         <span className="victory-emblem-emoji">🏆</span>
       </div>
