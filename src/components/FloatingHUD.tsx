@@ -18,7 +18,7 @@ export const FloatingHUD: React.FC<FloatingHUDProps> = ({ streak, winRate }) => 
         '3,402 puzzles solved in the last hour',
         'Alex solved in 2 guesses!',
         'Global challenge word: BRAIN',
-        'User "WordKing" is on fire: 50 streak!',
+        'User \"WordKing\" is on fire: 50 streak!',
       ];
       setActivity(activities[Math.floor(Math.random() * activities.length)]);
     }, 5000);
@@ -26,7 +26,14 @@ export const FloatingHUD: React.FC<FloatingHUDProps> = ({ streak, winRate }) => 
   }, []);
 
   return (
-    <div className="floating-hud-root">
+    <div 
+      className="floating-hud-root"
+      style={{
+        transform: 'perspective(1000px) rotateX(calc(var(--my) * -5deg)) rotateY(calc(var(--mx) * 5deg))',
+        transition: 'transform 0.1s ease-out',
+        '--pulse-duration': `${Math.max(0.5, 2 - streak * 0.2)}s`
+      } as React.CSSProperties}
+    >
       <style>{`
         .floating-hud-root {
           position: fixed;

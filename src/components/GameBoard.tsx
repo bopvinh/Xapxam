@@ -63,7 +63,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
     }
 
     rows.push(
-      <div key={r} className={`board-row ${isShake ? 'shake-row' : ''}`}>
+      <div key={r} className={`board-row ${isCurrentRow ? 'active-row' : ''} ${isShake ? 'shake-row' : ''}`}>
         {cells}
       </div>
     );

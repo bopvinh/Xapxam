@@ -526,7 +526,7 @@ export const App: React.FC = () => {
         '--ty': `${mousePos.y * 20}px`,
       } as React.CSSProperties}
     >
-      <VectorBackground />
+      <VectorBackground status={showConfetti ? 'WIN' : status} />
       {activeMode && (
         <Header
           mode={activeMode}

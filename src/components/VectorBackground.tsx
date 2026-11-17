@@ -21,9 +21,16 @@ const LETTERS: FloatingLetter[] = [
   { char: 'Z', x: '93%', y: '42%', size: 32, duration: 10.5, delay: 1.8, color: '#ec4899' },
 ];
 
-export const VectorBackground: React.FC = () => {
+interface VectorBackgroundProps {
+  status?: 'PLAYING' | 'ROUND_OVER' | 'GAME_OVER' | 'WIN' | 'LOSS';
+}
+
+export const VectorBackground: React.FC<VectorBackgroundProps> = ({ status = 'PLAYING' }) => {
+  const isWin = status === 'WIN' || status === 'GAME_OVER';
+  const isSubmitting = status === 'ROUND_OVER';
+
   return (
-    <div className="vector-background-root kinetic-bg-layer" aria-hidden="true">
+    <div className={`vector-background-root kinetic-bg-layer ${isWin ? 'is-win' : ''} ${isSubmitting ? 'is-submitting' : ''}`} aria-hidden="true">
       {/* ── Background Vector Grid Matrix ─────────────────────── */}
       <svg className="vector-grid-overlay" width="100%" height="100%" style={{ transform: 'translate(calc(var(--tx) * 0.1), calc(var(--ty) * 0.1))' }}>
         <defs>
