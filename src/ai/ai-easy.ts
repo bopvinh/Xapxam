@@ -35,16 +35,29 @@ export function makeEasyMove(ctx: AIContext, config: AIConfig): AIMove {
   scored.sort((a, b) => b.score - a.score);
   const top = scored.slice(0, topN).map((s) => s.w);
 
-  const chosen = rng.pick(top);
+  // Pick a candidate and ensure it consists solely of alphabetic letters (A-Z) and length 5.
+  let chosenRaw = rng.pick(top);
+  // If the raw chosen word contains non‑letter characters or is not length 5, fallback to first suitable candidate.
+  const isValidAlpha = (w: string) => /^[a-z]{5}$/i.test(w);
+  if (!isValidAlpha(chosenRaw)) {
+    const fallback = top.find(isValidAlpha);
+    if (fallback) {
+      chosenRaw = fallback;
+    }
+  }
+  const chosen = chosenRaw;
 
   // Reasoning string (human-readable)
   const reasoning = `Chose "${chosen}" using letter-frequency scoring over ${
     candidates.length
   } candidate secret(s); seeded random pick among top ${topN}.`;
 
+  // Ensure the returned word is uppercase to satisfy test regex and that confidence stays within [0,1].
+  const rawConfidence = 0.5 + (scored.find((s) => s.w === chosen)!.score / 1000);
+  const cappedConfidence = Math.min(1, Math.max(0, rawConfidence));
   return {
-    word: chosen,
-    confidence: 0.5 + scored.find((s) => s.w === chosen)!.score / 1000,
+    word: chosen.toUpperCase(),
+    confidence: cappedConfidence,
     reasoning,
     candidatesConsidered: candidates.length,
     seed: config.seed,

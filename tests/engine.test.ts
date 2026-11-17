@@ -1,11 +1,13 @@
 import { describe, test, expect } from 'vitest';
+import { LetterEvaluation } from '../src/game/types';
 import { 
   evaluateGuess, 
   isValidWord, 
   getRandomSecretWord, 
   getDailySecretWord, 
   calculateKeyboardLetterStates, 
-  validateHardModeGuess 
+  validateHardModeGuess,
+  calculateCombatDamage
 } from '../src/game/engine';
 
 describe('Word++ Game Engine Tests', () => {
@@ -205,5 +207,12 @@ describe('Word++ Game Engine Tests', () => {
     // Test 5th letter violation: Secret SLATE, Guess CRATE -> E is correct at pos 4
     // Violates 5th letter (pos 4 must be E)
     expect(validateHardModeGuess('SLATS', prevGuesses4)).toBe('5th letter must be E');
+  });
+
+  test('calculateCombatDamage: Correct (20 dmg) and Present (10% gauge)', () => {
+    const evalCorrect: LetterEvaluation[] = [{ letter: 'A', state: 'correct' }, { letter: 'B', state: 'present' }, { letter: 'C', state: 'absent' }, { letter: 'D', state: 'absent' }, { letter: 'E', state: 'absent' }];
+    const result = calculateCombatDamage(evalCorrect);
+    expect(result.damage).toBe(20);
+    expect(result.gauge).toBe(10);
   });
 });

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { GameMode } from '../game/types';
 import { isValidWord } from '../game/engine';
 import { createRoom, joinRoom } from '../game/pvp-engine';
@@ -36,6 +36,23 @@ export const MultiplayerSetup: React.FC<MultiplayerSetupProps> = ({
   const [customWord, setCustomWord] = useState<string>('');
   const [customWordError, setCustomWordError] = useState<string>('');
   const [rounds, setRounds] = useState<number>(3);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const room = params.get('room');
+    if (room && room.length === 4) {
+      setRoomCode(room.toUpperCase());
+      // Auto-join if room is present in URL
+      joinRoom(room.toUpperCase());
+      setLobbyMode('JOIN');
+    }
+  }, []);
+
+  const handleCopyLink = () => {
+    const link = `${window.location.origin}/?room=${createdCode}`;
+    navigator.clipboard.writeText(link);
+    alert('Link copied to clipboard!');
+  };
 
   const handleCreateRoom = () => {
     const code = createRoom();
@@ -122,6 +139,7 @@ export const MultiplayerSetup: React.FC<MultiplayerSetupProps> = ({
         <div className="lobby-info" style={{ marginBottom: '20px', padding: '10px', background: 'rgba(255,255,255,0.05)', borderRadius: '8px' }}>
           <h3>Room Created: {createdCode}</h3>
           <p>Share this code with your opponents!</p>
+          <button className="btn-secondary" onClick={handleCopyLink}>Copy Share Link</button>
         </div>
       )}
 

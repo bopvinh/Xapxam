@@ -138,3 +138,24 @@ export function validateHardModeGuess(
 
   return null;
 }
+
+/**
+ * Calculates damage and gauge increase based on guess evaluation.
+ * Correct: 20 dmg.
+ * Present: 10% gauge.
+ */
+export function calculateCombatDamage(evaluation: LetterEvaluation[]): { damage: number; gauge: number } {
+  let damage = 0;
+  let gauge = 0;
+
+  for (const item of evaluation) {
+    if (item.state === 'correct') {
+      damage += 20;
+    } else if (item.state === 'present') {
+      gauge += 10;
+    }
+  }
+
+  return { damage, gauge };
+}
+

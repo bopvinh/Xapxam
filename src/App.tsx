@@ -69,6 +69,13 @@ export const App: React.FC = () => {
 
   // Load stats & settings
   useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const room = params.get('room');
+    if (room && room.length === 4) {
+      setActiveMode('PARTY'); // Default to PARTY mode for URL join
+      setShowMultiplayerSetup(true);
+    }
+
     const savedStats = localStorage.getItem('wordplusplus_stats');
     if (savedStats) {
       try {
