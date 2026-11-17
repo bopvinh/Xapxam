@@ -2085,7 +2085,15 @@ button:focus-visible {
 }
 
 .main-menu-container,
-.gameplay-area,
+.gameplay-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: 800px;
+  animation: screen-fade 0.3s ease forwards;
+}
 .game-board-container,
 .multiplayer-setup-container,
 .setup-form,
