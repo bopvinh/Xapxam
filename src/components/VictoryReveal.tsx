@@ -49,8 +49,21 @@ export const VictoryReveal: React.FC<VictoryRevealProps> = ({
     });
   }, []);
 
+  const edgeParticles = useMemo(() => {
+    return Array.from({ length: 12 }).map((_, _i) => ({
+      style: {
+        left: `${Math.random() * 100}%`,
+        top: `${Math.random() * 100}%`,
+        animationDelay: `${Math.random() * 0.5}s`
+      } as React.CSSProperties
+    }));
+  }, []);
+
   return (
     <div className={`victory-reveal animate-scale is-win-aura`} role="status" aria-live="polite">
+      {edgeParticles.map((p, i) => (
+        <div key={i} className="victory-edge-particle" style={p.style} />
+      ))}
       <div className="victory-particle-explosion">
         {particles.map((style, i) => (
           <div key={i} className="victory-particle" style={style} />
