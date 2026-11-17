@@ -518,7 +518,7 @@ export const App: React.FC = () => {
 
   return (
     <div 
-      className={`app-container ${colorBlindMode ? 'cb-theme' : ''}`}
+      className={`app-container ${colorBlindMode ? 'cb-theme' : ''} ${showConfetti ? 'screen-flash-green' : ''}`}
       style={{
         '--mx': mousePos.x,
         '--my': mousePos.y,

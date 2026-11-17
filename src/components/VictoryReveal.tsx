@@ -65,7 +65,7 @@ export const VictoryReveal: React.FC<VictoryRevealProps> = ({
       <h2 className="victory-title">Word Solved!</h2>
 
       {/* 3D letter cascade of the solved word */}
-      <div className="victory-word">
+      <div className="victory-word victory-word-shimmer">
         {finalEvals.map((ev, idx) => (
           <div
             key={idx}
