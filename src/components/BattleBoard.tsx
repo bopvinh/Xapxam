@@ -16,14 +16,16 @@ export const BattleBoard: React.FC<BattleBoardProps> = ({
 }) => {
   const [playerHealth, setPlayerHealth] = useState(100);
   const [opponentHealth, setOpponentHealth] = useState(100);
+  const [gauge, setGauge] = useState(0);
   const [shake, setShake] = useState(false);
 
   useEffect(() => {
     const socket = io('http://localhost:3000');
     socket.emit('join', roomID);
     
-    socket.on('damage_received', (data: { damage: number }) => {
+    socket.on('damage_received', (data: { damage: number; gauge: number }) => {
       setPlayerHealth(prev => Math.max(0, prev - data.damage));
+      setGauge(prev => Math.min(100, prev + data.gauge));
       setShake(true);
       setTimeout(() => setShake(false), 500);
     });
@@ -38,6 +40,9 @@ export const BattleBoard: React.FC<BattleBoardProps> = ({
       <div className="combat-hud" style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px', padding: '0 8px' }}>
         <div className="health-bar player" style={{ color: '#22d3a0', fontWeight: 600 }}>
           Player HP: {playerHealth}
+        </div>
+        <div className="gauge" style={{ color: '#F59E0B', fontWeight: 600 }}>
+          Gauge: {gauge}%
         </div>
         <div className="health-bar opponent" style={{ color: '#f43f5e', fontWeight: 600 }}>
           Opponent HP: {opponentHealth}

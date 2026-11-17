@@ -21,9 +21,13 @@ io.on('connection', (socket) => {
     // Relay guess to others in the same room
     socket.to(data.roomID).emit('guess_received', { ...data, senderID: socket.id });
     
-    // Simulate combat: incorrect guess deals damage to sender? No, correct guess deals damage to opponent.
-    // For now, simplify: any guess deals 10 damage to opponent.
-    socket.to(data.roomID).emit('damage_received', { damage: 10 });
+    // Skill-based combat: calculate damage/gauge based on evaluation
+    const { evaluateGuess } = require('./engine.js'); // Assuming engine is available via build/CJS
+    const evaluation = evaluateGuess(data.guess, data.secretWord); // Need to pass secretWord
+    const damage = evaluation.filter(e => e.state === 'correct').length * 20;
+    const gauge = evaluation.filter(e => e.state === 'present').length * 10;
+    
+    socket.to(data.roomID).emit('damage_received', { damage, gauge });
   });
 
   socket.on('disconnect', () => {
