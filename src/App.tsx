@@ -670,13 +670,14 @@ export const App: React.FC = () => {
               </div>
             )}
 
-            {/* On-screen Keyboard */}
+            {/* On-screen Keyboard */ }
             <Keyboard
               onChar={(char) => handleKeyPress(char)}
               onEnter={() => handleKeyPress('ENTER')}
               onDelete={() => handleKeyPress('DEL')}
               letterStates={keyboardStates}
               disabled={status !== 'PLAYING'}
+              isSubmitting={status === 'PLAYING' && isJolting}
             />
           </div>
         )}

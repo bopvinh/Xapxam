@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { LetterState } from '../game/types';
 
 interface KeyboardProps {
@@ -7,6 +7,7 @@ interface KeyboardProps {
   onDelete: () => void;
   letterStates: Record<string, LetterState>;
   disabled?: boolean;
+  isSubmitting?: boolean;
 }
 
 const KEYBOARD_ROWS = [
@@ -20,10 +21,20 @@ export const Keyboard: React.FC<KeyboardProps> = ({
   onEnter,
   onDelete,
   letterStates,
-  disabled = false
+  disabled = false,
+  isSubmitting = false
 }) => {
+  const [activeSpinKey, setActiveSpinKey] = useState<string | null>(null);
+
   const handleClick = (key: string) => {
     if (disabled) return;
+    
+    // Trigger 3D-spin animation for character keys
+    if (key !== 'ENTER' && key !== 'DEL') {
+      setActiveSpinKey(key);
+      setTimeout(() => setActiveSpinKey(null), 300);
+    }
+
     if (key === 'ENTER') {
       onEnter();
     } else if (key === 'DEL') {
@@ -34,12 +45,14 @@ export const Keyboard: React.FC<KeyboardProps> = ({
   };
 
   return (
-    <div className="keyboard-container">
+    <div className={`keyboard-container ${isSubmitting ? 'is-submitting' : ''}`}>
       {KEYBOARD_ROWS.map((row, rIdx) => (
         <div key={rIdx} className="keyboard-row">
           {row.map((key) => {
             const isSpecial = key === 'ENTER' || key === 'DEL';
             const state = isSpecial ? '' : letterStates[key] || '';
+            const isEnter = key === 'ENTER';
+            const isSpinning = activeSpinKey === key;
 
             let label: React.ReactNode = key;
             if (key === 'ENTER') {
@@ -66,7 +79,7 @@ export const Keyboard: React.FC<KeyboardProps> = ({
               <button
                 key={key}
                 type="button"
-                className={`key-btn ${isSpecial ? 'special-key' : ''} ${state}`}
+                className={`key-btn ${isSpecial ? 'special-key' : ''} ${state} ${isEnter && isSubmitting ? 'enter-shockwave-source' : ''} ${isSpinning ? 'is-spinning' : ''}`}
                 onClick={() => handleClick(key)}
                 disabled={disabled}
               >
