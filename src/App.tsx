@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import './styles/global.css';
+import './styles/artifact-system.css';
 import { GameMode, Player, PlayerStats, LetterState } from './game/types';
 import {
   evaluateGuess,
@@ -31,6 +32,8 @@ import { VectorBackground } from './components/VectorBackground';
 import { RowReticle } from './components/RowReticle';
 
 import { FloatingHUD } from './components/FloatingHUD';
+import { ArtifactSystem } from './components/ArtifactSystem';
+import { PlayerInventory, EquippedArtifacts, ARTIFACT_DATABASE, RARITY_CONFIG } from './game/artifacts';
 
 const DEFAULT_STATS: PlayerStats = {
   gamesPlayed: 0,
@@ -67,7 +70,8 @@ export const App: React.FC = () => {
   const [showShare, setShowShare] = useState<boolean>(false);
   const [showMastery, setShowMastery] = useState<boolean>(false);
   const [showLeaderboard, setShowLeaderboard] = useState<boolean>(false);
-  const [isJolting, setIsJolting] = useState<boolean>(false);
+    const [showArtifacts, setShowArtifacts] = useState<boolean>(false);
+    const [isJolting, setIsJolting] = useState<boolean>(false);
 
   // Settings state
   const [colorBlindMode, setColorBlindMode] = useState<boolean>(false);
@@ -76,10 +80,33 @@ export const App: React.FC = () => {
   const [timerDuration] = useState<number>(60);
   const [showConfetti, setShowConfetti] = useState<boolean>(false);
 
-  // Player Stats state
-  const [stats, setStats] = useState<PlayerStats>(DEFAULT_STATS);
+    // Player Stats state
+    const [stats, setStats] = useState<PlayerStats>(DEFAULT_STATS);
 
-  // Core Game State
+    // Artifact System State
+    const [artifactInventory, setArtifactInventory] = useState<PlayerInventory>(() => {
+      const saved = localStorage.getItem('wordplusplus_artifacts');
+      if (saved) {
+        try {
+          return JSON.parse(saved);
+        } catch (e) {
+          console.error(e);
+        }
+      }
+      return {
+        artifacts: {},
+        equipped: { weapon: null, armor: null, utility: null, trinket: null },
+        currency: 500, // Starting Lexicons
+        totalEarned: 500
+      };
+    });
+
+    // Persist artifact inventory
+    useEffect(() => {
+      localStorage.setItem('wordplusplus_artifacts', JSON.stringify(artifactInventory));
+    }, [artifactInventory]);
+
+    // Core Game State
   const [secretWord, setSecretWord] = useState<string>('');
   const [players, setPlayers] = useState<Player[]>([]);
   const [activePlayerIndex, setActivePlayerIndex] = useState<number>(0);
@@ -317,20 +344,61 @@ export const App: React.FC = () => {
     setCurrentGuess('');
 
     // Single Player Modes
-    if (activeMode === 'CLASSIC' || activeMode === 'DAILY') {
-      if (isWon) {
-        setStatus('ROUND_OVER');
-        updateStats(true, newGuesses.length);
-        showToast('🎉 Brilliant! You solved the word!');
-        // setTimeout(() => setShowShare(true), 1500);
-      } else if (isOutOfAttempts) {
-        setStatus('ROUND_OVER');
-        updateStats(false, 6);
-        showToast(`😔 Game over! The word was ${secretWord}`);
-        triggerShake(5);
-      }
-      return;
-    }
+        if (activeMode === 'CLASSIC' || activeMode === 'DAILY') {
+          if (isWon) {
+            setStatus('ROUND_OVER');
+            updateStats(true, newGuesses.length);
+        
+            // Artifact System: Award Lexicons and chance for artifact drop
+            const baseReward = 100;
+            const streakBonus = Math.min(stats.currentStreak * 10, 200);
+            const attemptBonus = (7 - newGuesses.length) * 15;
+            const totalReward = baseReward + streakBonus + attemptBonus;
+        
+            const newInventory = { ...artifactInventory };
+            newInventory.currency += totalReward;
+            newInventory.totalEarned += totalReward;
+        
+            // Chance for artifact drop (10% base, higher with streak)
+            const dropChance = 0.1 + Math.min(stats.currentStreak * 0.02, 0.15);
+            if (Math.random() < dropChance) {
+              // Pick a random artifact weighted by rarity
+              const artifacts = ARTIFACT_DATABASE;
+              const totalWeight = artifacts.reduce((sum, a) => sum + RARITY_CONFIG[a.rarity].dropWeight, 0);
+              let roll = Math.random() * totalWeight;
+              let droppedArtifact = artifacts[0];
+              for (const art of artifacts) {
+                roll -= RARITY_CONFIG[art.rarity].dropWeight;
+                if (roll <= 0) { droppedArtifact = art; break; }
+              }
+          
+              if (newInventory.artifacts[droppedArtifact.id]) {
+                newInventory.artifacts[droppedArtifact.id].level = Math.min(
+                  newInventory.artifacts[droppedArtifact.id].level + 1,
+                  droppedArtifact.maxLevel
+                );
+              } else {
+                newInventory.artifacts[droppedArtifact.id] = {
+                  artifactId: droppedArtifact.id,
+                  level: 1,
+                  obtainedAt: Date.now()
+                };
+              }
+          
+              showToast(`🎉 Brilliant! You solved the word! +${totalReward} Lexicons • Artifact found: ${droppedArtifact.name}!`);
+            } else {
+              showToast(`🎉 Brilliant! You solved the word! +${totalReward} Lexicons`);
+            }
+        
+            setArtifactInventory(newInventory);
+          } else if (isOutOfAttempts) {
+            setStatus('ROUND_OVER');
+            updateStats(false, 6);
+            showToast(`😔 Game over! The word was ${secretWord}`);
+            triggerShake(5);
+          }
+          return;
+        }
 
     // Timed Mode Turn Complete Reset
     if (activeMode === 'TIMED') {
@@ -533,17 +601,19 @@ export const App: React.FC = () => {
       <VectorBackground status={showConfetti ? 'WIN' : status} />
       {activeMode && (
         <Header
-          mode={activeMode}
-          onOpenHelp={() => setIsHelpOpen(true)}
-          onOpenStats={() => setIsStatsOpen(true)}
-          onHomeClick={handleHomeClick}
-          colorBlindMode={colorBlindMode}
-          onToggleColorBlind={handleToggleColorBlind}
-          hardMode={hardMode}
-          onToggleHardMode={handleToggleHardMode}
-          soundEnabled={soundEnabled}
-          onToggleSound={handleToggleSound}
-        />
+                  mode={activeMode}
+                  onOpenHelp={() => setIsHelpOpen(true)}
+                  onOpenStats={() => setIsStatsOpen(true)}
+                  onOpenArtifacts={() => setShowArtifacts(true)}
+                  onHomeClick={handleHomeClick}
+                  colorBlindMode={colorBlindMode}
+                  onToggleColorBlind={handleToggleColorBlind}
+                  hardMode={hardMode}
+                  onToggleHardMode={handleToggleHardMode}
+                  soundEnabled={soundEnabled}
+                  onToggleSound={handleToggleSound}
+                  artifactCurrency={artifactInventory.currency}
+                />
       )}
 
       <main className="app-main-content">
@@ -743,10 +813,16 @@ export const App: React.FC = () => {
         stats={stats}
       />
       <LeaderboardModal
-        isOpen={showLeaderboard}
-        onClose={() => setShowLeaderboard(false)}
-      />
-      <FloatingHUD 
+              isOpen={showLeaderboard}
+              onClose={() => setShowLeaderboard(false)}
+            />
+            <ArtifactSystem
+              isOpen={showArtifacts}
+              onClose={() => setShowArtifacts(false)}
+              inventory={artifactInventory}
+              onInventoryChange={setArtifactInventory}
+            />
+            <FloatingHUD
         streak={stats.currentStreak} 
         winRate={stats.gamesPlayed > 0 ? Math.round((stats.gamesWon / stats.gamesPlayed) * 100) : 100} 
       />

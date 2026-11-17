@@ -5,6 +5,7 @@ interface HeaderProps {
   mode: GameMode | null;
   onOpenHelp: () => void;
   onOpenStats: () => void;
+  onOpenArtifacts: () => void;
   onHomeClick: () => void;
   colorBlindMode: boolean;
   onToggleColorBlind: () => void;
@@ -12,6 +13,7 @@ interface HeaderProps {
   onToggleHardMode: () => void;
   soundEnabled: boolean;
   onToggleSound: () => void;
+  artifactCurrency: number;
 }
 
 /** Home icon */
@@ -143,9 +145,19 @@ export const Header: React.FC<HeaderProps> = ({
       </div>
 
       {/* ── Right: settings cluster ───────────────────────── */}
-      <div className="header-right" role="toolbar" aria-label="Game settings">
-        <button
-          className={`icon-btn toggle-sound-btn${soundEnabled ? ' active' : ''}`}
+            <div className="header-right" role="toolbar" aria-label="Game settings">
+              <button
+                className="icon-btn artifact-btn"
+                onClick={onOpenArtifacts}
+                title={`Artifacts (${artifactCurrency.toLocaleString()} Lexicons)`}
+                aria-label={`Open Artifact System (${artifactCurrency.toLocaleString()} Lexicons)`}
+              >
+                <span className="artifact-btn-icon">🎒</span>
+                <span className="artifact-btn-count">{artifactCurrency.toLocaleString()}</span>
+              </button>
+
+              <button
+                className={`icon-btn toggle-sound-btn${soundEnabled ? ' active' : ''}`}
           onClick={onToggleSound}
           title={soundEnabled ? 'Sound: ON' : 'Sound: OFF'}
           aria-label={soundEnabled ? 'Mute sound' : 'Enable sound'}
