@@ -1892,10 +1892,10 @@ button:focus-visible {
 .victory-title {
   animation: title-bounce-elastic 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards, victory-title-pulse 3s infinite ease-in-out;
   font-family: var(--font-display);
-  font-size: clamp(5rem, 15vw, 8rem);
+  font-size: clamp(2rem, 8vw, 4rem);
   font-weight: 800;
   text-align: center;
-  letter-spacing: -4px;
+  letter-spacing: -2px;
 }
 
 .victory-emblem {
@@ -2873,14 +2873,15 @@ button:focus-visible {
    VICTORY REVEAL — signature solved-word "winner's screen"
    ============================================================ */
 .victory-reveal {
-  padding: 80px;
-  width: 100%;
-  max-width: 900px;
+  padding: 40px;
+  width: 50%;
+  max-width: 500px;
+  min-width: 320px;
   text-align: center;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: var(--space-6);
+  gap: var(--space-4);
   background: linear-gradient(160deg, rgba(13, 17, 23, 0.97) 0%, rgba(16, 22, 32, 0.95) 100%);
   border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: var(--radius-lg);
@@ -2899,7 +2900,7 @@ button:focus-visible {
   padding-bottom: var(--space-3);
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
-.victory-emblem-emoji { font-size: 120px; }
+.victory-emblem-emoji { font-size: 60px; }
 
 .victory-word {
   display: flex;
