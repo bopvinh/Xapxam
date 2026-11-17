@@ -788,6 +788,16 @@ button {
   margin-top: 4px;
 }
 
+
+@keyframes key-spin {
+  0% { transform: rotateY(0deg); }
+  100% { transform: rotateY(360deg); }
+}
+
+.animate-key-spin {
+  animation: key-spin 0.3s ease-in-out;
+}
+
 /* Animations */
 @keyframes scale-up {
   0% { transform: scale(0.8); }

@@ -1,10 +1,14 @@
 import { io, Socket } from 'socket.io-client';
 
-export function initPvPSocket(roomID: string): Socket {
-  // TODO: Point to real PvP server
-  return io('http://localhost:3000', { autoConnect: false });
+let pvpSocket: Socket | null = null;
+
+export function initPvPSocket(_roomID: string): Socket {
+  pvpSocket = io('http://localhost:3000', { autoConnect: false });
+  return pvpSocket;
 }
 
 export function sendGuess(guess: string): void {
-  // TODO: Implement
+  if (pvpSocket) {
+    pvpSocket.emit('guess', guess);
+  }
 }

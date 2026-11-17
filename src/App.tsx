@@ -20,6 +20,7 @@ import { DefinitionModal } from './components/DefinitionModal';
 import { MultiplayerSetup } from './components/MultiplayerSetup';
 import { Scoreboard } from './components/Scoreboard';
 import { Timer } from './components/Timer';
+import { VictoryScreen } from './components/VictoryScreen';
 
 const DEFAULT_STATS: PlayerStats = {
   gamesPlayed: 0,
@@ -57,6 +58,7 @@ export const App: React.FC = () => {
   const [status, setStatus] = useState<'PLAYING' | 'ROUND_OVER' | 'GAME_OVER'>('PLAYING');
   const [roundNumber, setRoundNumber] = useState<number>(1);
   const [maxRounds, setMaxRounds] = useState<number>(1);
+  const [lastPressedKey, setLastPressedKey] = useState<string | null>(null);
 
   // Timed Mode Timer State
   const [timeLeft, setTimeLeft] = useState<number>(60);
@@ -365,7 +367,10 @@ export const App: React.FC = () => {
       setCurrentGuess((prev) => prev.slice(0, -1));
     } else if (/^[A-Z]$/i.test(key)) {
       if (currentGuess.length < 5) {
-        setCurrentGuess((prev) => (prev + key).toUpperCase());
+        const upperKey = key.toUpperCase();
+        setCurrentGuess((prev) => prev + upperKey);
+        setLastPressedKey(upperKey);
+        setTimeout(() => setLastPressedKey(null), 10);
       }
     }
   }, [currentGuess, status, secretWord, players, activePlayerIndex, activeMode]);
@@ -590,6 +595,7 @@ export const App: React.FC = () => {
               onDelete={() => handleKeyPress('DEL')}
               letterStates={keyboardStates}
               disabled={status !== 'PLAYING'}
+              lastPressedKey={lastPressedKey}
             />
           </div>
         )}
@@ -604,6 +610,13 @@ export const App: React.FC = () => {
             onNextRound={handleNextRound}
             onNewGame={handleHomeClick}
             isGameOver={roundNumber >= maxRounds}
+          />
+        )}
+
+        {status === 'GAME_OVER' && (
+          <VictoryScreen 
+            winner={players.sort((a,b) => a.score - b.score)[0]?.name || 'Unknown'} 
+            onPlayAgain={handleHomeClick}
           />
         )}
       </main>

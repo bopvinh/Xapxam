@@ -1,12 +1,31 @@
-import { describe, it, expect, vi } from 'vitest';
-import { initPvPSocket } from '../src/game/pvp-engine';
-import { Socket } from 'socket.io-client';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { initPvPSocket, sendGuess } from '../src/game/pvp-engine';
+import { io } from 'socket.io-client';
+
+vi.mock('socket.io-client', () => {
+  const mockSocket = {
+    emit: vi.fn(),
+    on: vi.fn(),
+  };
+  return {
+    io: vi.fn(() => mockSocket),
+  };
+});
 
 describe('pvp-engine', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
   it('should initialize a socket connection', () => {
     const socket = initPvPSocket('test-room');
     expect(socket).toBeDefined();
-    // Socket.io-client might have different connection state on init,
-    // but the object should be there.
+    expect(io).toHaveBeenCalledWith('http://localhost:3000', { autoConnect: false });
+  });
+
+  it('should send a guess over the initialized socket', () => {
+    const socket = initPvPSocket('test-room');
+    sendGuess('stare');
+    expect(socket.emit).toHaveBeenCalledWith('guess', 'stare');
   });
 });

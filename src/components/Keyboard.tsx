@@ -7,6 +7,7 @@ interface KeyboardProps {
   onDelete: () => void;
   letterStates: Record<string, LetterState>;
   disabled?: boolean;
+  lastPressedKey?: string | null;
 }
 
 const KEYBOARD_ROWS = [
@@ -20,10 +21,20 @@ export const Keyboard: React.FC<KeyboardProps> = ({
   onEnter,
   onDelete,
   letterStates,
-  disabled = false
+  disabled = false,
+  lastPressedKey
 }) => {
+  const [animatingKey, setAnimatingKey] = React.useState<string | null>(null);
+
+  React.useEffect(() => {
+    if (lastPressedKey) {
+      setAnimatingKey(lastPressedKey);
+    }
+  }, [lastPressedKey]);
+
   const handleClick = (key: string) => {
     if (disabled) return;
+    setAnimatingKey(key);
     if (key === 'ENTER') {
       onEnter();
     } else if (key === 'DEL') {
@@ -40,13 +51,15 @@ export const Keyboard: React.FC<KeyboardProps> = ({
           {row.map((key) => {
             const isSpecial = key === 'ENTER' || key === 'DEL';
             const state = isSpecial ? '' : letterStates[key] || '';
+            const isAnimating = animatingKey === key;
 
             return (
               <button
                 key={key}
                 type="button"
-                className={`key-btn ${isSpecial ? 'special-key' : ''} ${state}`}
+                className={`key-btn ${isSpecial ? 'special-key' : ''} ${state} ${isAnimating ? 'animate-key-spin' : ''}`}
                 onClick={() => handleClick(key)}
+                onAnimationEnd={() => setAnimatingKey(null)}
                 disabled={disabled}
               >
                 {key === 'DEL' ? '⌫' : key}
