@@ -70,6 +70,7 @@ export const VictoryReveal: React.FC<VictoryRevealProps> = ({
         ))}
       </div>
       <div className="victory-emblem">
+        <div className="victory-emblem-glow" />
         <span className="victory-emblem-emoji">🏆</span>
       </div>
 
