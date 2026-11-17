@@ -136,6 +136,30 @@
   overflow: hidden;
 }
 
+/* Shimmer overlay on hero background */
+.kinetic-bg-layer::after {
+  content: '';
+  position: absolute;
+  inset: -20%;
+  background: linear-gradient(
+    110deg,
+    transparent 40%,
+    rgba(99, 102, 241, 0.08) 50%,
+    transparent 60%
+  );
+  background-size: 200% 100%;
+  animation: var(--animation-shimmer);
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0.6;
+}
+
+/* Hero mouse tracking variables */
+:root {
+  --hero-mouse-x: 50%;
+  --hero-mouse-y: 50%;
+}
+
 
 
 /* ── Color blind overrides ────────────────────────────────── */
@@ -2665,6 +2689,39 @@ button:focus-visible {
   box-shadow: 0 12px 28px rgba(99, 102, 241, 0.35), inset 0 1px 2px rgba(255, 255, 255, 0.3);
 }
 
+/* Enhanced hero CTA hover with glow pulse */
+.hero-tiles-row:hover .hero-interactive-tile:not(:hover) {
+  transform: scale(0.96);
+  opacity: 0.6;
+  filter: blur(1px);
+}
+
+/* Adaptive cursor follower for hero tiles */
+.hero-tiles-row {
+  position: relative;
+}
+
+.hero-tiles-row::before {
+  content: '';
+  position: absolute;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: radial-gradient(circle at center, rgba(99, 102, 241, 0.15), transparent 70%);
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  transition: opacity 0.3s ease, transform 0.1s ease-out;
+  opacity: 0;
+  z-index: 0;
+  mix-blend-mode: screen;
+  left: var(--hero-mouse-x, 50%);
+  top: var(--hero-mouse-y, 50%);
+}
+
+.hero-tiles-row:hover::before {
+  opacity: 1;
+}
+
 .hero-tile-letter {
   font-family: var(--font-display);
   font-size: 26px;
@@ -2873,19 +2930,24 @@ button:focus-visible {
    VICTORY REVEAL — signature solved-word "winner's screen"
    ============================================================ */
 .victory-reveal {
-  padding: 40px;
-  width: 50%;
-  max-width: 500px;
-  min-width: 320px;
+  padding: clamp(16px, 3vh, 28px);
+  width: 95%;
+  max-width: min(380px, 95vw);
+  min-width: 280px;
+  max-height: 80vh;
+  overflow-y: auto;
   text-align: center;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: var(--space-4);
-  background: linear-gradient(160deg, rgba(13, 17, 23, 0.97) 0%, rgba(16, 22, 32, 0.95) 100%);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  gap: clamp(10px, 2vh, 14px);
+  background: linear-gradient(160deg, rgba(13, 17, 23, 0.98) 0%, rgba(16, 22, 32, 0.96) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: var(--radius-lg);
-  box-shadow: 0 16px 40px rgba(0,0,0,0.5);
+  box-shadow: 
+    0 18px 45px rgba(0,0,0,0.6),
+    0 0 0 1px rgba(255,255,255,0.05) inset,
+    0 0 35px var(--medal-glow-color, rgba(255, 215, 0, 0.15));
   animation: victory-flash 1s ease-in-out, scale-up 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both, gold-victory-pulse 3s infinite ease-in-out;
 }
 .victory-reveal::before {
@@ -3016,6 +3078,140 @@ button:focus-visible {
   transition: var(--transition);
 }
 .btn-victory-ghost:hover { color: var(--text-primary); border-color: rgba(255, 255, 255, 0.2); }
+
+/* ── Dynamic Medal System ── */
+.victory-medal {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+  margin-bottom: var(--space-2);
+  padding: var(--space-4);
+  border-radius: var(--radius-lg);
+  background: linear-gradient(160deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.medal-glow {
+  position: absolute;
+  inset: -8px;
+  border-radius: var(--radius-lg);
+  background: radial-gradient(ellipse at center, var(--medal-glow-color) 0%, transparent 70%);
+  opacity: 0;
+  animation: medal-glow-pulse 2s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.victory-medal[data-tier="diamond"] .medal-glow { --medal-glow-color: rgba(0, 200, 255, 0.35); }
+.victory-medal[data-tier="gold"] .medal-glow { --medal-glow-color: rgba(255, 215, 0, 0.35); }
+.victory-medal[data-tier="silver"] .medal-glow { --medal-glow-color: rgba(192, 192, 192, 0.3); }
+
+@keyframes medal-glow-pulse {
+  0%, 100% { opacity: 0.3; transform: scale(0.95); }
+  50% { opacity: 0.6; transform: scale(1.05); }
+}
+
+.medal-emoji { font-size: 48px; filter: drop-shadow(0 4px 12px currentColor); }
+.victory-medal[data-tier="diamond"] .medal-emoji { color: #00c8ff; }
+.victory-medal[data-tier="gold"] .medal-emoji { color: #ffd700; }
+.victory-medal[data-tier="silver"] .medal-emoji { color: #c0c0c0; }
+
+.medal-label {
+  font-family: var(--font-display);
+  font-size: var(--text-xs);
+  font-weight: 800;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+.victory-medal[data-tier="diamond"] .medal-label { color: #00c8ff; }
+.victory-medal[data-tier="gold"] .medal-label { color: #ffd700; }
+.victory-medal[data-tier="silver"] .medal-label { color: #c0c0c0; }
+
+.medal-attempts {
+  font-family: var(--font-mono);
+  font-size: var(--text-lg);
+  font-weight: 800;
+  color: var(--text-primary);
+}
+
+/* ── Streak Fire Visualization ── */
+.victory-streak-fire {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  margin: var(--space-2) 0;
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-pill);
+  background: linear-gradient(90deg, rgba(255, 100, 0, 0.1) 0%, rgba(255, 200, 0, 0.05) 100%);
+  border: 1px solid rgba(255, 150, 0, 0.2);
+}
+
+.streak-flame {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.flame-core {
+  font-size: 32px;
+  animation: flame-flicker 0.15s ease-in-out infinite alternate;
+  filter: drop-shadow(0 0 8px #ff6400) drop-shadow(0 0 16px #ffc800);
+  z-index: 2;
+}
+
+.flame-aura {
+  position: absolute;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 100, 0, 0.4) 0%, rgba(255, 200, 0, 0.2) 40%, transparent 70%);
+  animation: flame-aura-breathe 1.5s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.streak-count {
+  position: absolute;
+  font-family: var(--font-mono);
+  font-size: 16px;
+  font-weight: 800;
+  color: #fff;
+  text-shadow: 0 0 8px #ff6400, 0 0 16px #ffc800;
+  transform: translate(8px, -8px);
+  z-index: 3;
+}
+
+.streak-label {
+  font-family: var(--font-display);
+  font-size: var(--text-xs);
+  font-weight: 800;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: #ffc800;
+  text-shadow: 0 0 8px #ff6400;
+}
+
+@keyframes flame-flicker {
+  0% { transform: scale(1) rotate(-2deg); opacity: 0.9; }
+  25% { transform: scale(1.05) rotate(1deg); opacity: 1; }
+  50% { transform: scale(0.95) rotate(2deg); opacity: 0.85; }
+  75% { transform: scale(1.02) rotate(-1deg); opacity: 0.95; }
+  100% { transform: scale(1) rotate(-2deg); opacity: 0.9; }
+}
+
+@keyframes flame-aura-breathe {
+  0%, 100% { transform: scale(0.8); opacity: 0.3; }
+  50% { transform: scale(1.2); opacity: 0.6; }
+}
+
+/* Medal tier color variations for the victory reveal border */
+.victory-reveal.medal-diamond { border-color: rgba(0, 200, 255, 0.4); box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5), 0 0 32px rgba(0, 200, 255, 0.2); }
+.victory-reveal.medal-gold { border-color: rgba(255, 215, 0, 0.4); box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5), 0 0 32px rgba(255, 215, 0, 0.2); }
+.victory-reveal.medal-silver { border-color: rgba(192, 192, 192, 0.3); box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5), 0 0 24px rgba(192, 192, 192, 0.15); }
 
 
 .main-menu-container:hover .vector-corner-tl { transform: translate(-2px, -2px); opacity: 1; }
@@ -3504,6 +3700,65 @@ button:focus-visible {
   .daily-ribbon__number {
     font-size: 14px;
   }
+}
+
+/* Daily progress ribbon - visible on every main menu load */
+.main-menu-progress-ribbon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin: 8px auto 16px;
+  padding: 10px 20px;
+  max-width: 480px;
+  background: linear-gradient(90deg, 
+    rgba(245, 158, 11, 0.08) 0%, 
+    rgba(245, 158, 11, 0.15) 50%, 
+    rgba(99, 102, 241, 0.08) 100%
+  );
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  border-radius: var(--radius-lg);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  color: var(--text-primary);
+  box-shadow: 0 4px 20px rgba(245, 158, 11, 0.15);
+  animation: ribbon-slide-in 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.main-menu-progress-ribbon__label {
+  color: #f59e0b;
+  text-transform: uppercase;
+  font-size: 10px;
+  letter-spacing: 1px;
+}
+
+.main-menu-progress-ribbon__bar {
+  flex: 1;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 3px;
+  overflow: hidden;
+  position: relative;
+}
+
+.main-menu-progress-ribbon__fill {
+  height: 100%;
+  background: linear-gradient(90deg, #f59e0b, #fde047);
+  border-radius: 3px;
+  transition: width 1s cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-shadow: 0 0 10px rgba(245, 158, 11, 0.5);
+}
+
+.main-menu-progress-ribbon__streak {
+  color: #f59e0b;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+@keyframes ribbon-slide-in {
+  0% { opacity: 0; transform: translateY(-20px) scale(0.95); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
 }
 .social-proof-ticker {
   width: 100%;

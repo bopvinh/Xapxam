@@ -335,7 +335,7 @@ export interface ArtifactSynergy {
   id: string;
   name: string;
   description: string;
-  requiredArtifacts: string[];      // Artifact IDs required
+  requiredArtifacts?: string[];      // Artifact IDs required
   requiredSlots?: ArtifactSlot[];   // Or slots required
   bonus: { type: string; value: number; description: string };
 }
@@ -380,7 +380,6 @@ export interface ShopItem {
 
 export function generateShopOffers(inventory: PlayerInventory, count: number = 4): ShopItem[] {
   const offers: ShopItem[] = [];
-  const ownedIds = new Set(Object.keys(inventory.artifacts));
   
   for (let i = 0; i < count; i++) {
     // Weighted random selection
@@ -415,7 +414,7 @@ export function getArtifactEffectiveEffects(artifact: Artifact, level: number): 
 }
 
 // Check active synergies
-export function getActiveSynergies(equipped: EquippedArtifacts, inventory: PlayerInventory): ArtifactSynergy[] {
+export function getActiveSynergies(equipped: EquippedArtifacts): ArtifactSynergy[] {
   const active: ArtifactSynergy[] = [];
   const equippedIds = Object.values(equipped).filter(Boolean) as string[];
   const equippedCount = equippedIds.length;
@@ -423,7 +422,7 @@ export function getActiveSynergies(equipped: EquippedArtifacts, inventory: Playe
   for (const synergy of ARTIFACT_SYNERGIES) {
     let satisfied = false;
     
-    if (synergy.requiredArtifacts.length > 0) {
+    if (synergy.requiredArtifacts && synergy.requiredArtifacts.length > 0) {
       satisfied = synergy.requiredArtifacts.every(id => equippedIds.includes(id));
     } else if (synergy.requiredSlots) {
       satisfied = synergy.requiredSlots.every(slot => equipped[slot]);
@@ -480,8 +479,6 @@ export function calculateArtifactScoreBonus(
     const effects = getArtifactEffectiveEffects(artifact, level);
     
     for (const effect of effects) {
-      let applied = false;
-      
       switch (effect.type) {
         case 'letter_bonus':
           if (!effect.condition || context.word.includes(effect.condition.split(':')[1])) {
@@ -490,7 +487,6 @@ export function calculateArtifactScoreBonus(
               : context.word.length;
             flatBonus += count * effect.value;
             breakdown.push(`${artifact.name}: +${count * effect.value} (letter bonus)`);
-            applied = true;
           }
           break;
           
@@ -498,14 +494,12 @@ export function calculateArtifactScoreBonus(
           const vowels = context.word.match(/[AEIOU]/gi)?.length || 0;
           flatBonus += vowels * effect.value;
           breakdown.push(`${artifact.name}: +${vowels * effect.value} (${vowels} vowels)`);
-          applied = true;
           break;
           
         case 'consonant_bonus':
           const consonants = context.word.match(/[BCDFGHJKLMNPQRSTVWXYZ]/gi)?.length || 0;
           flatBonus += consonants * effect.value;
           breakdown.push(`${artifact.name}: +${consonants * effect.value} (${consonants} consonants)`);
-          applied = true;
           break;
           
         case 'length_bonus':
@@ -513,7 +507,6 @@ export function calculateArtifactScoreBonus(
             const bonus = Math.round(baseScore * (effect.value / 100) * (context.word.length - 4));
             flatBonus += bonus;
             breakdown.push(`${artifact.name}: +${bonus} (length bonus)`);
-            applied = true;
           }
           break;
           
@@ -527,7 +520,6 @@ export function calculateArtifactScoreBonus(
           if (shouldApply) {
             totalMultiplier *= effect.value;
             breakdown.push(`${artifact.name}: x${effect.value} multiplier`);
-            applied = true;
           }
           break;
           
@@ -536,7 +528,6 @@ export function calculateArtifactScoreBonus(
             const streakMult = 1 + Math.min(context.currentStreak, 10) * (effect.value / 100);
             totalMultiplier *= streakMult;
             breakdown.push(`${artifact.name}: x${streakMult.toFixed(2)} (streak)`);
-            applied = true;
           }
           break;
       }
@@ -544,7 +535,7 @@ export function calculateArtifactScoreBonus(
   }
   
   // Apply synergies
-  const synergies = getActiveSynergies(equipped, inventory);
+  const synergies = getActiveSynergies(equipped);
   for (const synergy of synergies) {
     if (synergy.bonus.type === 'all_bonus') {
       totalMultiplier *= (1 + synergy.bonus.value / 100);

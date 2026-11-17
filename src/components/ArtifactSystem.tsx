@@ -1,6 +1,5 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo } from 'react';
 import { 
-  Artifact, 
   ArtifactRarity, 
   EquippedArtifacts, 
   PlayerInventory,
@@ -12,7 +11,6 @@ import {
   getActiveSynergies,
   canUpgradeArtifact,
   getUpgradeCost,
-  upgradeArtifact,
   getArtifactEffectiveEffects
 } from '../game/artifacts';
 
@@ -47,7 +45,6 @@ export const ArtifactSystem: React.FC<ArtifactSystemProps> = ({
   const [activeTab, setActiveTab] = useState<'equip' | 'inventory' | 'shop' | 'synergies'>('equip');
   const [shopOffers, setShopOffers] = useState<ShopItem[]>(() => generateShopOffers(inventory));
   const [shopRefreshCost] = useState(10);
-  const [selectedArtifact, setSelectedArtifact] = useState<Artifact | null>(null);
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null);
 
   const equippedArtifacts = useMemo(() => 
@@ -74,7 +71,7 @@ export const ArtifactSystem: React.FC<ArtifactSystemProps> = ({
         return b.level - a.level;
       }), [inventory.artifacts]);
 
-  const activeSynergies = useMemo(() => getActiveSynergies(inventory.equipped, inventory), [inventory.equipped, inventory.artifacts]);
+  const activeSynergies = useMemo(() => getActiveSynergies(inventory.equipped), [inventory.equipped, inventory.artifacts]);
 
   const showToast = (message: string, type: 'success' | 'error' | 'info' = 'info') => {
     setToast({ message, type });
@@ -434,16 +431,16 @@ export const ArtifactSystem: React.FC<ArtifactSystemProps> = ({
                             <span className="bonus-desc">{synergy.bonus.description}</span>
                           </>
                         ) : (
-                          <>
-                            <span className="requirement">REQUIRES:</span>
-                            {synergy.requiredArtifacts.length > 0 && (
-                              <span>{synergy.requiredArtifacts.map(id => ARTIFACT_DATABASE.find(a => a.id === id)?.name).join(' + ')}</span>
-                            )}
-                            {synergy.requiredSlots && (
-                              <span>{synergy.requiredSlots.map(s => SLOT_LABELS[s]).join(' + ')}</span>
-                            )}
-                          </>
-                        )}
+                                                  <>
+                                                    <span className="requirement">REQUIRES:</span>
+                                                    {synergy.requiredArtifacts && synergy.requiredArtifacts.length > 0 && (
+                                                      <span>{synergy.requiredArtifacts.map(id => ARTIFACT_DATABASE.find(a => a.id === id)?.name).join(' + ')}</span>
+                                                    )}
+                                                    {synergy.requiredSlots && (
+                                                      <span>{synergy.requiredSlots.map(s => SLOT_LABELS[s]).join(' + ')}</span>
+                                                    )}
+                                                  </>
+                                                )}
                       </div>
                     </div>
                   );

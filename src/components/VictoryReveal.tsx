@@ -59,8 +59,16 @@ export const VictoryReveal: React.FC<VictoryRevealProps> = ({
     }));
   }, []);
 
+  // Medal tier based on attempts used
+  const medalTier = attemptsUsed <= 2 ? 'diamond' : attemptsUsed <= 4 ? 'gold' : 'silver';
+  const medalEmoji = medalTier === 'diamond' ? '💎' : medalTier === 'gold' ? '🥇' : '🥈';
+  const medalLabel = medalTier === 'diamond' ? 'PERFECT' : medalTier === 'gold' ? 'MASTERFUL' : 'SKILLED';
+
+  // Streak fire intensity
+  const streakIntensity = Math.min(streak, 10);
+
   return (
-    <div className={`victory-reveal animate-scale is-win-aura`} role="status" aria-live="polite">
+    <div className={`victory-reveal animate-scale is-win-aura medal-${medalTier}`} role="status" aria-live="polite">
       {edgeParticles.map((p, i) => (
         <div key={i} className="victory-edge-particle" style={p.style} />
       ))}
@@ -69,9 +77,13 @@ export const VictoryReveal: React.FC<VictoryRevealProps> = ({
           <div key={i} className="victory-particle" style={style} />
         ))}
       </div>
-      <div className="victory-emblem">
-        <div className="victory-emblem-glow" />
-        <span className="victory-emblem-emoji">🏆</span>
+      
+      {/* Dynamic Medal Display */}
+      <div className="victory-medal" data-tier={medalTier}>
+        <div className="medal-glow" />
+        <span className="medal-emoji">{medalEmoji}</span>
+        <span className="medal-label">{medalLabel}</span>
+        <span className="medal-attempts">{attemptsUsed}/6</span>
       </div>
 
       <h2 className="victory-title">Word Solved!</h2>
@@ -88,6 +100,18 @@ export const VictoryReveal: React.FC<VictoryRevealProps> = ({
           </div>
         ))}
       </div>
+
+      {/* Streak Fire Visualization */}
+      {streak > 1 && (
+        <div className="victory-streak-fire" data-intensity={streakIntensity}>
+          <div className="streak-flame">
+            <span className="flame-core">🔥</span>
+            <span className="flame-aura" />
+            <span className="streak-count">{streak}</span>
+          </div>
+          <span className="streak-label">{streak} WIN STREAK</span>
+        </div>
+      )}
 
       <p className="victory-mode">
         {mode.replace('_', ' ')} · {finalGuess}

@@ -186,19 +186,20 @@ export const MainMenu: React.FC<MainMenuProps> = ({
     </>,
   ];
 
-  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+    const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+    const [heroTileMousePos, setHeroTileMousePos] = useState({ x: 0, y: 0 });
 
-  useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      const x = (e.clientX / window.innerWidth - 0.5) * 20;
-      const y = (e.clientY / window.innerHeight - 0.5) * 20;
-      setMousePos({ x, y });
-    };
-    window.addEventListener('mousemove', handleMouseMove);
-    return () => window.removeEventListener('mousemove', handleMouseMove);
-  }, []);
+    useEffect(() => {
+      const handleMouseMove = (e: MouseEvent) => {
+        const x = (e.clientX / window.innerWidth - 0.5) * 20;
+        const y = (e.clientY / window.innerHeight - 0.5) * 20;
+        setMousePos({ x, y });
+      };
+      window.addEventListener('mousemove', handleMouseMove);
+      return () => window.removeEventListener('mousemove', handleMouseMove);
+    }, []);
 
-  return (
+    return (
     <div className="main-menu-container animate-scale" style={{ 
       transform: `perspective(1000px) rotateY(${mousePos.x * 0.1}deg) rotateX(${-mousePos.y * 0.1}deg)` 
     }}>
@@ -225,43 +226,77 @@ export const MainMenu: React.FC<MainMenuProps> = ({
       </div>
 
       {/* ── Daily solver ribbon ──────────────────────────── */}
-      <div className="daily-ribbon">
-        <div className="daily-ribbon__inner">
-          <span className="daily-ribbon__label">today's solvers</span>
-          <span className="daily-ribbon__number">2,847</span>
-          <span className="daily-ribbon__streak">
-            🔥 <span className="daily-ribbon__label">streak bonus</span>
-          </span>
-        </div>
-      </div>
+            <div className="daily-ribbon">
+              <div className="daily-ribbon__inner">
+                <span className="daily-ribbon__label">today's solvers</span>
+                <span className="daily-ribbon__number">2,847</span>
+                <span className="daily-ribbon__streak">
+                  🔥 <span className="daily-ribbon__label">streak bonus</span>
+                </span>
+              </div>
+            </div>
 
-      {/* ── Hero ─────────────────────────────────────────── */}
-      <section className="hero-section" aria-label="Game title" style={{ padding: '4px 0' }}>
-        <div className="hero-tiles-row" style={{ display: 'flex', justifyContent: 'center', gap: '8px', marginBottom: '6px' }}>
-          {tiles.map(({ letter, color }, idx) => (
-            <div
-              key={idx}
-              className={`hero-interactive-tile ${flippedTile === idx ? 'tile-flip' : ''}`}
-              onClick={() => handleTileClick(idx)}
-              onMouseEnter={() => {
-                soundManager.playPop();
-              }}
-              title="Click to flip!"
-              role="button"
-              tabIndex={0}
-              style={{
-                borderColor: color,
-                boxShadow: `0 8px 20px rgba(0, 0, 0, 0.4), 0 0 12px ${color}33`,
-              }}
-            >
-              <span className="hero-tile-letter" style={{ color: letter === 'R' ? 'var(--text-secondary)' : '#ffffff' }}>
-                {letter}
+            {/* ── Daily Progress Ribbon ──────────────────────────── */}
+            <div className="main-menu-progress-ribbon" role="status" aria-live="polite">
+              <span className="main-menu-progress-ribbon__label">Daily Progress</span>
+              <div className="main-menu-progress-ribbon__bar">
+                <div 
+                  className="main-menu-progress-ribbon__fill" 
+                  style={{ width: `${dayProgress}%` }}
+                />
+              </div>
+              <span className="main-menu-progress-ribbon__streak">
+                🔥 {userStats?.streak || 0} Day Streak
               </span>
             </div>
-          ))}
-        </div>
-        <p className="hero-subtitle" style={{ marginTop: '2px', letterSpacing: '3px' }}>The Ultimate Word Challenge</p>
-      </section>
+
+            {/* ── Hero ─────────────────────────────────────────── */}
+                  <section className="hero-section" aria-label="Game title" style={{ padding: '4px 0' }}>
+                    <div 
+                              className="hero-tiles-row" 
+                              style={{ 
+                                display: 'flex', 
+                                justifyContent: 'center', 
+                                gap: '8px', 
+                                marginBottom: '6px',
+                                '--hero-mouse-x': `${heroTileMousePos.x}px`,
+                                '--hero-mouse-y': `${heroTileMousePos.y}px`
+                              } as React.CSSProperties}
+                              onMouseMove={(e) => {
+                        const rect = e.currentTarget.getBoundingClientRect();
+                        setHeroTileMousePos({
+                          x: e.clientX - rect.left,
+                          y: e.clientY - rect.top
+                        });
+                      }}
+                      onMouseLeave={() => {
+                        setHeroTileMousePos({ x: 0, y: 0 });
+                      }}
+                    >
+                      {tiles.map(({ letter, color }, idx) => (
+                        <div
+                          key={idx}
+                          className={`hero-interactive-tile ${flippedTile === idx ? 'tile-flip' : ''}`}
+                          onClick={() => handleTileClick(idx)}
+                          onMouseEnter={() => {
+                            soundManager.playPop();
+                          }}
+                          title="Click to flip!"
+                          role="button"
+                          tabIndex={0}
+                          style={{
+                            borderColor: color,
+                            boxShadow: `0 8px 20px rgba(0, 0, 0, 0.4), 0 0 12px ${color}33`,
+                          }}
+                        >
+                          <span className="hero-tile-letter" style={{ color: letter === 'R' ? 'var(--text-secondary)' : '#ffffff' }}>
+                            {letter}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                    <p className="hero-subtitle" style={{ marginTop: '2px', letterSpacing: '3px' }}>The Ultimate Word Challenge</p>
+                  </section>
 
       {/* ── Featured Modes: Spotlight Pair (Classic & Daily) + Compact Secondary ── */}
       <div>

@@ -90,6 +90,7 @@ export const Header: React.FC<HeaderProps> = ({
   mode,
   onOpenHelp,
   onOpenStats,
+  onOpenArtifacts,
   onHomeClick,
   colorBlindMode,
   onToggleColorBlind,
@@ -97,6 +98,7 @@ export const Header: React.FC<HeaderProps> = ({
   onToggleHardMode,
   soundEnabled,
   onToggleSound,
+  artifactCurrency,
 }) => {
   return (
     <header className="app-header" role="banner">

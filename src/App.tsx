@@ -33,7 +33,7 @@ import { RowReticle } from './components/RowReticle';
 
 import { FloatingHUD } from './components/FloatingHUD';
 import { ArtifactSystem } from './components/ArtifactSystem';
-import { PlayerInventory, EquippedArtifacts, ARTIFACT_DATABASE, RARITY_CONFIG } from './game/artifacts';
+import { PlayerInventory, ARTIFACT_DATABASE, RARITY_CONFIG } from './game/artifacts';
 
 const DEFAULT_STATS: PlayerStats = {
   gamesPlayed: 0,
