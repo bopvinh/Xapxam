@@ -1,0 +1,66 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080" fill="none">
+  <defs>
+    <linearGradient id="grad-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0c0f12"/>
+      <stop offset="100%" stop-color="#12151d"/>
+    </linearGradient>
+    <radialGradient id="glow-1" cx="50%" cy="50%" r="70%" fx="50%" fy="50%">
+      <stop offset="0%" stop-color="#1a2535" stop-opacity="0.1"/>
+      <stop offset="100%" stop-color="#0c0f12" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="glow-2" cx="60%" cy="40%" r="40%" fx="50%" fy="50%">
+      <stop offset="0%" stop-color="#1a2535" stop-opacity="0.15"/>
+      <stop offset="100%" stop-color="#0c0f12" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="glow-outer" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="10" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <filter id="glow-inner" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="6" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <rect width="1920" height="1080" fill="url(#grad-bg)"/>
+  <rect class="glow-outer" x="0" y="0" width="1920" height="1080" fill="url(#glow-1)"/>
+  <rect class="glow-inner" x="0" y="0" width="1920" height="1080" fill="url(#glow-2)"/>
+  <g class="hero-animation" style="animation: glow-pulse 8s infinite alternate, glow-pulse 12s infinite alternate;">
+    <rect x="0" y="0" width="1920" height="1080" fill="rgba(13, 17, 23, 0.15)" class="glow-outer"/>
+    <rect x="0" y="0" width="1920" height="1080" fill="rgba(18, 24, 35, 0.08)" class="glow-outer"/>
+  </g>
+  <path class="glow-pulse" d="M0,1080 L0,0 L1920,0 L1920,1080 Z" fill="rgba(18, 24, 35, 0.12)" opacity="0.3" />
+  <path class="glow-pulse" d="M0,0 L1920,0 L1920,1080 L0,1080 Z" fill="rgba(18, 24, 35, 0.08)" opacity="0.2" />
+  <g class="glow-pulse" style="animation: glow-pulse 10s infinite alternate;">
+    <circle cx="240" cy="360" r="120" fill="none" stroke="#1a2535" stroke-width="1" opacity="0.2"/>
+    <circle cx="1680" cy="720" r="80" fill="none" stroke="#1a2535" stroke-width="1" opacity="0.15"/>
+  </g>
+  <path class="glow-pulse" d="M0,1080 Q960,540 1920,1080" fill="none" stroke="#1a2535" stroke-width="1" opacity="0.15" />
+  <g class="glow-pulse" style="animation: glow-pulse 14s infinite alternate;">
+    <ellipse cx="480" cy="540" rx="180" ry="120" fill="none" stroke="#1a2535" stroke-width="0.5" opacity="0.1"/>
+    <ellipse cx="1440" cy="450" rx="120" ry="80" fill="none" stroke="#1a2535" stroke-width="0.5" opacity="0.1"/>
+  </g>
+  <text x="960" y="540" text-anchor="middle" font-family="Outfit, sans-serif" font-size="48" fill="#f1f5f9" opacity="0.3">The Ultimate Word Challenge</text>
+  <text x="960" y="590" text-anchor="middle" font-family="Outfit, sans-serif" font-size="28" fill="#f1f5f9" opacity="0.4">Solve the secret 5-letter word in 6 attempts</text>
+  <text x="960" y="620" text-anchor="middle" font-family="Outfit, sans-serif" font-size="24" fill="#f1f5f9" opacity="0.2">Press SPACE to launch Classic mode</text>
+  <text x="960" y="650" text-anchor="middle" font-family="Outfit, sans-serif" font-size="20" fill="#f1f5f9" opacity="0.15">Or press D for Daily Challenge</text>
+  <defs>
+    <style>
+      .glow-pulse {
+        animation: glow-pulse 8s infinite alternate, glow-pulse 12s infinite alternate;
+      }
+      @keyframes glow-pulse {
+        from { opacity: 0.1; transform: scale(0.95); }
+        to { opacity: 0.3; transform: scale(1.05); }
+      }
+      .hero-animation {
+        animation: glow-pulse 8s infinite alternate, glow-pulse 12s infinite alternate;
+      }
+    </style>
+  </defs>
+</svg>

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { GameMode } from '../game/types';
 import { soundManager } from '../game/audio';
+import heroBgV2 from '../assets/hero-bg-v2.svg';
 
 interface MainMenuProps {
   onSelectMode: (mode: GameMode) => void;
@@ -200,13 +201,25 @@ export const MainMenu: React.FC<MainMenuProps> = ({
     }, []);
 
     return (
-    <div className="main-menu-container animate-scale">
-          <div style={{ transform: `perspective(1000px) rotateY(${mousePos.x * 0.1}deg) rotateX(${-mousePos.y * 0.1}deg)`, width:'100%', height:'100%', position:'relative' }}>
-      {/* ── Precision Vector Corner Reticle Brackets ───────── */}
-      <div className="vector-corner-tl" aria-hidden="true" />
-      <div className="vector-corner-tr" aria-hidden="true" />
-      <div className="vector-corner-bl" aria-hidden="true" />
-      <div className="vector-corner-br" aria-hidden="true" />
+        <div className="main-menu-container animate-scale">
+              <div style={{ transform: `perspective(1000px) rotateY(${mousePos.x * 0.1}deg) rotateX(${-mousePos.y * 0.1}deg)`, width:'100%', height:'100%', position:'relative' }}>
+          {/* ── Premium SVG Hero Background ───────────────────────── */}
+          <div 
+            className="hero-svg-bg" 
+            style={{ 
+              position: 'absolute', 
+              inset: 0, 
+              zIndex: 0, 
+              pointerEvents: 'none',
+              opacity: 0.6
+            }} 
+            dangerouslySetInnerHTML={{ __html: heroBgV2 }}
+          />
+          {/* ── Precision Vector Corner Reticle Brackets ───────── */}
+          <div className="vector-corner-tl" aria-hidden="true" />
+          <div className="vector-corner-tr" aria-hidden="true" />
+          <div className="vector-corner-bl" aria-hidden="true" />
+          <div className="vector-corner-br" aria-hidden="true" />
 
       {/* ── Top Ribbon Stats ─────────────────────────────── */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '11px', color: 'var(--text-secondary)', padding: '0 4px' }}>
