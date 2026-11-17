@@ -11,5 +11,17 @@ export default defineConfig({
     outDir: 'dist',
     sourcemap: true,
   },
-  test: undefined,
+  test: {
+    include: ['tests/**/*.test.ts', 'src/**/*.test.ts'],
+    exclude: ['node_modules', 'whitefish/node_modules'],
+    globals: true,
+    environment: 'jsdom',
+    setupFiles: [],
+    pool: 'forks',
+    poolOptions: {
+      forks: {
+        singleFork: true,
+      },
+    },
+  },
 })

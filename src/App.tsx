@@ -20,6 +20,17 @@ import { DefinitionModal } from './components/DefinitionModal';
 import { MultiplayerSetup } from './components/MultiplayerSetup';
 import { Scoreboard } from './components/Scoreboard';
 import { Timer } from './components/Timer';
+import { DailyChestModal } from './components/DailyChestModal';
+import { WordMentorModal } from './components/WordMentorModal';
+import { SpeedBlitzModal } from './components/SpeedBlitzModal';
+import { ShareModal } from './components/ShareModal';
+import { MasteryStatsModal } from './components/MasteryStatsModal';
+import { LeaderboardModal } from './components/LeaderboardModal';
+import { VictoryReveal } from './components/VictoryReveal';
+import { VectorBackground } from './components/VectorBackground';
+import { RowReticle } from './components/RowReticle';
+
+import { FloatingHUD } from './components/FloatingHUD';
 
 const DEFAULT_STATS: PlayerStats = {
   gamesPlayed: 0,
@@ -30,6 +41,19 @@ const DEFAULT_STATS: PlayerStats = {
 };
 
 export const App: React.FC = () => {
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      setMousePos({
+        x: (e.clientX / window.innerWidth - 0.5) * 2,
+        y: (e.clientY / window.innerHeight - 0.5) * 2,
+      });
+    };
+    window.addEventListener('mousemove', handleMouseMove);
+    return () => window.removeEventListener('mousemove', handleMouseMove);
+  }, []);
+
   // Navigation / Modals State
   const [activeMode, setActiveMode] = useState<GameMode | null>(null);
   const [isHelpOpen, setIsHelpOpen] = useState<boolean>(false);
@@ -37,6 +61,13 @@ export const App: React.FC = () => {
   const [isDefinitionOpen, setIsDefinitionOpen] = useState<boolean>(false);
   const [showMultiplayerSetup, setShowMultiplayerSetup] = useState<boolean>(false);
   const [showScoreboard, setShowScoreboard] = useState<boolean>(false);
+  const [showDailyChest, setShowDailyChest] = useState<boolean>(false);
+  const [showMentor, setShowMentor] = useState<boolean>(false);
+  const [showBlitz, setShowBlitz] = useState<boolean>(false);
+  const [showShare, setShowShare] = useState<boolean>(false);
+  const [showMastery, setShowMastery] = useState<boolean>(false);
+  const [showLeaderboard, setShowLeaderboard] = useState<boolean>(false);
+  const [isJolting, setIsJolting] = useState<boolean>(false);
 
   // Settings state
   const [colorBlindMode, setColorBlindMode] = useState<boolean>(false);
@@ -74,10 +105,6 @@ export const App: React.FC = () => {
       } catch (e) {
         console.error(e);
       }
-    }
-    const cbMode = localStorage.getItem('wordplusplus_colorblind');
-    if (cbMode === 'true') {
-      setColorBlindMode(true);
     }
     const hmMode = localStorage.getItem('wordplusplus_hardmode');
     if (hmMode === 'true') {
@@ -252,6 +279,8 @@ export const App: React.FC = () => {
 
     const evaluation = evaluateGuess(formattedGuess, secretWord);
     soundManager.playFlip();
+    setIsJolting(true);
+    setTimeout(() => setIsJolting(false), 600);
     const isWon = formattedGuess === secretWord;
     if (isWon) {
       triggerVictory();
@@ -293,10 +322,12 @@ export const App: React.FC = () => {
         setStatus('ROUND_OVER');
         updateStats(true, newGuesses.length);
         showToast('🎉 Brilliant! You solved the word!');
+        // setTimeout(() => setShowShare(true), 1500);
       } else if (isOutOfAttempts) {
         setStatus('ROUND_OVER');
         updateStats(false, 6);
         showToast(`😔 Game over! The word was ${secretWord}`);
+        triggerShake(5);
       }
       return;
     }
@@ -348,8 +379,11 @@ export const App: React.FC = () => {
     return -1;
   };
 
-  const triggerShake = () => {
-    setInvalidRowIndex(players[activePlayerIndex]?.guesses.length || 0);
+  const triggerShake = (rowIndex?: number) => {
+    const target = typeof rowIndex === 'number'
+      ? rowIndex
+      : Math.min(players[activePlayerIndex]?.guesses.length || 0, 5);
+    setInvalidRowIndex(target);
     setTimeout(() => {
       setInvalidRowIndex(null);
     }, 500);
@@ -482,8 +516,21 @@ export const App: React.FC = () => {
     });
   };
 
+  const guessesLength = activePlayer ? activePlayer.guesses.length : 0;
+  const tensionScale = activeMode ? 1 + Math.max(0, guessesLength - 3) * 0.015 : 1;
+
   return (
-    <div className={`app-container ${colorBlindMode ? 'cb-theme' : ''}`}>
+    <div 
+      className={`app-container ${colorBlindMode ? 'cb-theme' : ''} ${showConfetti ? 'screen-flash-green' : ''}`}
+      style={{
+        '--mx': mousePos.x,
+        '--my': mousePos.y,
+        '--tx': `${mousePos.x * 20}px`,
+        '--ty': `${mousePos.y * 20}px`,
+        '--tension-scale': tensionScale,
+      } as React.CSSProperties}
+    >
+      <VectorBackground status={showConfetti ? 'WIN' : status} />
       {activeMode && (
         <Header
           mode={activeMode}
@@ -531,6 +578,12 @@ export const App: React.FC = () => {
 
         {activeMode && !showMultiplayerSetup && !showScoreboard && activePlayer && (
           <div className="gameplay-area animate-scale">
+            {/* Kinetic Row Reticle (Tactical Focus HUD) */}
+            <RowReticle activeRow={activePlayer.guesses.length} />
+
+            {/* Kinetic Viewport Impact Layer (jolt effect) */}
+            <div className={`viewport-impact-layer${isJolting ? ' viewport-impact-jolt' : ''}`} aria-hidden="true" />
+
             {/* Multiplayer Banner */}
             {players.length > 1 && (
               <div className="multiplayer-hud">
@@ -555,6 +608,11 @@ export const App: React.FC = () => {
               />
             )}
 
+            {/* Activity Reticle (kinetic tracking HUD) */}
+            {activePlayer && status === 'PLAYING' && (
+              <RowReticle activeRow={activePlayer.guesses.length} />
+            )}
+
             {/* Game Grid */}
             <GameBoard
               guesses={activePlayer.guesses}
@@ -565,31 +623,60 @@ export const App: React.FC = () => {
 
             {/* Feedback actions if solved / failed */}
             {status === 'ROUND_OVER' && (
-              <div className="reveal-actions-panel animate-scale">
-                <p className="outcome-reveal">
-                  {activePlayer.solved ? '🎉 Word Solved!' : `😔 Answer: ${secretWord}`}
-                </p>
-                <div className="outcome-btns">
-                  <button className="btn-primary" onClick={() => startSinglePlayerGame(activeMode)}>
-                    Play Again
-                  </button>
-                  <button className="btn-secondary" onClick={() => setIsDefinitionOpen(true)}>
-                    📖 Meaning
-                  </button>
-                  <button className="btn-secondary" onClick={handleShareEmoji}>
-                    Share
-                  </button>
-                </div>
+              <div className="reveal-wrapper">
+                {activePlayer.solved ? (
+                  <VictoryReveal
+                    won={true}
+                    finalGuess={secretWord}
+                    finalEvals={
+                      activePlayer.guesses[activePlayer.guesses.length - 1]?.evaluation ?? []
+                    }
+                    mode={activeMode}
+                    attemptsUsed={activePlayer.attemptsUsed}
+                    streak={stats.currentStreak}
+                    winRate={
+                      stats.gamesPlayed > 0
+                        ? Math.round((stats.gamesWon / stats.gamesPlayed) * 100)
+                        : 100
+                    }
+                    onPlayAgain={() => startSinglePlayerGame(activeMode)}
+                    onMeaning={() => setIsDefinitionOpen(true)}
+                  />
+                ) : (
+                  <div className="reveal-actions-panel animate-scale">
+                    <p className="outcome-reveal">
+                      😔 Answer: {secretWord}
+                    </p>
+                    <div className="outcome-btns">
+                      <button
+                        className="btn-primary"
+                        onClick={() => startSinglePlayerGame(activeMode)}
+                      >
+                        Play Again
+                      </button>
+                      <button
+                        className="btn-secondary"
+                        onClick={() => setIsDefinitionOpen(true)}
+                      >
+                        📖 Meaning
+                      </button>
+                      <button className="btn-secondary" onClick={handleShareEmoji}>
+                        Share
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
             )}
 
-            {/* On-screen Keyboard */}
+            {/* On-screen Keyboard */ }
             <Keyboard
               onChar={(char) => handleKeyPress(char)}
               onEnter={() => handleKeyPress('ENTER')}
               onDelete={() => handleKeyPress('DEL')}
               letterStates={keyboardStates}
               disabled={status !== 'PLAYING'}
+              isSubmitting={status === 'PLAYING' && isJolting}
             />
           </div>
         )}
@@ -612,6 +699,57 @@ export const App: React.FC = () => {
       <HelpModal isOpen={isHelpOpen} onClose={() => setIsHelpOpen(false)} />
       <StatsModal isOpen={isStatsOpen} onClose={() => setIsStatsOpen(false)} stats={stats} onReset={handleResetStats} />
       <DefinitionModal isOpen={isDefinitionOpen} onClose={() => setIsDefinitionOpen(false)} word={secretWord} />
+      <DailyChestModal
+        isOpen={showDailyChest}
+        onClose={() => setShowDailyChest(false)}
+        onClaim={(reward) => {
+          setShowDailyChest(false);
+          if (reward.id === 'streak-shield') {
+            const saved = localStorage.getItem('wordplusplus_streak');
+            let count = 0;
+            if (saved) {
+              try { count = JSON.parse(saved).count || 0; } catch (e) {}
+            }
+            localStorage.setItem('wordplusplus_streak', JSON.stringify({ count, active: true }));
+            window.location.reload(); // Refresh to update main menu display instantly!
+          }
+          showToast(`🎁 Claimed: ${reward.label}`);
+        }}
+      />
+      <WordMentorModal
+        isOpen={showMentor}
+        onClose={() => setShowMentor(false)}
+        word={secretWord || 'CLIMB'}
+      />
+      <SpeedBlitzModal
+        isOpen={showBlitz}
+        onClose={() => setShowBlitz(false)}
+        onStartBlitz={(seconds) => {
+          setShowBlitz(false);
+          handleSelectMode('FAST');
+          showToast(`⏱️ Speed Rush mode activated: ${seconds} seconds limit!`);
+        }}
+      />
+      <ShareModal
+        isOpen={showShare}
+        onClose={() => setShowShare(false)}
+        word={secretWord}
+        attemptsUsed={players[activePlayerIndex]?.guesses.length}
+        solved={players[activePlayerIndex]?.solved}
+      />
+      <MasteryStatsModal
+        isOpen={showMastery}
+        onClose={() => setShowMastery(false)}
+        stats={stats}
+      />
+      <LeaderboardModal
+        isOpen={showLeaderboard}
+        onClose={() => setShowLeaderboard(false)}
+      />
+      <FloatingHUD 
+        streak={stats.currentStreak} 
+        winRate={stats.gamesPlayed > 0 ? Math.round((stats.gamesWon / stats.gamesPlayed) * 100) : 100} 
+      />
     </div>
   );
 };
