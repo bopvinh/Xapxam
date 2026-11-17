@@ -1,22 +1,40 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { GameBoard } from './GameBoard'; 
 import { GuessResult } from '../game/types';
+import { io } from 'socket.io-client';
 
 interface BattleBoardProps {
-  playerHealth: number;
-  opponentHealth: number;
+  roomID: string;
   guesses: GuessResult[];
   currentGuess: string;
 }
 
 export const BattleBoard: React.FC<BattleBoardProps> = ({ 
-  playerHealth, 
-  opponentHealth, 
+  roomID,
   guesses, 
   currentGuess 
 }) => {
+  const [playerHealth, setPlayerHealth] = useState(100);
+  const [opponentHealth, setOpponentHealth] = useState(100);
+  const [shake, setShake] = useState(false);
+
+  useEffect(() => {
+    const socket = io('http://localhost:3000');
+    socket.emit('join', roomID);
+    
+    socket.on('damage_received', (data: { damage: number }) => {
+      setPlayerHealth(prev => Math.max(0, prev - data.damage));
+      setShake(true);
+      setTimeout(() => setShake(false), 500);
+    });
+
+    return () => {
+      socket.disconnect();
+    };
+  }, [roomID]);
+
   return (
-    <div className="battle-board">
+    <div className={`battle-board ${shake ? 'shake-row' : ''}`}>
       <div className="combat-hud" style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px', padding: '0 8px' }}>
         <div className="health-bar player" style={{ color: '#22d3a0', fontWeight: 600 }}>
           Player HP: {playerHealth}

@@ -20,6 +20,10 @@ io.on('connection', (socket) => {
   socket.on('guess', (data) => {
     // Relay guess to others in the same room
     socket.to(data.roomID).emit('guess_received', { ...data, senderID: socket.id });
+    
+    // Simulate combat: incorrect guess deals damage to sender? No, correct guess deals damage to opponent.
+    // For now, simplify: any guess deals 10 damage to opponent.
+    socket.to(data.roomID).emit('damage_received', { damage: 10 });
   });
 
   socket.on('disconnect', () => {
