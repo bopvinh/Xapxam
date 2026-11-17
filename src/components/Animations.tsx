@@ -1,4 +1,3 @@
-import { motion } from 'framer-motion';
 
 export const flipVariants = {
   hidden: { rotateY: 180, opacity: 0 },

@@ -1,20 +1,22 @@
 import React from 'react';
-import GameBoard from './GameBoard'; // Assume this is where the main board is
+import { GameBoard } from './GameBoard'; 
+import { GuessResult } from '../game/types';
 
 interface BattleBoardProps {
   playerHealth: number;
   opponentHealth: number;
-  // ... other props
+  guesses: GuessResult[];
+  currentGuess: string;
 }
 
-const BattleBoard: React.FC<BattleBoardProps> = ({ playerHealth, opponentHealth }) => {
+const BattleBoard: React.FC<BattleBoardProps> = ({ playerHealth, opponentHealth, guesses, currentGuess }) => {
   return (
     <div className="battle-board">
       <div className="combat-hud">
         <div className="health-bar player">Health: {playerHealth}</div>
         <div className="health-bar opponent">Opponent: {opponentHealth}</div>
       </div>
-      <GameBoard />
+      <GameBoard guesses={guesses} currentGuess={currentGuess} />
     </div>
   );
 };
