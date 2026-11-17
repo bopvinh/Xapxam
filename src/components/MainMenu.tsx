@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { GameMode } from '../game/types';
 import { soundManager } from '../game/audio';
 import heroBgV2 from '../assets/hero-bg-v2.svg';
@@ -155,14 +155,52 @@ export const MainMenu: React.FC<MainMenuProps> = ({
   }, []);
 
   const handleTileClick = (index: number) => {
-    soundManager.playFlip();
-    setFlippedTile(index);
-    setTimeout(() => setFlippedTile(null), 800);
-  };
+      soundManager.playFlip();
+      setFlippedTile(index);
+      setTimeout(() => setFlippedTile(null), 800);
+    };
 
-  const handleHover = () => {
-    soundManager.playHover();
-  };
+    // Innovative CTA: Hold-to-charge entry mechanic
+    const [chargeState, setChargeState] = useState<'idle' | 'charging' | 'ready'>('idle');
+    const [chargeProgress, setChargeProgress] = useState(0);
+    const [chargeTargetMode, setChargeTargetMode] = useState<GameMode | null>(null);
+    const chargeIntervalRef = useRef<number | null>(null);
+
+    const startCharge = (mode: GameMode) => {
+      soundManager.playHover();
+      setChargeTargetMode(mode);
+      setChargeState('charging');
+      setChargeProgress(0);
+      chargeIntervalRef.current = window.setInterval(() => {
+        setChargeProgress(prev => {
+          const next = Math.min(100, prev + 2.5);
+          if (next >= 100) {
+            if (chargeIntervalRef.current) clearInterval(chargeIntervalRef.current);
+            setChargeState('ready');
+            setTimeout(() => {
+              if (chargeTargetMode) {
+                soundManager.playFlip();
+                onSelectMode(chargeTargetMode);
+              }
+              setChargeState('idle');
+              setChargeTargetMode(null);
+            }, 200);
+          }
+          return next;
+        });
+      }, 30);
+    };
+
+    const cancelCharge = () => {
+      if (chargeIntervalRef.current) clearInterval(chargeIntervalRef.current);
+      setChargeState('idle');
+      setChargeTargetMode(null);
+      setChargeProgress(0);
+    };
+
+    const handleHover = () => {
+      soundManager.playHover();
+    };
 
   const tiles = [
     { letter: 'W', state: 'correct', color: '#22d3a0' },
@@ -323,61 +361,79 @@ export const MainMenu: React.FC<MainMenuProps> = ({
           aria-label="Game modes"
           style={{ gap: '8px' }}
         >
-          {MODES.map(({ mode, label, description, tag, tagColor }) => {
-            const isDaily = mode === 'DAILY';
-            const isClassic = mode === 'CLASSIC';
-            return (
-              <button
-                key={mode}
-                className={`menu-card ${isDaily ? 'daily-highlight-card' : ''}`}
-                onClick={() => {
-                  soundManager.playFlip();
-                  onSelectMode(mode);
-                }}
-                onMouseEnter={handleHover}
-                role="button"
-                aria-label={mode === 'CLASSIC' ? 'Play Classic mode' : `${label} — ${description}`}
-                style={{
-                  '--card-accent': tagColor,
-                  padding: '10px 14px',
-                } as React.CSSProperties}
-              >
-                <div className="card-body" style={{ width: '100%' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px', justifyContent: 'space-between' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                      <span className="mode-accent-dot" style={{ background: tagColor, boxShadow: `0 0 6px ${tagColor}` }} />
-                      <h3 style={{ fontSize: '14px', margin: 0 }}>{label}</h3>
-                      {isDaily && (
-                        <span className="daily-pulse-badge">FEATURED</span>
-                      )}
-                    </div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                      {isDaily && (
-                        <kbd style={{ fontSize: '9px', padding: '1px 4px', background: 'rgba(245,158,11,0.2)', border: '1px solid #f59e0b', borderRadius: '3px', color: '#f59e0b', fontWeight: 800 }}>D</kbd>
-                      )}
-                      {isClassic && (
-                        <kbd style={{ fontSize: '9px', padding: '1px 4px', background: 'rgba(129,140,248,0.2)', border: '1px solid #818cf8', borderRadius: '3px', color: '#818cf8', fontWeight: 800 }}>SPACE</kbd>
-                      )}
-                      <span className="mode-category-tag" style={{ color: tagColor, borderColor: tagColor, background: `${tagColor}18` }}>
-                        {tag}
-                      </span>
-                    </div>
-                  </div>
-                  <p style={{ fontSize: '11px', margin: '4px 0 0 0', opacity: 0.85 }}>{description}</p>
-                  {isDaily && (
-                    <div style={{ marginTop: '6px' }}>
-                      <div className="daily-timer-ticker" style={{ margin: '0 0 4px 0', fontSize: '10px' }}>
-                        <span>⏳ Resets in {dailyCountdown}</span>
-                      </div>
-                      <div style={{ width: '100%', height: '3px', background: 'rgba(255,255,255,0.08)', borderRadius: '2px', overflow: 'hidden' }}>
-                        <div style={{ width: `${dayProgress}%`, height: '100%', background: 'linear-gradient(90deg, #f59e0b, #fde047)', transition: 'width 1s linear' }} />
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </button>
-            );
-          })}
+                  {MODES.map(({ mode, label, description, tag, tagColor }) => {
+                    const isDaily = mode === 'DAILY';
+                    const isClassic = mode === 'CLASSIC';
+                    const isCharging = chargeState === 'charging' && chargeTargetMode === mode;
+                    const isReady = chargeState === 'ready' && chargeTargetMode === mode;
+                    return (
+                      <button
+                        key={mode}
+                        className={`menu-card ${isDaily ? 'daily-highlight-card' : ''} ${isCharging ? 'charging' : ''} ${isReady ? 'ready' : ''}`}
+                        onMouseDown={(e) => {
+                          e.preventDefault();
+                          startCharge(mode);
+                        }}
+                        onMouseUp={cancelCharge}
+                        onMouseLeave={cancelCharge}
+                        onClick={() => {
+                          if (!isCharging) {
+                            soundManager.playFlip();
+                            onSelectMode(mode);
+                          }
+                        }}
+                        onMouseEnter={handleHover}
+                        role="button"
+                        aria-label={mode === 'CLASSIC' ? 'Play Classic mode' : `${label} — ${description}`}
+                        style={{
+                          '--card-accent': tagColor,
+                          padding: '10px 14px',
+                        } as React.CSSProperties}
+                      >
+                        <div className="card-body" style={{ width: '100%' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', justifyContent: 'space-between' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                              <span className="mode-accent-dot" style={{ background: tagColor, boxShadow: `0 0 6px ${tagColor}` }} />
+                              <h3 style={{ fontSize: '14px', margin: 0 }}>{label}</h3>
+                              {isDaily && (
+                                <span className="daily-pulse-badge">FEATURED</span>
+                              )}
+                            </div>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                              {isDaily && (
+                                <kbd style={{ fontSize: '9px', padding: '1px 4px', background: 'rgba(245,158,11,0.2)', border: '1px solid #f59e0b', borderRadius: '3px', color: '#f59e0b', fontWeight: 800 }}>D</kbd>
+                              )}
+                              {isClassic && (
+                                <kbd style={{ fontSize: '9px', padding: '1px 4px', background: 'rgba(129,140,248,0.2)', border: '1px solid #818cf8', borderRadius: '3px', color: '#818cf8', fontWeight: 800 }}>SPACE</kbd>
+                              )}
+                              <span className="mode-category-tag" style={{ color: tagColor, borderColor: tagColor, background: `${tagColor}18` }}>
+                                {tag}
+                              </span>
+                            </div>
+                          </div>
+                          <p style={{ fontSize: '11px', margin: '4px 0 0 0', opacity: 0.85 }}>{description}</p>
+                          {isDaily && (
+                            <div style={{ marginTop: '6px' }}>
+                              <div className="daily-timer-ticker" style={{ margin: '0 0 4px 0', fontSize: '10px' }}>
+                                <span>⏳ Resets in {dailyCountdown}</span>
+                              </div>
+                              <div style={{ width: '100%', height: '3px', background: 'rgba(255,255,255,0.08)', borderRadius: '2px', overflow: 'hidden' }}>
+                                <div style={{ width: `${dayProgress}%`, height: '100%', background: 'linear-gradient(90deg, #f59e0b, #fde047)', transition: 'width 1s linear' }} />
+                              </div>
+                            </div>
+                          )}
+                          {/* Hold-to-charge overlay */}
+                          {isCharging || isReady ? (
+                            <div style={{ position: 'relative' }}>
+                              <div className="charge-ring" />
+                              <div className="charge-fill" style={{ transform: `rotate(${-90 + chargeProgress * 3.6}deg)` }} />
+                              <span className="charge-label">{isReady ? 'RELEASE' : `${Math.round(chargeProgress)}%`}</span>
+                            </div>
+                          ) : null}
+                        </div>
+                      </button>
+                    );
+                  })}
         </div>
       </div>
 
