@@ -200,9 +200,8 @@ export const MainMenu: React.FC<MainMenuProps> = ({
     }, []);
 
     return (
-    <div className="main-menu-container animate-scale" style={{ 
-      transform: `perspective(1000px) rotateY(${mousePos.x * 0.1}deg) rotateX(${-mousePos.y * 0.1}deg)` 
-    }}>
+    <div className="main-menu-container animate-scale">
+          <div style={{ transform: `perspective(1000px) rotateY(${mousePos.x * 0.1}deg) rotateX(${-mousePos.y * 0.1}deg)`, width:'100%', height:'100%', position:'relative' }}>
       {/* ── Precision Vector Corner Reticle Brackets ───────── */}
       <div className="vector-corner-tl" aria-hidden="true" />
       <div className="vector-corner-tr" aria-hidden="true" />
