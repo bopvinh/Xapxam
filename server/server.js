@@ -30,6 +30,11 @@ io.on('connection', (socket) => {
     socket.to(data.roomID).emit('damage_received', { damage, gauge });
   });
 
+  socket.on('request_rematch', (roomID) => {
+    // Reset room state for everyone
+    io.in(roomID).emit('rematch_started');
+  });
+
   socket.on('disconnect', () => {
     console.log('Client disconnected:', socket.id);
   });

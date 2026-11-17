@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { io } from 'socket.io-client';
 import './styles/global.css';
 import { GameMode, Player, PlayerStats, LetterState } from './game/types';
 import {
@@ -139,6 +140,32 @@ export const App: React.FC = () => {
     localStorage.setItem('wordplusplus_stats', JSON.stringify(DEFAULT_STATS));
     showToast('Statistics reset successfully');
   };
+
+  const handleRematchStart = useCallback(() => {
+    const newWord = getRandomSecretWord();
+    setSecretWord(newWord);
+    setPlayers(prev => prev.map(p => ({
+      ...p,
+      guesses: [],
+      solved: false,
+      attemptsUsed: 0
+    })));
+    setStatus('PLAYING');
+    setCurrentGuess('');
+    setRoundNumber(1);
+    showToast('⚔️ REMATCH STARTED! ⚔️');
+  }, []);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const room = params.get('room');
+    if (room && room.length === 4) {
+      const socket = io('http://localhost:3000');
+      socket.emit('join', room);
+      socket.on('rematch_started', handleRematchStart);
+      return () => { socket.disconnect(); };
+    }
+  }, [handleRematchStart]);
 
   // Select game mode
   const handleSelectMode = (mode: GameMode) => {
@@ -623,6 +650,9 @@ export const App: React.FC = () => {
         {status === 'GAME_OVER' && (
           <VictoryScreen 
             winner={players.sort((a,b) => a.score - b.score)[0]?.name || 'Unknown'} 
+            roomID={new URLSearchParams(window.location.search).get('room') || undefined}
+            guessesCount={activePlayer?.guesses.length || 0}
+            playerHP={100} // Default for final screen
             onPlayAgain={handleHomeClick}
           />
         )}
