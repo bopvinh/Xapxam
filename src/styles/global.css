@@ -1828,7 +1828,8 @@ button:focus-visible {
 }
 
 .victory-reveal.is-win-aura {
-  animation: victory-flash 1s ease-in-out, scale-up 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both, gold-victory-pulse 3s infinite ease-in-out;
+  animation: victory-flash 1s ease-in-out, scale-up 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both, gold-victory-pulse 2s infinite ease-in-out;
+  transform: scale(1.2);
 }
 
 @keyframes edge-firework-burst {
@@ -1882,8 +1883,16 @@ button:focus-visible {
   100% { transform: rotate(360deg) scale(1); opacity: 0.5; }
 }
 
+@keyframes victory-title-pulse {
+  0% { transform: scale(1); filter: hue-rotate(0deg); }
+  50% { transform: scale(1.1); filter: hue-rotate(20deg); }
+  100% { transform: scale(1); filter: hue-rotate(0deg); }
+}
+
 .victory-title {
-  animation: title-bounce-elastic 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+  animation: title-bounce-elastic 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards, victory-title-pulse 3s infinite ease-in-out;
+  font-size: 3rem;
+  letter-spacing: -2px;
 }
 
 .victory-emblem {
