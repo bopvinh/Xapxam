@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { GameMode } from '../game/types';
 import { isValidWord } from '../game/engine';
+import { createRoom, joinRoom } from '../game/pvp-engine';
 
 interface PlayerInput {
   name: string;
@@ -22,6 +23,10 @@ export const MultiplayerSetup: React.FC<MultiplayerSetupProps> = ({
   onStart,
   onBack
 }) => {
+  const [lobbyMode, setLobbyMode] = useState<'LOCAL' | 'CREATE' | 'JOIN'>('LOCAL');
+  const [roomCode, setRoomCode] = useState<string>('');
+  const [createdCode, setCreatedCode] = useState<string>('');
+  
   const [playerList, setPlayerList] = useState<PlayerInput[]>([
     { name: 'Player 1' },
     { name: 'Player 2' },
@@ -31,6 +36,19 @@ export const MultiplayerSetup: React.FC<MultiplayerSetupProps> = ({
   const [customWord, setCustomWord] = useState<string>('');
   const [customWordError, setCustomWordError] = useState<string>('');
   const [rounds, setRounds] = useState<number>(3);
+
+  const handleCreateRoom = () => {
+    const code = createRoom();
+    setCreatedCode(code);
+    setLobbyMode('CREATE');
+  };
+
+  const handleJoinRoom = () => {
+    if (roomCode.length === 4) {
+      joinRoom(roomCode);
+      setLobbyMode('JOIN');
+    }
+  };
 
   const handleNameChange = (idx: number, value: string) => {
     const updated = [...playerList];
@@ -88,8 +106,24 @@ export const MultiplayerSetup: React.FC<MultiplayerSetupProps> = ({
     <div className="setup-container card-panel animate-scale">
       <div className="setup-header">
         <h2>{mode.replace('_', ' ')} Setup</h2>
-        <p className="subtitle">Configure players and select the secret word</p>
+        <p className="subtitle">Select connection mode or local pass-and-play</p>
       </div>
+
+      <div className="lobby-selector" style={{ marginBottom: '20px', display: 'flex', gap: '10px' }}>
+        <button className={`btn-secondary ${lobbyMode === 'LOCAL' ? 'active' : ''}`} onClick={() => setLobbyMode('LOCAL')}>Local</button>
+        <button className={`btn-secondary ${lobbyMode === 'CREATE' ? 'active' : ''}`} onClick={handleCreateRoom}>Create Room</button>
+        <div style={{ display: 'flex', gap: '4px' }}>
+          <input type="text" placeholder="CODE" maxLength={4} value={roomCode} onChange={(e) => setRoomCode(e.target.value.toUpperCase())} style={{ width: '60px' }} />
+          <button className="btn-secondary" onClick={handleJoinRoom}>Join</button>
+        </div>
+      </div>
+
+      {lobbyMode === 'CREATE' && (
+        <div className="lobby-info" style={{ marginBottom: '20px', padding: '10px', background: 'rgba(255,255,255,0.05)', borderRadius: '8px' }}>
+          <h3>Room Created: {createdCode}</h3>
+          <p>Share this code with your opponents!</p>
+        </div>
+      )}
 
       <form onSubmit={handleSubmit} className="setup-form">
         <div className="form-section">

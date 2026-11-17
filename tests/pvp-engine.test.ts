@@ -25,7 +25,7 @@ describe('pvp-engine', () => {
 
   it('should send a guess over the initialized socket', () => {
     const socket = initPvPSocket('test-room');
-    sendGuess('stare');
-    expect(socket.emit).toHaveBeenCalledWith('guess', 'stare');
+    sendGuess('stare', 'ROOM');
+    expect(socket.emit).toHaveBeenCalledWith('guess', { roomID: 'ROOM', guess: 'stare' });
   });
 });
