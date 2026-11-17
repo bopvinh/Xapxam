@@ -1,0 +1,222 @@
+/* ── MvC2-Inspired Victory Celebration System ───────────────── */
+
+/* Screen Flash & Color Grading */
+@keyframes mvc2-flash-burst {
+  0% { opacity: 0; }
+  10% { opacity: 1; background: white; }
+  20% { opacity: 0.3; background: radial-gradient(circle at center, #fff 0%, #f59e0b 50%, transparent 100%); }
+  40% { opacity: 0.6; background: radial-gradient(circle at center, #06b6d4 0%, #6366f1 50%, transparent 100%); }
+  60% { opacity: 0.4; background: radial-gradient(circle at center, #22d3a0 0%, #f59e0b 50%, transparent 100%); }
+  100% { opacity: 0; background: transparent; }
+}
+
+.mvc2-flash-overlay {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9999;
+  animation: mvc2-flash-burst 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+  mix-blend-mode: screen;
+}
+
+/* Perfect / Flawless Text Animation */
+@keyframes mvc2-perfect-reveal {
+  0% { transform: scale(0) rotate(-15deg); opacity: 0; filter: blur(20px); }
+  30% { transform: scale(1.3) rotate(2deg); opacity: 1; filter: blur(0); text-shadow: 0 0 40px #f59e0b, 0 0 80px #fde047; }
+  50% { transform: scale(1) rotate(0deg); text-shadow: 0 0 60px #f59e0b, 0 0 120px #fde047, 0 0 200px #fff; }
+  100% { transform: scale(1) rotate(0deg); opacity: 1; }
+}
+
+@keyframes mvc2-perfect-pulse {
+  0%, 100% { text-shadow: 0 0 30px #f59e0b, 0 0 60px #fde047, 0 0 100px #fff; }
+  50% { text-shadow: 0 0 60px #f59e0b, 0 0 120px #fde047, 0 0 200px #fff, 0 0 300px #f59e0b; }
+}
+
+.mvc2-perfect-banner {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-family: var(--font-display), 'Cinzel', serif;
+  font-weight: 900;
+  font-size: clamp(48px, 15vw, 120px);
+  letter-spacing: 0.15em;
+  color: #fff;
+  text-transform: uppercase;
+  z-index: 10000;
+  animation: mvc2-perfect-reveal 0.8s cubic-bezier(0.34, 1.56, 0.64, 1),
+             mvc2-perfect-pulse 2s ease-in-out infinite 0.8s;
+  pointer-events: none;
+  text-shadow: 0 0 30px #f59e0b, 0 0 60px #fde047, 0 0 100px #fff;
+  filter: drop-shadow(0 4px 20px rgba(0,0,0,0.8));
+}
+
+.mvc2-perfect-banner::before,
+.mvc2-perfect-banner::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  width: 120px;
+  height: 4px;
+  background: linear-gradient(90deg, transparent, #f59e0b, #fde047, #fff, #fde047, #f59e0b, transparent);
+  animation: mvc2-line-expand 0.6s ease-out 0.2s both;
+}
+
+.mvc2-perfect-banner::before { left: -160px; transform: translateY(-50%); }
+.mvc2-perfect-banner::after { right: -160px; transform: translateY(-50%); }
+
+@keyframes mvc2-line-expand {
+  0% { width: 0; opacity: 0; }
+  100% { width: 120px; opacity: 1; }
+}
+
+/* Character Victory Pose - Hero Tiles */
+@keyframes mvc2-tile-victory-pose {
+  0% { transform: scale(1) rotate(0deg) translateY(0); }
+  15% { transform: scale(1.15) rotate(-5deg) translateY(-20px); }
+  30% { transform: scale(1.25) rotate(3deg) translateY(-40px); box-shadow: 0 30px 60px rgba(0,0,0,0.6), 0 0 80px currentColor; }
+  45% { transform: scale(1.1) rotate(-2deg) translateY(-10px); }
+  60% { transform: scale(1.05) rotate(1deg) translateY(-5px); }
+  100% { transform: scale(1) rotate(0deg) translateY(0); }
+}
+
+@keyframes mvc2-tile-charge {
+  0% { box-shadow: 0 8px 20px rgba(0,0,0,0.4), 0 0 12px currentColor; }
+  50% { box-shadow: 0 0 40px currentColor, 0 0 80px currentColor, inset 0 0 40px rgba(255,255,255,0.5); transform: scale(1.08); }
+  100% { box-shadow: 0 8px 20px rgba(0,0,0,0.4), 0 0 12px currentColor; }
+}
+
+.hero-tile.mvc2-victory {
+  animation: mvc2-tile-victory-pose 1.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+  z-index: 100;
+}
+
+.hero-tile.mvc2-charge {
+  animation: mvc2-tile-charge 0.8s ease-in-out infinite;
+}
+
+/* Victory Particles - MvC2 Style Burst */
+@keyframes mvc2-particle-burst {
+  0% { transform: translate(-50%, -50%) scale(0) rotate(0deg); opacity: 1; }
+  100% { transform: translate(-50%, -50%) translate(var(--tx), var(--ty)) scale(1) rotate(var(--rot)); opacity: 0; }
+}
+
+.mvc2-particle {
+  position: fixed;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9998;
+  transform: translate(-50%, -50%);
+  animation: mvc2-particle-burst 1.2s cubic-bezier(0.1, 0.8, 0.2, 1) forwards;
+}
+
+.mvc2-particle.spark { background: radial-gradient(circle, #fff 0%, #f59e0b 40%, transparent 70%); }
+.mvc2-particle.energy { background: radial-gradient(circle, #06b6d4 0%, #6366f1 50%, transparent 70%); }
+.mvc2-particle.flare { background: radial-gradient(circle, #22d3a0 0%, #f59e0b 50%, transparent 70%); clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%); }
+
+/* Victory Background Shift */
+@keyframes mvc2-bg-shift {
+  0% { filter: hue-rotate(0deg) brightness(1) contrast(1); }
+  25% { filter: hue-rotate(30deg) brightness(1.3) contrast(1.2); }
+  50% { filter: hue-rotate(-20deg) brightness(1.4) contrast(1.3); }
+  75% { filter: hue-rotate(15deg) brightness(1.2) contrast(1.1); }
+  100% { filter: hue-rotate(0deg) brightness(1) contrast(1); }
+}
+
+.app-container.mvc2-victory-bg {
+  animation: mvc2-bg-shift 2s ease-in-out;
+}
+
+/* Combo Counter Style Display */
+@keyframes mvc2-combo-count {
+  0% { transform: scale(0.5); opacity: 0; }
+  20% { transform: scale(1.4); opacity: 1; }
+  40% { transform: scale(1); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.mvc2-combo-display {
+  position: fixed;
+  bottom: 20%;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: var(--font-display), 'Cinzel', serif;
+  font-weight: 900;
+  font-size: clamp(32px, 8vw, 72px);
+  color: #fde047;
+  text-shadow: 0 0 20px #f59e0b, 0 0 40px #fde047, 2px 4px 0 #000;
+  z-index: 10000;
+  animation: mvc2-combo-count 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+  pointer-events: none;
+}
+
+.mvc2-combo-label {
+  display: block;
+  font-size: 0.35em;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  color: #fff;
+  text-shadow: 0 0 10px #f59e0b;
+  margin-top: -8px;
+}
+
+/* Character Callout Text */
+@keyframes mvc2-callout {
+  0% { transform: translateX(-50%) scale(0) translateY(20px); opacity: 0; }
+  20% { transform: translateX(-50%) scale(1.1) translateY(-5px); opacity: 1; }
+  40% { transform: translateX(-50%) scale(1) translateY(0); }
+  80% { opacity: 1; }
+  100% { transform: translateX(-50%) scale(0.9) translateY(-20px); opacity: 0; }
+}
+
+.mvc2-callout {
+  position: fixed;
+  top: 15%;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: var(--font-display), 'Cinzel', serif;
+  font-weight: 800;
+  font-size: clamp(24px, 6vw, 48px);
+  color: #fff;
+  text-shadow: 0 0 20px currentColor, 0 0 40px currentColor, 2px 4px 0 #000;
+  padding: 8px 24px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, rgba(0,0,0,0.8), rgba(20,20,30,0.9));
+  border: 2px solid currentColor;
+  z-index: 10000;
+  animation: mvc2-callout 2s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  pointer-events: none;
+}
+
+/* Streak Fire Integration */
+@keyframes mvc2-streak-surge {
+  0% { transform: scale(1); filter: hue-rotate(0deg); }
+  50% { transform: scale(1.1); filter: hue-rotate(30deg) brightness(1.5); }
+  100% { transform: scale(1); filter: hue-rotate(0deg); }
+}
+
+.streak-flame.mvc2-surge {
+  animation: mvc2-streak-surge 0.6s ease-in-out 3;
+}
+
+/* Victory Reveal Container Enhancement */
+.victory-reveal.mvc2-mode {
+  position: relative;
+  overflow: visible;
+}
+
+.victory-reveal.mvc2-mode::before {
+  content: '';
+  position: absolute;
+  inset: -50%;
+  background: radial-gradient(ellipse at center, rgba(245, 158, 11, 0.15) 0%, transparent 60%);
+  pointer-events: none;
+  animation: mvc2-victory-glow 2s ease-in-out infinite;
+}
+
+@keyframes mvc2-victory-glow {
+  0%, 100% { opacity: 0.5; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.1); }
+}
