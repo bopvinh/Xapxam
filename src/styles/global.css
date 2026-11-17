@@ -1806,9 +1806,22 @@ button:focus-visible {
   100% { transform: translateY(0) rotateX(0deg); opacity: 1; }
 }
 
+.reveal-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  padding: var(--space-4);
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 10;
+}
+
 /* ── Victory Celebration: Golden Aura & Interactive Particles ── */
 @keyframes gold-victory-pulse {
-  0% { box-shadow: 0 0 20px rgba(250, 204, 21, 0.2); }
   50% { box-shadow: 0 0 60px rgba(250, 204, 21, 0.5); }
   100% { box-shadow: 0 0 20px rgba(250, 204, 21, 0.2); }
 }
