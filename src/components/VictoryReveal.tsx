@@ -50,7 +50,7 @@ export const VictoryReveal: React.FC<VictoryRevealProps> = ({
   }, []);
 
   return (
-    <div className="victory-reveal animate-scale" role="status" aria-live="polite">
+    <div className={`victory-reveal animate-scale is-win-aura`} role="status" aria-live="polite">
       <div className="victory-particle-explosion">
         {particles.map((style, i) => (
           <div key={i} className="victory-particle" style={style} />
