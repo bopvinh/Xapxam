@@ -3069,6 +3069,7 @@ button:focus-visible {
   background: linear-gradient(135deg, var(--bg-elevated), var(--bg-card));
   animation: rainbow-cycle 8s linear infinite;
   height: 64px;
+  min-width: 44px;
   font-size: 18px;
 }
 
