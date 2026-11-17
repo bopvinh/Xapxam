@@ -1822,6 +1822,7 @@ button:focus-visible {
 
 /* ── Victory Celebration: Golden Aura & Interactive Particles ── */
 @keyframes gold-victory-pulse {
+  0% { box-shadow: 0 0 20px rgba(250, 204, 21, 0.2); }
   50% { box-shadow: 0 0 60px rgba(250, 204, 21, 0.5); }
   100% { box-shadow: 0 0 20px rgba(250, 204, 21, 0.2); }
 }
