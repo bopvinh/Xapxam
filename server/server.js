@@ -19,7 +19,7 @@ io.on('connection', (socket) => {
 
   socket.on('guess', (data) => {
     // Relay guess to others in the same room
-    socket.to(data.roomID).emit('guess', data);
+    socket.to(data.roomID).emit('guess_received', { ...data, senderID: socket.id });
   });
 
   socket.on('disconnect', () => {

@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { initPvPSocket, sendGuess } from '../src/game/pvp-engine';
+import { initPvPSocket, sendGuess, onGuessReceived } from '../src/game/pvp-engine';
 import { io } from 'socket.io-client';
 
 vi.mock('socket.io-client', () => {
@@ -27,5 +27,12 @@ describe('pvp-engine', () => {
     const socket = initPvPSocket('test-room');
     sendGuess('stare', 'ROOM');
     expect(socket.emit).toHaveBeenCalledWith('guess', { roomID: 'ROOM', guess: 'stare' });
+  });
+
+  it('should register a listener for guess_received', () => {
+    const socket = initPvPSocket('test-room');
+    const callback = vi.fn();
+    onGuessReceived(callback);
+    expect(socket.on).toHaveBeenCalledWith('guess_received', callback);
   });
 });

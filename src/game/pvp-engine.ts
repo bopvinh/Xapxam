@@ -26,3 +26,9 @@ export function sendGuess(guess: string, roomID: string): void {
     pvpSocket.emit('guess', { roomID, guess });
   }
 }
+
+export function onGuessReceived(callback: (data: { roomID: string; guess: string; senderID?: string }) => void): void {
+  if (pvpSocket) {
+    pvpSocket.on('guess_received', callback);
+  }
+}
