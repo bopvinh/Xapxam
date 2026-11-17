@@ -9,7 +9,6 @@ interface VictoryRevealProps {
   attemptsUsed: number;
   streak: number;
   winRate: number;
-  onShare: () => void;
   onPlayAgain: () => void;
   onMeaning: () => void;
 }
@@ -31,7 +30,6 @@ export const VictoryReveal: React.FC<VictoryRevealProps> = ({
   attemptsUsed,
   streak,
   winRate,
-  onShare,
   onPlayAgain,
   onMeaning,
 }) => {
@@ -88,14 +86,6 @@ export const VictoryReveal: React.FC<VictoryRevealProps> = ({
       </div>
 
       <div className="victory-actions">
-        <button
-          type="button"
-          className="btn-victory-primary"
-          onClick={onShare}
-          aria-label="Share this win"
-        >
-          📤 Share This Win
-        </button>
         <button
           type="button"
           className="btn-victory-secondary"

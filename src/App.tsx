@@ -322,7 +322,7 @@ export const App: React.FC = () => {
         setStatus('ROUND_OVER');
         updateStats(true, newGuesses.length);
         showToast('🎉 Brilliant! You solved the word!');
-        setTimeout(() => setShowShare(true), 1500);
+        // setTimeout(() => setShowShare(true), 1500);
       } else if (isOutOfAttempts) {
         setStatus('ROUND_OVER');
         updateStats(false, 6);
@@ -639,7 +639,6 @@ export const App: React.FC = () => {
                         ? Math.round((stats.gamesWon / stats.gamesPlayed) * 100)
                         : 100
                     }
-                    onShare={handleShareEmoji}
                     onPlayAgain={() => startSinglePlayerGame(activeMode)}
                     onMeaning={() => setIsDefinitionOpen(true)}
                   />
