@@ -322,8 +322,8 @@ export const MainMenu: React.FC<MainMenuProps> = ({
                   onSelectMode(mode);
                 }}
                 onMouseEnter={handleHover}
-                role="listitem"
-                aria-label={`${label} — ${description}`}
+                role="button"
+                aria-label={mode === 'CLASSIC' ? 'Play Classic mode' : `${label} — ${description}`}
                 style={{
                   '--card-accent': tagColor,
                   padding: '10px 14px',
@@ -381,6 +381,7 @@ export const MainMenu: React.FC<MainMenuProps> = ({
         <button className="btn-secondary" onClick={onOpenStats} style={{ padding: '8px 18px', fontSize: '12px' }}>
           Statistics
         </button>
+      </div>
       </div>
     </div>
   );
