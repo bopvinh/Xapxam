@@ -3065,6 +3065,8 @@ button:focus-visible {
   border: 1px solid rgba(255, 255, 255, 0.1);
   background: linear-gradient(135deg, var(--bg-elevated), var(--bg-card));
   animation: rainbow-cycle 8s linear infinite;
+  height: 64px;
+  font-size: 18px;
 }
 
 .key-btn:hover {
