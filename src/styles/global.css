@@ -217,6 +217,8 @@ button:focus-visible {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+  transform: scale(var(--tension-scale, 1));
+  transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), background-color 0.25s ease;
 }
 
 /* ============================================================
@@ -997,7 +999,57 @@ button:focus-visible {
   background: var(--absent);
   border-color: var(--absent);
   color: var(--text-muted);
-  opacity: 0.75;
+  opacity: 0.7;
+  position: relative;
+  overflow: hidden;
+}
+
+/* ── Keyboard Key Disintegration ── */
+.key-label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+
+.key-btn.absent .key-label {
+  animation: key-label-disintegrate 0.6s ease-out forwards;
+  animation-delay: 0.4s;
+}
+
+@keyframes key-label-disintegrate {
+  0% { transform: scale(1); opacity: 1; filter: blur(0); }
+  50% { transform: scale(0.92); opacity: 0.7; filter: blur(0.5px); }
+  100% { transform: scale(0.85); opacity: 0.4; filter: blur(1.2px); }
+}
+
+.key-particle-container {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.key-particle {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  background: var(--text-muted);
+  border-radius: 50%;
+  opacity: 0;
+}
+
+.key-btn.absent .key-particle {
+  animation: key-particle-burst 0.8s cubic-bezier(0.12, 0, 0.39, 0) forwards;
+  animation-delay: 0.45s;
+}
+
+@keyframes key-particle-burst {
+  0% { transform: translate(0, 0) scale(1.5); opacity: 1; }
+  100% { transform: translate(var(--x), var(--y)) scale(0); opacity: 0; }
 }
 
 /* ============================================================
@@ -1574,9 +1626,16 @@ button:focus-visible {
   animation: submit-flash-green 0.6s ease-out;
 }
 
-.victory-word-shimmer {
-  animation: gold-word-shimmer 2s ease-in-out infinite alternate;
+@keyframes victory-word-bloom {
+  0% { filter: drop-shadow(0 0 0px transparent); }
+  50% { filter: drop-shadow(0 0 20px var(--correct-glow)) brightness(1.2); }
+  100% { filter: drop-shadow(0 0 10px var(--correct-glow)); }
 }
+
+.victory-word-shimmer {
+  animation: gold-word-shimmer 2s ease-in-out infinite alternate, victory-word-bloom 3s ease-in-out infinite alternate;
+}
+
 
 /* ── Active Row Breathing Border Glow ─────────────────────── */
 @keyframes row-border-breathe {

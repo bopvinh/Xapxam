@@ -70,7 +70,33 @@ export const Keyboard: React.FC<KeyboardProps> = ({
                 onClick={() => handleClick(key)}
                 disabled={disabled}
               >
-                {label}
+                <span className="key-label">{label}</span>
+                {state === 'absent' && (
+                  <div className="key-particle-container" aria-hidden="true">
+                    {[
+                      { x: '-18px', y: '-16px', size: 3, delay: '0.45s' },
+                      { x: '20px', y: '-12px', size: 4, delay: '0.48s' },
+                      { x: '-22px', y: '14px', size: 3, delay: '0.42s' },
+                      { x: '16px', y: '18px', size: 2, delay: '0.50s' },
+                      { x: '-12px', y: '-22px', size: 4, delay: '0.46s' },
+                      { x: '24px', y: '8px', size: 3, delay: '0.44s' },
+                      { x: '0px', y: '-24px', size: 2, delay: '0.49s' },
+                      { x: '-8px', y: '22px', size: 3, delay: '0.47s' },
+                    ].map((p, i) => (
+                      <span
+                        key={i}
+                        className="key-particle"
+                        style={{
+                          '--x': p.x,
+                          '--y': p.y,
+                          width: `${p.size}px`,
+                          height: `${p.size}px`,
+                          animationDelay: p.delay,
+                        } as React.CSSProperties}
+                      />
+                    ))}
+                  </div>
+                )}
               </button>
             );
           })}

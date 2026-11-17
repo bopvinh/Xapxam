@@ -516,6 +516,9 @@ export const App: React.FC = () => {
     });
   };
 
+  const guessesLength = activePlayer ? activePlayer.guesses.length : 0;
+  const tensionScale = activeMode ? 1 + Math.max(0, guessesLength - 3) * 0.015 : 1;
+
   return (
     <div 
       className={`app-container ${colorBlindMode ? 'cb-theme' : ''} ${showConfetti ? 'screen-flash-green' : ''}`}
@@ -524,6 +527,7 @@ export const App: React.FC = () => {
         '--my': mousePos.y,
         '--tx': `${mousePos.x * 20}px`,
         '--ty': `${mousePos.y * 20}px`,
+        '--tension-scale': tensionScale,
       } as React.CSSProperties}
     >
       <VectorBackground status={showConfetti ? 'WIN' : status} />
