@@ -1595,9 +1595,9 @@ button:focus-visible {
 
 /* ── Scale-up animation for letter entries ────────────────── */
 @keyframes scale-up {
-  0%   { transform: scale(0.85); border-color: var(--empty-border); }
-  70%  { transform: scale(1.05); }
-  100% { transform: scale(1); border-color: var(--text-secondary); }
+  0%   { transform: scale(0.85); border-color: var(--empty-border); box-shadow: 0 0 0 transparent; }
+  50%  { border-color: var(--accent-bright); box-shadow: 0 0 12px var(--accent-glow); }
+  100% { transform: scale(1); border-color: var(--text-secondary); box-shadow: 0 0 4px rgba(255,255,255,0.05); }
 }
 
 @keyframes board-cell-breathe {
@@ -1638,15 +1638,16 @@ button:focus-visible {
 
 
 /* ── Active Row Breathing Border Glow ─────────────────────── */
-@keyframes row-border-breathe {
-  0%, 100% {
-    border-color: rgba(99, 102, 241, 0.25);
-    box-shadow: 0 0 8px rgba(99, 102, 241, 0.1);
-  }
-  50% {
-    border-color: rgba(129, 140, 248, 0.6);
-    box-shadow: 0 0 18px rgba(129, 140, 248, 0.35);
-  }
+@keyframes active-rainbow-glow {
+  0% { border-color: var(--accent-bright); box-shadow: 0 0 10px var(--accent-glow); }
+  25% { border-color: #06b6d4; box-shadow: 0 0 10px rgba(6, 182, 212, 0.3); }
+  50% { border-color: #22d3a0; box-shadow: 0 0 10px rgba(34, 211, 160, 0.3); }
+  75% { border-color: #f59e0b; box-shadow: 0 0 10px rgba(245, 158, 11, 0.3); }
+  100% { border-color: var(--accent-bright); box-shadow: 0 0 10px var(--accent-glow); }
+}
+
+.board-cell.active-tile {
+  animation: board-cell-breathe 3s ease-in-out infinite, active-rainbow-glow 4s linear infinite;
 }
 
 /* ── Living Background Reactivity ─────────────────────────── */
