@@ -72,7 +72,7 @@ export const MainMenu: React.FC<MainMenuProps> = ({
   onOpenHelp,
   onOpenStats,
 }) => {
-//   const [flippedTile, setFlippedTile] = useState<number | null>(null);
+  const [flippedTile, setFlippedTile] = useState<number | null>(null);
   const [dailyCountdown, setDailyCountdown] = useState<string>('00:00:00');
   const [dayProgress, setDayProgress] = useState<number>(0);
   const [socialFeedIndex, setSocialFeedIndex] = useState<number>(0);
@@ -138,11 +138,11 @@ export const MainMenu: React.FC<MainMenuProps> = ({
     return () => clearTimeout(timer);
   }, []);
 
-  // const handleTileClick = (index: number) => {
-  //     soundManager.playFlip();
-  //     setFlippedTile(index);
-  //     setTimeout(() => setFlippedTile(null), 800);
-  //   };
+  const handleTileClick = (index: number) => {
+      soundManager.playFlip();
+      setFlippedTile(index);
+      setTimeout(() => setFlippedTile(null), 800);
+    };
 
     // Innovative CTA: Hold-to-charge entry mechanic
     const [chargeState, setChargeState] = useState<'idle' | 'charging' | 'ready'>('idle');
@@ -186,13 +186,13 @@ export const MainMenu: React.FC<MainMenuProps> = ({
       soundManager.playHover();
     };
 
-//   const tiles = [
-//     { letter: 'W', state: 'correct', color: '#22d3a0' },
-//     { letter: 'O', state: 'present', color: '#f59e0b' },
-//     { letter: 'R', state: 'absent', color: '#3b4760' },
-//     { letter: 'D', state: 'correct', color: '#22d3a0' },
-//     { letter: '++', state: 'brand', color: '#06b6d4' },
-//   ];
+  const tiles = [
+    { letter: 'W', state: 'correct', color: '#22d3a0', rot: -12, y: 6 },
+    { letter: 'O', state: 'present', color: '#f59e0b', rot: -6, y: 2 },
+    { letter: 'R', state: 'absent', color: '#818cf8', rot: 0, y: 0 },
+    { letter: 'D', state: 'correct', color: '#22d3a0', rot: 6, y: 2 },
+    { letter: '++', state: 'brand', color: '#06b6d4', rot: 12, y: 6 },
+  ];
 
   const socialMessages = [
     <>
@@ -247,32 +247,25 @@ export const MainMenu: React.FC<MainMenuProps> = ({
 
             {/* ── Hero ─────────────────────────────────────────── */}
                   <section className="hero-section" aria-label="Game title" style={{ padding: '4px 0' }}>
-                    {/* ── 3D Fanned Hero Anchor ─────────────────────────── */}
-                    <div className="hero-fan-container" aria-label="Featured modes">
-                      <div 
-                        className="hero-fan-card left"
-                        onClick={() => { soundManager.playFlip(); onSelectMode('DAILY'); }}
-                        title="Daily Challenge"
-                      >
-                        <span className="fan-card-icon">⚡</span>
-                        <span className="fan-card-label">Daily</span>
-                      </div>
-                      <div 
-                        className="hero-fan-card center"
-                        onClick={() => { soundManager.playFlip(); onSelectMode('CLASSIC'); }}
-                        title="Classic Mode"
-                      >
-                        <span className="fan-card-icon">🎯</span>
-                        <span className="fan-card-label">Classic</span>
-                      </div>
-                      <div 
-                        className="hero-fan-card right"
-                        onClick={() => { soundManager.playFlip(); onSelectMode('PARTY'); }}
-                        title="Multiplayer Party"
-                      >
-                        <span className="fan-card-icon">⚔️</span>
-                        <span className="fan-card-label">Party</span>
-                      </div>
+                    {/* ── 3D Fanned WORD++ Title Logo ─────────────────────────── */}
+                    <div className="hero-fanned-title-container" aria-label="WORD++ Title Logo">
+                      {tiles.map(({ letter, color, rot, y }, idx) => (
+                        <div
+                          key={idx}
+                          className={`hero-fanned-tile ${flippedTile === idx ? 'tile-flip' : ''}`}
+                          onClick={() => handleTileClick(idx)}
+                          onMouseEnter={() => soundManager.playPop()}
+                          title="Click to flip WORD++ tile!"
+                          style={{
+                            borderColor: color,
+                            boxShadow: `0 10px 25px rgba(0, 0, 0, 0.5), 0 0 16px ${color}55`,
+                            transform: `rotate(${rot}deg) translateY(${y}px)`,
+                            '--tile-color': color
+                          } as React.CSSProperties}
+                        >
+                          <span className="hero-tile-letter">{letter}</span>
+                        </div>
+                      ))}
                     </div>
                     <p className="hero-subtitle" style={{ marginTop: '2px', letterSpacing: '3px' }}>The Ultimate Word Challenge</p>
                   </section>

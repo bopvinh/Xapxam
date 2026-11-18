@@ -514,6 +514,61 @@ button:focus-visible {
   align-items: center;
 }
 
+/* ── 3D Fanned WORD++ Title Logo Component ── */
+.hero-fanned-title-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  margin: 12px 0;
+  perspective: 1000px;
+  transform-style: preserve-3d;
+}
+
+.hero-fanned-tile {
+  width: 58px;
+  height: 58px;
+  background: var(--bg-card);
+  border: 2.5px solid var(--tile-color, #818cf8);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-size: 26px;
+  font-weight: 900;
+  color: #ffffff;
+  cursor: pointer;
+  user-select: none;
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-fanned-tile::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.2) 0%, transparent 60%);
+  pointer-events: none;
+}
+
+.hero-fanned-tile:hover {
+  transform: translateY(-12px) scale(1.15) rotate(0deg) !important;
+  z-index: 10;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.7), 0 0 25px var(--tile-color) !important;
+}
+
+.hero-fanned-tile.tile-flip {
+  animation: hero-tile-3d-flip 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes hero-tile-3d-flip {
+  0% { transform: rotateY(0deg); }
+  50% { transform: rotateY(180deg); }
+  100% { transform: rotateY(360deg); }
+}
+
 /* ── Hero Fan Component ── */
 .hero-fan-container {
   position: relative;
