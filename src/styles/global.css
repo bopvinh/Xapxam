@@ -1047,14 +1047,14 @@ button:focus-visible {
 }
 
 .board-cell {
-  width: min(48px, 6.8vh);
-  height: min(48px, 6.8vh);
+  width: min(64px, 9vh);
+  height: min(64px, 9vh);
   border: 2px solid var(--empty-border);
   display: flex;
   align-items: center;
   justify-content: center;
   font-family: var(--font-display);
-  font-size: min(22px, 3.2vh);
+  font-size: min(30px, 4.5vh);
   font-weight: 800;
   text-transform: uppercase;
   border-radius: var(--radius-sm);
