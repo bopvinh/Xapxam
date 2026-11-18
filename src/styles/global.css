@@ -962,7 +962,7 @@ button:focus-visible {
   display: flex;
   justify-content: center;
   margin: 0;
-  padding-top: 2px;
+  padding-top: 2px !important;
 }
 
 .game-board {
@@ -2257,7 +2257,7 @@ button:focus-visible {
   width: 100%;
   max-width: 800px;
   gap: 2vh;
-  padding-top: 5vh;
+  padding-top: 2px !important;
   animation: screen-fade 0.3s ease forwards, scale-up 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) both;
 }
 .game-board-container,
