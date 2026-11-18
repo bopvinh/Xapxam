@@ -220,3 +220,142 @@
   0%, 100% { opacity: 0.5; transform: scale(1); }
   50% { opacity: 1; transform: scale(1.1); }
 }
+
+
+/* ============================================================
+   AAA ARCADE VICTORY SHOWDOWN (Holographic Gold Card)
+   ============================================================ */
+.aaa-victory-overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10000;
+  background: rgba(7, 9, 13, 0.7);
+  backdrop-filter: blur(8px);
+}
+
+.aaa-victory-card {
+  position: relative;
+  background: linear-gradient(180deg, #161b24 0%, #0d1117 100%);
+  border: 2px solid rgba(245, 158, 11, 0.4);
+  border-radius: var(--radius-xl);
+  padding: 40px;
+  width: 90%;
+  max-width: 500px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-shadow: 0 25px 60px rgba(0,0,0,0.8), 0 0 50px rgba(245, 158, 11, 0.2);
+  transform-style: preserve-3d;
+  animation: card-appear 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) both;
+}
+
+@keyframes card-appear {
+  0% { transform: scale(0.8) translateY(40px); opacity: 0; }
+  100% { transform: scale(1) translateY(0); opacity: 1; }
+}
+
+/* God-Rays Backdrop */
+.aaa-god-rays {
+  position: absolute;
+  width: 600px;
+  height: 600px;
+  background: conic-gradient(from 0deg, transparent 0%, #f59e0b 10%, transparent 20%, #06b6d4 30%, transparent 40%);
+  opacity: 0.15;
+  animation: god-rays-spin 10s linear infinite;
+  pointer-events: none;
+}
+
+@keyframes god-rays-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Beveled 3D Victory Tiles */
+.aaa-word-tiles-row {
+  display: flex;
+  gap: 8px;
+  margin: 24px 0;
+  perspective: 1000px;
+}
+
+.aaa-word-tile {
+  width: 64px;
+  height: 64px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-size: 32px;
+  font-weight: 900;
+  color: white;
+  position: relative;
+  transform-style: preserve-3d;
+  animation: aaa-tile-flip 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.aaa-tile-shine {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.4) 0%, transparent 50%);
+  border-radius: var(--radius-sm);
+}
+
+@keyframes aaa-tile-flip {
+  0% { transform: rotateX(90deg); }
+  100% { transform: rotateX(0deg); }
+}
+
+.aaa-word-tile.correct {
+  background: linear-gradient(145deg, #10b981 0%, #047857 100%);
+  border: 2px solid #6ee7b7;
+  box-shadow: 0 10px 25px rgba(16, 185, 129, 0.5), inset 0 2px 3px rgba(255, 255, 255, 0.4);
+}
+
+/* Stats Badges */
+.aaa-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  width: 100%;
+  margin-top: 16px;
+}
+
+.aaa-stat-badge {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 8px;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.aaa-stat-val { font-size: 16px; font-weight: 800; }
+.aaa-stat-lbl { font-size: 8px; text-transform: uppercase; color: var(--text-muted); }
+
+/* Hero CTA Button */
+.aaa-btn-play-again {
+  position: relative;
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  color: white;
+  padding: 16px 40px;
+  border-radius: 999px;
+  font-weight: 900;
+  font-size: 16px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  overflow: hidden;
+  box-shadow: 0 8px 30px rgba(245, 158, 11, 0.5);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.btn-glow-sweep {
+  position: absolute;
+  top: 0; left: -100%; width: 50%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+  animation: shimmer-sweep 2.5s infinite ease-in-out;
+}
