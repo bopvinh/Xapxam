@@ -72,7 +72,7 @@ export const MainMenu: React.FC<MainMenuProps> = ({
   onOpenHelp,
   onOpenStats,
 }) => {
-  const [flippedTile, setFlippedTile] = useState<number | null>(null);
+//   const [flippedTile, setFlippedTile] = useState<number | null>(null);
   const [dailyCountdown, setDailyCountdown] = useState<string>('00:00:00');
   const [dayProgress, setDayProgress] = useState<number>(0);
   const [socialFeedIndex, setSocialFeedIndex] = useState<number>(0);
@@ -128,21 +128,21 @@ export const MainMenu: React.FC<MainMenuProps> = ({
   // Entrance Domino Wave Flip
   useEffect(() => {
     const timer = setTimeout(() => {
-      [0, 1, 2, 3, 4].forEach((idx) => {
+      [0, 1, 2, 3, 4].forEach((_idx) => {
         setTimeout(() => {
-          setFlippedTile(idx);
-          setTimeout(() => setFlippedTile(null), 600);
-        }, idx * 120);
+          // setFlippedTile(idx);
+          // setTimeout(() => setFlippedTile(null), 600);
+        }, _idx * 120);
       });
     }, 400);
     return () => clearTimeout(timer);
   }, []);
 
-  const handleTileClick = (index: number) => {
-      soundManager.playFlip();
-      setFlippedTile(index);
-      setTimeout(() => setFlippedTile(null), 800);
-    };
+  // const handleTileClick = (index: number) => {
+  //     soundManager.playFlip();
+  //     setFlippedTile(index);
+  //     setTimeout(() => setFlippedTile(null), 800);
+  //   };
 
     // Innovative CTA: Hold-to-charge entry mechanic
     const [chargeState, setChargeState] = useState<'idle' | 'charging' | 'ready'>('idle');
@@ -186,13 +186,13 @@ export const MainMenu: React.FC<MainMenuProps> = ({
       soundManager.playHover();
     };
 
-  const tiles = [
-    { letter: 'W', state: 'correct', color: '#22d3a0' },
-    { letter: 'O', state: 'present', color: '#f59e0b' },
-    { letter: 'R', state: 'absent', color: '#3b4760' },
-    { letter: 'D', state: 'correct', color: '#22d3a0' },
-    { letter: '++', state: 'brand', color: '#06b6d4' },
-  ];
+//   const tiles = [
+//     { letter: 'W', state: 'correct', color: '#22d3a0' },
+//     { letter: 'O', state: 'present', color: '#f59e0b' },
+//     { letter: 'R', state: 'absent', color: '#3b4760' },
+//     { letter: 'D', state: 'correct', color: '#22d3a0' },
+//     { letter: '++', state: 'brand', color: '#06b6d4' },
+//   ];
 
   const socialMessages = [
     <>
@@ -210,7 +210,7 @@ export const MainMenu: React.FC<MainMenuProps> = ({
   ];
 
     const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
-    const [heroTileMousePos, setHeroTileMousePos] = useState({ x: 0, y: 0 });
+    // const [heroTileMousePos, setHeroTileMousePos] = useState({ x: 0, y: 0 });
 
     useEffect(() => {
       const handleMouseMove = (e: MouseEvent) => {
@@ -247,48 +247,32 @@ export const MainMenu: React.FC<MainMenuProps> = ({
 
             {/* ── Hero ─────────────────────────────────────────── */}
                   <section className="hero-section" aria-label="Game title" style={{ padding: '4px 0' }}>
-                    <div 
-                              className="hero-tiles-row" 
-                              style={{ 
-                                display: 'flex', 
-                                justifyContent: 'center', 
-                                gap: '8px', 
-                                marginBottom: '6px',
-                                '--hero-mouse-x': `${heroTileMousePos.x}px`,
-                                '--hero-mouse-y': `${heroTileMousePos.y}px`
-                              } as React.CSSProperties}
-                              onMouseMove={(e) => {
-                        const rect = e.currentTarget.getBoundingClientRect();
-                        setHeroTileMousePos({
-                          x: e.clientX - rect.left,
-                          y: e.clientY - rect.top
-                        });
-                      }}
-                      onMouseLeave={() => {
-                        setHeroTileMousePos({ x: 0, y: 0 });
-                      }}
-                    >
-                      {tiles.map(({ letter, color }, idx) => (
-                        <div
-                          key={idx}
-                          className={`hero-interactive-tile ${flippedTile === idx ? 'tile-flip' : ''}`}
-                          onClick={() => handleTileClick(idx)}
-                          onMouseEnter={() => {
-                            soundManager.playPop();
-                          }}
-                          title="Click to flip!"
-                          role="button"
-                          tabIndex={0}
-                          style={{
-                            borderColor: color,
-                            boxShadow: `0 8px 20px rgba(0, 0, 0, 0.4), 0 0 12px ${color}33`,
-                          }}
-                        >
-                          <span className="hero-tile-letter" style={{ color: letter === 'R' ? 'var(--text-secondary)' : '#ffffff' }}>
-                            {letter}
-                          </span>
-                        </div>
-                      ))}
+                    {/* ── 3D Fanned Hero Anchor ─────────────────────────── */}
+                    <div className="hero-fan-container" aria-label="Featured modes">
+                      <div 
+                        className="hero-fan-card left"
+                        onClick={() => { soundManager.playFlip(); onSelectMode('DAILY'); }}
+                        title="Daily Challenge"
+                      >
+                        <span className="fan-card-icon">⚡</span>
+                        <span className="fan-card-label">Daily</span>
+                      </div>
+                      <div 
+                        className="hero-fan-card center"
+                        onClick={() => { soundManager.playFlip(); onSelectMode('CLASSIC'); }}
+                        title="Classic Mode"
+                      >
+                        <span className="fan-card-icon">🎯</span>
+                        <span className="fan-card-label">Classic</span>
+                      </div>
+                      <div 
+                        className="hero-fan-card right"
+                        onClick={() => { soundManager.playFlip(); onSelectMode('PARTY'); }}
+                        title="Multiplayer Party"
+                      >
+                        <span className="fan-card-icon">⚔️</span>
+                        <span className="fan-card-label">Party</span>
+                      </div>
                     </div>
                     <p className="hero-subtitle" style={{ marginTop: '2px', letterSpacing: '3px' }}>The Ultimate Word Challenge</p>
                   </section>
