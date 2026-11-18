@@ -152,6 +152,9 @@ export const VictoryReveal: React.FC<VictoryRevealProps> = ({
       {/* Main Victory Reveal Container */}
       <div className={`victory-reveal animate-scale is-win-aura medal-${medalTier} mvc2-mode`} role="status" aria-live="polite" style={{
         height: '100vh',
+        width: '90%',
+        maxWidth: '600px',
+        margin: '0 auto',
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'center',
@@ -214,20 +217,22 @@ export const VictoryReveal: React.FC<VictoryRevealProps> = ({
           <span>Win: <strong>{winRate}%</strong></span>
         </div>
 
-        <div className="victory-actions" style={{ marginTop: '16px' }}>
+        <div className="victory-actions" style={{ marginTop: '16px', display: 'flex', gap: '16px' }}>
           <button
             type="button"
-            className="btn-victory-secondary"
+            className="btn-primary"
             onClick={onPlayAgain}
             aria-label="Play again"
+            style={{ padding: '16px 32px', fontSize: '16px' }}
           >
             Play Again
           </button>
           <button
             type="button"
-            className="btn-victory-ghost"
+            className="btn-secondary"
             onClick={onMeaning}
             aria-label="Show word meaning"
+            style={{ padding: '16px 32px', fontSize: '16px' }}
           >
             Meaning
           </button>
