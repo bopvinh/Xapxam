@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { GameMode } from '../game/types';
 import { soundManager } from '../game/audio';
-import heroBgV2 from '../assets/hero-bg-v2.svg';
+// import heroBgV2 from '../assets/hero-bg-v2.svg';
 
 interface MainMenuProps {
   onSelectMode: (mode: GameMode) => void;
@@ -76,23 +76,7 @@ export const MainMenu: React.FC<MainMenuProps> = ({
   const [dailyCountdown, setDailyCountdown] = useState<string>('00:00:00');
   const [dayProgress, setDayProgress] = useState<number>(0);
   const [socialFeedIndex, setSocialFeedIndex] = useState<number>(0);
-  const [userStats, setUserStats] = useState<{ streak: number; winRate: number } | null>(null);
 
-  // Load user stats preview for loss-aversion / ego hook
-  useEffect(() => {
-    try {
-      const saved = localStorage.getItem('wordplusplus_stats');
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        const played = parsed.gamesPlayed || 0;
-        const won = parsed.gamesWon || 0;
-        const rate = played > 0 ? Math.round((won / played) * 100) : 100;
-        setUserStats({ streak: parsed.currentStreak || 0, winRate: rate });
-      }
-    } catch {
-      // Ignore parse errors
-    }
-  }, []);
 
   // Daily UTC countdown & day progress calculation
   useEffect(() => {
@@ -251,54 +235,13 @@ export const MainMenu: React.FC<MainMenuProps> = ({
               pointerEvents: 'none',
               opacity: 0.6
             }} 
-            dangerouslySetInnerHTML={{ __html: heroBgV2 }}
+            
           />
           {/* ── Precision Vector Corner Reticle Brackets ───────── */}
           <div className="vector-corner-tl" aria-hidden="true" />
           <div className="vector-corner-tr" aria-hidden="true" />
           <div className="vector-corner-bl" aria-hidden="true" />
           <div className="vector-corner-br" aria-hidden="true" />
-
-      {/* ── Top Ribbon Stats ─────────────────────────────── */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '11px', color: 'var(--text-secondary)', padding: '0 4px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', color: userStats && userStats.streak > 0 ? '#f59e0b' : 'var(--text-muted)' }}>
-            🔥 <strong>{userStats?.streak || 0}</strong> Streak
-          </span>
-          <span style={{ opacity: 0.3 }}>|</span>
-          <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', color: 'var(--text-primary)' }}>
-            🎯 <strong>{userStats?.winRate ?? 100}%</strong> Win
-          </span>
-        </div>
-        <span style={{ fontSize: '10px', textTransform: 'uppercase', letterSpacing: '1px', color: 'var(--accent-bright)', fontWeight: 700 }}>
-          ⚡ Hotkeys Active
-        </span>
-      </div>
-
-      {/* ── Daily solver ribbon ──────────────────────────── */}
-            <div className="daily-ribbon">
-              <div className="daily-ribbon__inner">
-                <span className="daily-ribbon__label">today's solvers</span>
-                <span className="daily-ribbon__number">2,847</span>
-                <span className="daily-ribbon__streak">
-                  🔥 <span className="daily-ribbon__label">streak bonus</span>
-                </span>
-              </div>
-            </div>
-
-            {/* ── Daily Progress Ribbon ──────────────────────────── */}
-            <div className="main-menu-progress-ribbon" role="status" aria-live="polite">
-              <span className="main-menu-progress-ribbon__label">Daily Progress</span>
-              <div className="main-menu-progress-ribbon__bar">
-                <div 
-                  className="main-menu-progress-ribbon__fill" 
-                  style={{ width: `${dayProgress}%` }}
-                />
-              </div>
-              <span className="main-menu-progress-ribbon__streak">
-                🔥 {userStats?.streak || 0} Day Streak
-              </span>
-            </div>
 
             {/* ── Hero ─────────────────────────────────────────── */}
                   <section className="hero-section" aria-label="Game title" style={{ padding: '4px 0' }}>

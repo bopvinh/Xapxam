@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { io } from 'socket.io-client';
 import './styles/global.css';
 import './styles/artifact-system.css';
 import { GameMode, Player, PlayerStats, LetterState } from './game/types';
@@ -28,6 +29,7 @@ import { ShareModal } from './components/ShareModal';
 import { MasteryStatsModal } from './components/MasteryStatsModal';
 import { LeaderboardModal } from './components/LeaderboardModal';
 import { VictoryReveal } from './components/VictoryReveal';
+import { VictoryScreen } from './components/VictoryScreen';
 import { VectorBackground } from './components/VectorBackground';
 import { RowReticle } from './components/RowReticle';
 
@@ -115,6 +117,7 @@ export const App: React.FC = () => {
   const [status, setStatus] = useState<'PLAYING' | 'ROUND_OVER' | 'GAME_OVER'>('PLAYING');
   const [roundNumber, setRoundNumber] = useState<number>(1);
   const [maxRounds, setMaxRounds] = useState<number>(1);
+  const [lastPressedKey, setLastPressedKey] = useState<string | null>(null);
 
   // Timed Mode Timer State
   const [timeLeft, setTimeLeft] = useState<number>(60);
@@ -125,6 +128,13 @@ export const App: React.FC = () => {
 
   // Load stats & settings
   useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const room = params.get('room');
+    if (room && room.length === 4) {
+      setActiveMode('PARTY'); // Default to PARTY mode for URL join
+      setShowMultiplayerSetup(true);
+    }
+
     const savedStats = localStorage.getItem('wordplusplus_stats');
     if (savedStats) {
       try {
@@ -184,6 +194,32 @@ export const App: React.FC = () => {
     localStorage.setItem('wordplusplus_stats', JSON.stringify(DEFAULT_STATS));
     showToast('Statistics reset successfully');
   };
+
+  const handleRematchStart = useCallback(() => {
+    const newWord = getRandomSecretWord();
+    setSecretWord(newWord);
+    setPlayers(prev => prev.map(p => ({
+      ...p,
+      guesses: [],
+      solved: false,
+      attemptsUsed: 0
+    })));
+    setStatus('PLAYING');
+    setCurrentGuess('');
+    setRoundNumber(1);
+    showToast('⚔️ REMATCH STARTED! ⚔️');
+  }, []);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const room = params.get('room');
+    if (room && room.length === 4) {
+      const socket = io('http://localhost:3000');
+      socket.emit('join', room);
+      socket.on('rematch_started', handleRematchStart);
+      return () => { socket.disconnect(); };
+    }
+  }, [handleRematchStart]);
 
   // Select game mode
   const handleSelectMode = (mode: GameMode) => {
@@ -467,7 +503,10 @@ export const App: React.FC = () => {
       setCurrentGuess((prev) => prev.slice(0, -1));
     } else if (/^[A-Z]$/i.test(key)) {
       if (currentGuess.length < 5) {
-        setCurrentGuess((prev) => (prev + key).toUpperCase());
+        const upperKey = key.toUpperCase();
+        setCurrentGuess((prev) => prev + upperKey);
+        setLastPressedKey(upperKey);
+        setTimeout(() => setLastPressedKey(null), 10);
       }
     }
   }, [currentGuess, status, secretWord, players, activePlayerIndex, activeMode]);
@@ -747,6 +786,7 @@ export const App: React.FC = () => {
               letterStates={keyboardStates}
               disabled={status !== 'PLAYING'}
               isSubmitting={status === 'PLAYING' && isJolting}
+              lastPressedKey={lastPressedKey}
             />
           </div>
         )}
@@ -761,6 +801,16 @@ export const App: React.FC = () => {
             onNextRound={handleNextRound}
             onNewGame={handleHomeClick}
             isGameOver={roundNumber >= maxRounds}
+          />
+        )}
+
+        {status === 'GAME_OVER' && (
+          <VictoryScreen 
+            winner={players.sort((a,b) => b.score - a.score)[0]?.name || 'Unknown'} 
+            roomID={new URLSearchParams(window.location.search).get('room') || undefined}
+            guessesCount={activePlayer?.guesses.length || 0}
+            playerHP={100} // Default for final screen
+            onPlayAgain={handleHomeClick}
           />
         )}
       </main>

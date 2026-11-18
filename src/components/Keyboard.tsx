@@ -8,6 +8,7 @@ interface KeyboardProps {
   letterStates: Record<string, LetterState>;
   disabled?: boolean;
   isSubmitting?: boolean;
+  lastPressedKey?: string | null;
 }
 
 const KEYBOARD_ROWS = [
@@ -22,9 +23,17 @@ export const Keyboard: React.FC<KeyboardProps> = ({
   onDelete,
   letterStates,
   disabled = false,
-  isSubmitting = false
+  isSubmitting = false,
+  lastPressedKey
 }) => {
   const [activeSpinKey, setActiveSpinKey] = useState<string | null>(null);
+
+  React.useEffect(() => {
+    if (lastPressedKey) {
+      setActiveSpinKey(lastPressedKey);
+      setTimeout(() => setActiveSpinKey(null), 300);
+    }
+  }, [lastPressedKey]);
 
   const handleClick = (key: string) => {
     if (disabled) return;
