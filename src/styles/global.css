@@ -1047,14 +1047,14 @@ button:focus-visible {
 }
 
 .board-cell {
-  width: min(64px, 9vh);
-  height: min(64px, 9vh);
+  width: min(54px, 7.5vh);
+  height: min(54px, 7.5vh);
   border: 2px solid var(--empty-border);
   display: flex;
   align-items: center;
   justify-content: center;
   font-family: var(--font-display);
-  font-size: min(30px, 4.5vh);
+  font-size: min(25px, 3.8vh);
   font-weight: 800;
   text-transform: uppercase;
   border-radius: var(--radius-sm);
@@ -1114,14 +1114,14 @@ button:focus-visible {
 }
 
 .key-btn {
-  height: min(28px, 4.2vh);
+  height: min(32px, 4.5vh);
   flex: 1;
   background: var(--bg-elevated);
   border: var(--border-subtle);
   border-radius: var(--radius-sm);
   color: var(--text-primary);
   font-weight: 700;
-  font-size: min(10px, 1.4vh);
+  font-size: min(11px, 1.6vh);
   cursor: pointer;
   user-select: none;
   display: flex;

@@ -706,7 +706,7 @@ export const App: React.FC = () => {
         )}
 
         {activeMode && !showMultiplayerSetup && !showScoreboard && activePlayer && (
-          <div className="gameplay-area animate-scale" style={{ height: "100vh", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", overflow: "hidden" }}>
+          <div className="gameplay-area animate-scale" style={{ height: "calc(100vh - 75px)", display: "flex", flexDirection: "column", justifyContent: "space-between", alignItems: "center", overflow: "hidden", padding: "6px 0", boxSizing: "border-box" }}>
             {/* Kinetic Row Reticle (Tactical Focus HUD) */}
             <RowReticle activeRow={activePlayer.guesses.length} />
 
