@@ -35,7 +35,11 @@ export const MasteryStatsModal: React.FC<MasteryStatsModalProps> = ({
 
   return (
     <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-content mastery-modal animate-scale" onClick={(e) => e.stopPropagation()}>
+      <div className="modal-content mastery-modal animate-scale" onClick={(e) => e.stopPropagation()} style={{
+        maxHeight: '95vh',
+        width: '90vw',
+        maxWidth: '500px'
+      }}>
         <div className="modal-header">
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
             <span style={{ fontSize: '24px' }}>🎖️</span>
@@ -47,7 +51,7 @@ export const MasteryStatsModal: React.FC<MasteryStatsModalProps> = ({
           <button className="close-btn" onClick={onClose} aria-label="Close">&times;</button>
         </div>
 
-        <div className="modal-body" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        <div className="modal-body" style={{ display: 'flex', flexDirection: 'column', gap: '12px', padding: '16px' }}>
           {/* Level Header Banner */}
           <div
             style={{
