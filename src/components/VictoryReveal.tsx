@@ -150,7 +150,15 @@ export const VictoryReveal: React.FC<VictoryRevealProps> = ({
       </div>
 
       {/* Main Victory Reveal Container */}
-      <div className={`victory-reveal animate-scale is-win-aura medal-${medalTier} mvc2-mode`} role="status" aria-live="polite">
+      <div className={`victory-reveal animate-scale is-win-aura medal-${medalTier} mvc2-mode`} role="status" aria-live="polite" style={{
+        height: '100vh',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center',
+        padding: '16px',
+        overflow: 'hidden'
+      }}>
         {edgeParticles.map((p, i) => (
           <div key={i} className="victory-edge-particle" style={p.style} />
         ))}
@@ -206,7 +214,7 @@ export const VictoryReveal: React.FC<VictoryRevealProps> = ({
           <span>Win: <strong>{winRate}%</strong></span>
         </div>
 
-        <div className="victory-actions">
+        <div className="victory-actions" style={{ marginTop: '16px' }}>
           <button
             type="button"
             className="btn-victory-secondary"
