@@ -26,6 +26,7 @@ export const BattleBoard: React.FC<BattleBoardProps> = ({
   const [opponentHealth, setOpponentHealth] = useState(100);
   const [gauge, setGauge] = useState(0);
   const [shake, setShake] = useState(false);
+  const [flash, setFlash] = useState(false);
   const [combatMessage, setCombatMessage] = useState('⚔️ BATTLE ENGAGED');
 
   // Compute damage dealt to opponent based on correct letters in last guess
@@ -53,8 +54,12 @@ export const BattleBoard: React.FC<BattleBoardProps> = ({
       setPlayerHealth(prev => Math.max(0, prev - data.damage));
       setGauge(prev => Math.min(100, prev + data.gauge));
       setShake(true);
+      setFlash(true);
       setCombatMessage(`⚠️ CRITICAL! Received -${data.damage} DMG!`);
-      setTimeout(() => setShake(false), 500);
+      setTimeout(() => {
+        setShake(false);
+        setFlash(false);
+      }, 500);
     });
 
     return () => {
@@ -63,7 +68,20 @@ export const BattleBoard: React.FC<BattleBoardProps> = ({
   }, [roomID]);
 
   return (
-    <div className={`battle-board-wrapper ${shake ? 'shake-row' : ''}`} style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+    <div className={`battle-board-wrapper ${shake ? 'shake-row' : ''}`} style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', position: 'relative' }}>
+      {flash && (
+        <div 
+          style={{
+            position: 'absolute',
+            inset: 0,
+            backgroundColor: 'rgba(244, 63, 94, 0.3)',
+            zIndex: 99,
+            pointerEvents: 'none',
+            borderRadius: '12px',
+            animation: 'screen-flash-red 0.5s ease-out'
+          }} 
+        />
+      )}
       {/* ── Arcade PvP Combat HUD ───────────────────────────── */}
       <div className="pvp-combat-hud">
         {/* Player Status */}
