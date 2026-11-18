@@ -33,7 +33,7 @@ import { VictoryScreen } from './components/VictoryScreen';
 import { VectorBackground } from './components/VectorBackground';
 import { RowReticle } from './components/RowReticle';
 
-import { FloatingHUD } from './components/FloatingHUD';
+// import { FloatingHUD } from './components/FloatingHUD';
 import { ArtifactSystem } from './components/ArtifactSystem';
 import { PlayerInventory, ARTIFACT_DATABASE, RARITY_CONFIG } from './game/artifacts';
 
@@ -867,10 +867,10 @@ export const App: React.FC = () => {
               inventory={artifactInventory}
               onInventoryChange={setArtifactInventory}
             />
-            <FloatingHUD
+            {/* <FloatingHUD
         streak={stats.currentStreak} 
         winRate={stats.gamesPlayed > 0 ? Math.round((stats.gamesWon / stats.gamesPlayed) * 100) : 100} 
-      />
+      /> */}
     </div>
   );
 };
