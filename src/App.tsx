@@ -261,6 +261,7 @@ export const App: React.FC = () => {
     players: { name: string; isHost: boolean }[];
     secretWord: string;
     maxRounds: number;
+    roomCode?: string;
   }) => {
     setShowMultiplayerSetup(false);
     setSecretWord(setupData.secretWord.toUpperCase());
@@ -686,7 +687,7 @@ export const App: React.FC = () => {
         )}
 
         {activeMode && !showMultiplayerSetup && !showScoreboard && activePlayer && (
-          <div className="gameplay-area animate-scale">
+          <div className="gameplay-area animate-scale" style={{ height: "100vh", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", overflow: "hidden" }}>
             {/* Kinetic Row Reticle (Tactical Focus HUD) */}
             <RowReticle activeRow={activePlayer.guesses.length} />
 

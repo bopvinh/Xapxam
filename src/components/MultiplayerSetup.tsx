@@ -13,6 +13,7 @@ interface MultiplayerSetupProps {
     secretWord: string;
     maxRounds: number;
     teamCount?: number;
+    roomCode?: string;
   }) => void;
   onBack: () => void;
 }
@@ -31,6 +32,12 @@ export const MultiplayerSetup: React.FC<MultiplayerSetupProps> = ({
   const [customWord, setCustomWord] = useState<string>('');
   const [customWordError, setCustomWordError] = useState<string>('');
   const [rounds, setRounds] = useState<number>(3);
+  const [roomCode, setRoomCode] = useState<string>('');
+
+  const generateRoomCode = () => {
+    const code = Math.random().toString(36).substring(2, 6).toUpperCase();
+    setRoomCode(code);
+  };
 
   const handleNameChange = (idx: number, value: string) => {
     const updated = [...playerList];
@@ -80,7 +87,8 @@ export const MultiplayerSetup: React.FC<MultiplayerSetupProps> = ({
     onStart({
       players: preparedPlayers,
       secretWord: formattedWord,
-      maxRounds: rounds
+      maxRounds: rounds,
+      roomCode: roomCode
     });
   };
 
@@ -138,6 +146,16 @@ export const MultiplayerSetup: React.FC<MultiplayerSetupProps> = ({
               + Add Player
             </button>
           )}
+        </div>
+
+        <div className="form-section">
+          <h3>Room Management</h3>
+          <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+            <button type="button" className="btn-secondary" onClick={generateRoomCode}>
+              Generate Room Code
+            </button>
+            <input type="text" value={roomCode} readOnly placeholder="ROOM CODE" style={{ width: '120px', textAlign: 'center' }} />
+          </div>
         </div>
 
         <div className="form-section">
