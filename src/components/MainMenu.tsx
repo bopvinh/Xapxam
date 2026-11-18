@@ -224,7 +224,9 @@ export const MainMenu: React.FC<MainMenuProps> = ({
 
     return (
         <div className="main-menu-container animate-scale">
-              <div style={{ transform: `perspective(1000px) rotateY(${mousePos.x * 0.1}deg) rotateX(${-mousePos.y * 0.1}deg)`, width:'100%', height:'100%', position:'relative' }}>
+          <div className="main-menu-inner" style={{ transform: `perspective(1000px) rotateY(${mousePos.x * 0.1}deg) rotateX(${-mousePos.y * 0.1}deg)`, width:'100%', height:'100%', position:'relative', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+          <div className="main-menu-inner" style={{ transform: `perspective(1000px) rotateY(${mousePos.x * 0.1}deg) rotateX(${-mousePos.y * 0.1}deg)` }}>
+              <div style={{ width:'100%', height:'100%', position:'relative', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
           {/* ── Premium SVG Hero Background ───────────────────────── */}
           <div 
             className="hero-svg-bg" 
@@ -396,5 +398,7 @@ export const MainMenu: React.FC<MainMenuProps> = ({
       </div>
       </div>
     </div>
+        </div>
+          </div>
   );
 };
