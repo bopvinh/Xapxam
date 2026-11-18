@@ -656,6 +656,8 @@ export const App: React.FC = () => {
                   onToggleSound={handleToggleSound}
                   artifactCurrency={artifactInventory.currency}
                   roomCode={roomCode}
+                  activePlayerName={players.length > 1 && activePlayer ? activePlayer.name : undefined}
+                  roundInfo={players.length > 1 ? `Round ${roundNumber} of ${maxRounds}` : undefined}
                 />
       )}
 
@@ -697,18 +699,7 @@ export const App: React.FC = () => {
             {/* Kinetic Viewport Impact Layer (jolt effect) */}
             <div className={`viewport-impact-layer${isJolting ? ' viewport-impact-jolt' : ''}`} aria-hidden="true" />
 
-            {/* Multiplayer Banner */}
-            {players.length > 1 && (
-              <div className="multiplayer-hud">
-                <div className="hud-player-badge active-player">
-                  <span>Current Player:</span>
-                  <strong>{activePlayer.name}</strong>
-                </div>
-                <div className="hud-round-badge">
-                  Round {roundNumber} of {maxRounds}
-                </div>
-              </div>
-            )}
+
 
             {/* Timer for Timed Mode */}
             {activeMode === 'TIMED' && (
