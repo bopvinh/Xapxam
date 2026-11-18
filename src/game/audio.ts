@@ -174,6 +174,87 @@ class SoundManager {
       console.error(e);
     }
   }
+
+  // Crystalline chime for GREEN correct tile reveal
+  public playCorrect() {
+    if (!this.enabled) return;
+    try {
+      this.initCtx();
+      if (!this.ctx) return;
+
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(880, this.ctx.currentTime); // A5
+      osc.frequency.exponentialRampToValueAtTime(1760, this.ctx.currentTime + 0.12); // A6
+
+      gain.gain.setValueAtTime(0.2, this.ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.12);
+
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+
+      osc.start();
+      osc.stop(this.ctx.currentTime + 0.12);
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  // Warm bell tone for AMBER present tile reveal
+  public playPresent() {
+    if (!this.enabled) return;
+    try {
+      this.initCtx();
+      if (!this.ctx) return;
+
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(587.33, this.ctx.currentTime); // D5
+      osc.frequency.exponentialRampToValueAtTime(880, this.ctx.currentTime + 0.1);
+
+      gain.gain.setValueAtTime(0.15, this.ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.1);
+
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+
+      osc.start();
+      osc.stop(this.ctx.currentTime + 0.1);
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  // Dull thud for GRAY absent tile reveal
+  public playAbsent() {
+    if (!this.enabled) return;
+    try {
+      this.initCtx();
+      if (!this.ctx) return;
+
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(180, this.ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(90, this.ctx.currentTime + 0.06);
+
+      gain.gain.setValueAtTime(0.08, this.ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.06);
+
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+
+      osc.start();
+      osc.stop(this.ctx.currentTime + 0.06);
+    } catch (e) {
+      console.error(e);
+    }
+  }
 }
 
 export const soundManager = new SoundManager();

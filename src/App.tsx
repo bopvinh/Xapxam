@@ -345,7 +345,20 @@ export const App: React.FC = () => {
     }
 
     const evaluation = evaluateGuess(formattedGuess, secretWord);
-    soundManager.playFlip();
+    
+    // Sequential Staggered Audio-Visual Tile Reveal Cascade
+    evaluation.forEach((item, idx) => {
+      setTimeout(() => {
+        if (item.state === 'correct') {
+          soundManager.playCorrect();
+        } else if (item.state === 'present') {
+          soundManager.playPresent();
+        } else {
+          soundManager.playAbsent();
+        }
+      }, idx * 120);
+    });
+
     setIsJolting(true);
     setTimeout(() => setIsJolting(false), 600);
     const isWon = formattedGuess === secretWord;
