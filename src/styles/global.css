@@ -961,29 +961,29 @@ button:focus-visible {
 .game-board-container {
   display: flex;
   justify-content: center;
-  margin: var(--space-3) 0;
+  margin: 0;
 }
 
 .game-board {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 4px;
 }
 
 .board-row {
   display: flex;
-  gap: 6px;
+  gap: 4px;
 }
 
 .board-cell {
-  width: 54px;
-  height: 54px;
+  width: 44px;
+  height: 44px;
   border: 2px solid var(--empty-border);
   display: flex;
   align-items: center;
   justify-content: center;
   font-family: var(--font-display);
-  font-size: 24px;
+  font-size: 20px;
   font-weight: 800;
   text-transform: uppercase;
   border-radius: var(--radius-sm);
@@ -1031,19 +1031,19 @@ button:focus-visible {
 .keyboard-container {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 4px;
   width: 100%;
-  margin-top: var(--space-4);
+  margin-top: 8px;
 }
 
 .keyboard-row {
   display: flex;
   justify-content: center;
-  gap: 5px;
+  gap: 4px;
 }
 
 .key-btn {
-  height: 50px;
+  height: 42px;
   flex: 1;
   background: var(--bg-elevated);
   border: var(--border-subtle);
@@ -3385,7 +3385,7 @@ button:focus-visible {
 /* ── Tactical Keyboard Enhancements (Change #3) ───────────────── */
 .keyboard-container {
   position: relative;
-  padding: 16px;
+  padding: 8px;
   width: 95%;
   max-width: 900px;
   margin: 0 auto;
