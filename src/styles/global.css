@@ -4031,3 +4031,177 @@ button:focus-visible {
 }
 
 
+
+
+/* ============================================================
+   TACTICAL TILE BURST & SHOCKWAVE VFX (THEATRICS)
+   ============================================================ */
+.tile-burst-effect {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: visible;
+  z-index: 10;
+}
+
+.tile-shockwave {
+  position: absolute;
+  inset: -4px;
+  border-radius: var(--radius-sm);
+  border: 2px solid transparent;
+  animation: shockwave-expand 0.6s cubic-bezier(0.12, 0, 0.39, 0) forwards;
+}
+
+.tile-shockwave.correct {
+  border-color: #22d3a0;
+  box-shadow: 0 0 15px #22d3a0;
+}
+
+.tile-shockwave.present {
+  border-color: #f59e0b;
+  box-shadow: 0 0 15px #f59e0b;
+}
+
+@keyframes shockwave-expand {
+  0% { transform: scale(0.9); opacity: 1; }
+  100% { transform: scale(1.4); opacity: 0; }
+}
+
+.tile-particle-spore {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  top: 50%;
+  left: 50%;
+  opacity: 0;
+}
+
+.tile-particle-spore.correct { background: #22d3a0; box-shadow: 0 0 6px #22d3a0; }
+.tile-particle-spore.present { background: #f59e0b; box-shadow: 0 0 6px #f59e0b; }
+
+.tile-particle-spore.p1 { animation: spore-fly-1 0.7s cubic-bezier(0.12, 0, 0.39, 0) forwards; }
+.tile-particle-spore.p2 { animation: spore-fly-2 0.7s cubic-bezier(0.12, 0, 0.39, 0) forwards; }
+.tile-particle-spore.p3 { animation: spore-fly-3 0.7s cubic-bezier(0.12, 0, 0.39, 0) forwards; }
+.tile-particle-spore.p4 { animation: spore-fly-4 0.7s cubic-bezier(0.12, 0, 0.39, 0) forwards; }
+
+@keyframes spore-fly-1 {
+  0% { transform: translate(-50%, -50%) scale(1.5); opacity: 1; }
+  100% { transform: translate(-28px, -24px) scale(0); opacity: 0; }
+}
+@keyframes spore-fly-2 {
+  0% { transform: translate(-50%, -50%) scale(1.5); opacity: 1; }
+  100% { transform: translate(28px, -24px) scale(0); opacity: 0; }
+}
+@keyframes spore-fly-3 {
+  0% { transform: translate(-50%, -50%) scale(1.5); opacity: 1; }
+  100% { transform: translate(-24px, 28px) scale(0); opacity: 0; }
+}
+@keyframes spore-fly-4 {
+  0% { transform: translate(-50%, -50%) scale(1.5); opacity: 1; }
+  100% { transform: translate(24px, 28px) scale(0); opacity: 0; }
+}
+
+/* ============================================================
+   ARCADE PVP COMBAT HUD STYLING
+   ============================================================ */
+.pvp-combat-hud {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  max-width: 400px;
+  background: rgba(13, 17, 23, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-md);
+  padding: 6px 12px;
+  margin-bottom: 6px;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+}
+
+.combat-side {
+  display: flex;
+  flex-direction: column;
+  width: 100px;
+}
+
+.combat-name {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  margin-bottom: 2px;
+}
+
+.hp-bar-outer {
+  width: 100%;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.hp-bar-inner {
+  height: 100%;
+  transition: width 0.4s ease-out;
+  border-radius: 4px;
+}
+
+.hp-bar-inner.player-hp {
+  background: linear-gradient(90deg, #10b981, #22d3a0);
+  box-shadow: 0 0 8px rgba(34, 211, 160, 0.5);
+}
+
+.hp-bar-inner.opponent-hp {
+  background: linear-gradient(90deg, #f43f5e, #fb7185);
+  box-shadow: 0 0 8px rgba(244, 63, 94, 0.5);
+}
+
+.hp-text {
+  font-size: 9px;
+  font-weight: 700;
+  margin-top: 2px;
+  color: var(--text-muted);
+}
+
+.combat-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+  padding: 0 8px;
+}
+
+.combat-callout {
+  font-size: 10px;
+  font-weight: 800;
+  color: #facc15;
+  letter-spacing: 0.5px;
+  text-align: center;
+  margin-bottom: 3px;
+  text-shadow: 0 0 6px rgba(250, 204, 21, 0.4);
+}
+
+.super-gauge-outer {
+  width: 80%;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.super-gauge-inner {
+  height: 100%;
+  background: linear-gradient(90deg, #f59e0b, #fde047);
+  box-shadow: 0 0 6px rgba(245, 158, 11, 0.6);
+  transition: width 0.3s ease-out;
+}
+
+.gauge-label {
+  font-size: 8px;
+  font-weight: 700;
+  color: #f59e0b;
+  margin-top: 2px;
+}

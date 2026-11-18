@@ -58,6 +58,15 @@ export const GameBoard: React.FC<GameBoardProps> = ({
           </svg>
           <span className="letter-text">{char}</span>
           {symbol && <span className="cb-badge">{symbol}</span>}
+          {isSubmittedRow && (state === 'correct' || state === 'present') && (
+            <div className="tile-burst-effect" aria-hidden="true">
+              <div className={`tile-shockwave ${state}`} />
+              <div className={`tile-particle-spore p1 ${state}`} />
+              <div className={`tile-particle-spore p2 ${state}`} />
+              <div className={`tile-particle-spore p3 ${state}`} />
+              <div className={`tile-particle-spore p4 ${state}`} />
+            </div>
+          )}
         </div>
       );
     }

@@ -15,6 +15,7 @@ import { soundManager } from './game/audio';
 import { Header } from './components/Header';
 import { MainMenu } from './components/MainMenu';
 import { GameBoard } from './components/GameBoard';
+import { BattleBoard } from './components/BattleBoard';
 import { Keyboard } from './components/Keyboard';
 import { HelpModal } from './components/HelpModal';
 import { StatsModal } from './components/StatsModal';
@@ -717,13 +718,25 @@ export const App: React.FC = () => {
               <RowReticle activeRow={activePlayer.guesses.length} />
             )}
 
-            {/* Game Grid */}
-            <GameBoard
-              guesses={activePlayer.guesses}
-              currentGuess={currentGuess}
-              invalidRowIndex={invalidRowIndex}
-              colorBlindMode={colorBlindMode}
-            />
+            {/* Game Grid / PvP Battle Board */}
+            {activeMode === 'PARTY' ? (
+              <BattleBoard
+                roomID={roomCode}
+                guesses={activePlayer.guesses}
+                currentGuess={currentGuess}
+                playerName={activePlayer.name}
+                opponentName={players.find(p => p.id !== activePlayer.id)?.name || 'OPPONENT'}
+                invalidRowIndex={invalidRowIndex}
+                colorBlindMode={colorBlindMode}
+              />
+            ) : (
+              <GameBoard
+                guesses={activePlayer.guesses}
+                currentGuess={currentGuess}
+                invalidRowIndex={invalidRowIndex}
+                colorBlindMode={colorBlindMode}
+              />
+            )}
 
             {/* Feedback actions if solved / failed */}
             {status === 'ROUND_OVER' && (
