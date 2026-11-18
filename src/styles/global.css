@@ -1114,14 +1114,14 @@ button:focus-visible {
 }
 
 .key-btn {
-  height: min(36px, 5.2vh);
+  height: min(28px, 4.2vh);
   flex: 1;
   background: var(--bg-elevated);
   border: var(--border-subtle);
   border-radius: var(--radius-sm);
   color: var(--text-primary);
   font-weight: 700;
-  font-size: min(12px, 1.8vh);
+  font-size: min(10px, 1.4vh);
   cursor: pointer;
   user-select: none;
   display: flex;
