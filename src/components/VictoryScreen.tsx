@@ -45,9 +45,18 @@ export const VictoryScreen: React.FC<VictoryScreenProps> = ({
   };
 
   return (
-    <div className="victory-screen animate-scale" style={{ textAlign: 'center', padding: '32px 16px' }}>
+    <div className="victory-screen animate-scale" style={{ 
+      textAlign: 'center', 
+      padding: '16px', 
+      height: '100vh', 
+      display: 'flex', 
+      flexDirection: 'column', 
+      justifyContent: 'center', 
+      alignItems: 'center',
+      overflow: 'hidden'
+    }}>
       <h1 style={{ 
-        fontSize: '48px', 
+        fontSize: 'clamp(32px, 8vw, 48px)', 
         color: isFlawless ? '#F59E0B' : '#22d3a0', 
         margin: '0 0 12px 0', 
         letterSpacing: '6px',
@@ -55,11 +64,18 @@ export const VictoryScreen: React.FC<VictoryScreenProps> = ({
       }}>
         {isFlawless ? '⚡ FLAWLESS ⚡' : 'VICTORY'}
       </h1>
-      <p style={{ fontSize: '20px', color: 'var(--text-primary)', marginBottom: '24px', fontWeight: 600 }}>
+      <p style={{ fontSize: 'clamp(16px, 4vw, 20px)', color: 'var(--text-primary)', marginBottom: '24px', fontWeight: 600 }}>
         {winner} Wins!
       </p>
 
-      <div className="stats-animation" style={{ background: 'rgba(255,255,255,0.03)', padding: '16px', borderRadius: '12px', maxWidth: '400px', margin: '0 auto 32px auto' }}>
+      <div className="stats-animation" style={{ 
+        background: 'rgba(255,255,255,0.03)', 
+        padding: '16px', 
+        borderRadius: '12px', 
+        width: '100%',
+        maxWidth: '400px', 
+        margin: '0 auto 32px auto' 
+      }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
           <span style={{ color: 'var(--text-secondary)' }}>Remaining HP:</span>
           <span style={{ color: '#22d3a0', fontWeight: 600 }}>{animatedHP} HP</span>
