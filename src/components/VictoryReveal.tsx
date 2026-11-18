@@ -60,7 +60,7 @@ export const VictoryReveal: React.FC<VictoryRevealProps> = ({
   const medalLabel = medalTier === 'diamond' ? 'PERFECT' : medalTier === 'gold' ? 'MASTERFUL' : 'SKILLED';
 
   // Streak fire intensity
-  const streakIntensity = Math.min(streak, 10);
+  
 
   // MvC2 state
   const [showFlash, setShowFlash] = useState(true);
@@ -196,16 +196,6 @@ export const VictoryReveal: React.FC<VictoryRevealProps> = ({
         </div>
 
         {/* Streak Fire Visualization with MvC2 Surge */}
-        {streak > 1 && (
-          <div className="victory-streak-fire" data-intensity={streakIntensity}>
-            <div className={`streak-flame ${streak >= 5 ? 'mvc2-surge' : ''}`}>
-              <span className="flame-core">🔥</span>
-              <span className="flame-aura" />
-              <span className="streak-count">{streak}</span>
-            </div>
-            <span className="streak-label">{streak} WIN STREAK</span>
-          </div>
-        )}
 
         <p className="victory-mode">
           {mode.replace('_', ' ')} · {finalGuess}
