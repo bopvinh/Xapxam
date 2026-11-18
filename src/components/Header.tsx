@@ -14,6 +14,9 @@ interface HeaderProps {
   soundEnabled: boolean;
   onToggleSound: () => void;
   artifactCurrency: number;
+  activePlayerName?: string;
+  roundInfo?: string;
+  roomCode?: string;
 }
 
 /** Home icon */
@@ -99,6 +102,9 @@ export const Header: React.FC<HeaderProps> = ({
   soundEnabled,
   onToggleSound,
   artifactCurrency,
+  activePlayerName,
+  roundInfo,
+  roomCode,
 }) => {
   return (
     <header className="app-header" role="banner">
@@ -120,6 +126,25 @@ export const Header: React.FC<HeaderProps> = ({
         >
           <HelpIcon />
         </button>
+
+        {activePlayerName && (
+          <div className="hud-player-badge active-player" style={{ marginLeft: '12px', display: 'flex', alignItems: 'center', gap: '4px', fontSize: '14px', background: 'rgba(255,255,255,0.05)', padding: '4px 10px', borderRadius: '6px' }}>
+            <span>Player:</span>
+            <strong style={{ color: 'var(--accent-bright)' }}>{activePlayerName}</strong>
+          </div>
+        )}
+
+        {roundInfo && (
+          <div className="hud-round-badge" style={{ marginLeft: '8px', fontSize: '13px', color: 'var(--text-secondary)', background: 'rgba(255,255,255,0.03)', padding: '4px 8px', borderRadius: '6px' }}>
+            {roundInfo}
+          </div>
+        )}
+        
+        {roomCode && (
+          <div className="hud-room-badge" style={{ marginLeft: '8px', fontSize: '13px', color: 'var(--accent-bright)', background: 'rgba(255,255,255,0.05)', padding: '4px 8px', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.1)' }}>
+            Room: <strong>{roomCode}</strong>
+          </div>
+        )}
       </div>
 
       {/* ── Center: brand + mode badge ───────────────────── */}

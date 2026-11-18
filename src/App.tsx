@@ -66,14 +66,15 @@ export const App: React.FC = () => {
   const [isDefinitionOpen, setIsDefinitionOpen] = useState<boolean>(false);
   const [showMultiplayerSetup, setShowMultiplayerSetup] = useState<boolean>(false);
   const [showScoreboard, setShowScoreboard] = useState<boolean>(false);
+  const [roomCode, setRoomCode] = useState<string>("");
   const [showDailyChest, setShowDailyChest] = useState<boolean>(false);
   const [showMentor, setShowMentor] = useState<boolean>(false);
   const [showBlitz, setShowBlitz] = useState<boolean>(false);
   const [showShare, setShowShare] = useState<boolean>(false);
   const [showMastery, setShowMastery] = useState<boolean>(false);
   const [showLeaderboard, setShowLeaderboard] = useState<boolean>(false);
-    const [showArtifacts, setShowArtifacts] = useState<boolean>(false);
-    const [isJolting, setIsJolting] = useState<boolean>(false);
+  const [showArtifacts, setShowArtifacts] = useState<boolean>(false);
+  const [isJolting, setIsJolting] = useState<boolean>(false);
 
   // Settings state
   const [colorBlindMode, setColorBlindMode] = useState<boolean>(false);
@@ -263,9 +264,10 @@ export const App: React.FC = () => {
     maxRounds: number;
     roomCode?: string;
   }) => {
+    setRoomCode(setupData.roomCode || "");
     setShowMultiplayerSetup(false);
-    setSecretWord(setupData.secretWord.toUpperCase());
     setMaxRounds(setupData.maxRounds);
+    setRoomCode(setupData.roomCode || "");
     setRoundNumber(1);
 
     const prepared: Player[] = setupData.players.map((p, idx) => ({
@@ -653,6 +655,7 @@ export const App: React.FC = () => {
                   soundEnabled={soundEnabled}
                   onToggleSound={handleToggleSound}
                   artifactCurrency={artifactInventory.currency}
+                  roomCode={roomCode}
                 />
       )}
 
