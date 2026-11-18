@@ -962,6 +962,7 @@ button:focus-visible {
   display: flex;
   justify-content: center;
   margin: 0;
+  padding-top: 2px;
 }
 
 .game-board {
