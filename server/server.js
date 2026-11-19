@@ -1,6 +1,6 @@
 import { Server } from 'socket.io';
 import { createServer } from 'http';
-import { evaluateGuess } from '../src/game/engine.js';
+import { evaluateGuess } from '../src/game/engine.ts';
 
 const httpServer = createServer();
 const io = new Server(httpServer, {
