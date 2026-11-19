@@ -457,6 +457,7 @@ button:focus-visible {
   backdrop-filter: blur(32px);
   -webkit-backdrop-filter: blur(32px);
   border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: var(--radius-md);
   padding: 0;
   overflow: hidden;
 }
@@ -2385,6 +2386,7 @@ button:focus-visible {
   padding: 4px 0;
   box-sizing: border-box;
   animation: screen-fade 0.3s ease forwards, scale-up 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  border-radius: var(--radius-md);
 }
 .game-board-container,
 .multiplayer-setup-container,
@@ -3122,10 +3124,10 @@ button:focus-visible {
   transition: opacity 0.3s ease, transform 0.3s ease;
 }
 
-.vector-corner-tl { top: 6px; left: 6px; border-top: 2px solid; border-left: 2px solid; }
-.vector-corner-tr { top: 6px; right: 6px; border-top: 2px solid; border-right: 2px solid; }
-.vector-corner-bl { bottom: 6px; left: 6px; border-bottom: 2px solid; border-left: 2px solid; }
-.vector-corner-br { bottom: 6px; right: 6px; border-bottom: 2px solid; border-right: 2px solid; }
+.vector-corner-tl { top: 6px; left: 6px; border-top: 2px solid; border-left: 2px solid; border-top-left-radius: 4px; }
+.vector-corner-tr { top: 6px; right: 6px; border-top: 2px solid; border-right: 2px solid; border-top-right-radius: 4px; }
+.vector-corner-bl { bottom: 6px; left: 6px; border-bottom: 2px solid; border-left: 2px solid; border-bottom-left-radius: 4px; }
+.vector-corner-br { bottom: 6px; right: 6px; border-bottom: 2px solid; border-right: 2px solid; border-bottom-right-radius: 4px; }
 
 /* ============================================================
    VICTORY REVEAL — signature solved-word "winner's screen"
