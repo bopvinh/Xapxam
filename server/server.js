@@ -1,13 +1,15 @@
 import { Server } from 'socket.io';
 import { createServer } from 'http';
-import { evaluateGuess } from '../src/game/engine.ts';
+import { evaluateGuess, getRandomSecretWord } from '../src/game/engine.ts';
 
 const httpServer = createServer();
 const io = new Server(httpServer, {
   cors: {
-    origin: "http://localhost:5173",
+    origin: ["http://localhost:5173", "http://127.0.0.1:5173"],
     methods: ["GET", "POST"]
-  }
+  },
+  allowEIO3: true,
+  transports: ['websocket', 'polling']
 });
 
 const rooms = new Map();
@@ -15,39 +17,56 @@ const rooms = new Map();
 io.on('connection', (socket) => {
   console.log('Client connected:', socket.id);
 
-  socket.on('create', ({ roomID, secretWord }) => {
+  socket.on('create', (payload) => {
+    const roomID = typeof payload === 'string' ? payload : payload?.roomID;
+    if (!roomID) return;
+    const secretWord = getRandomSecretWord();
     socket.join(roomID);
-    rooms.set(roomID, { secretWord });
+    rooms.set(roomID, { secretWord, host: socket.id });
+    socket.emit('room_created', { roomID });
     console.log(`Socket ${socket.id} created room ${roomID}`);
   });
 
-  socket.on('join', (roomID) => {
+  socket.on('join', (payload) => {
+    const roomID = typeof payload === 'string' ? payload : payload?.roomID;
+    if (!roomID) return;
     socket.join(roomID);
     console.log(`Socket ${socket.id} joined room ${roomID}`);
   });
 
   socket.on('guess', (data) => {
+    if (!data || !data.roomID || !data.guess) return;
     const room = rooms.get(data.roomID);
     if (!room) return;
 
     const evaluation = evaluateGuess(data.guess, room.secretWord);
-    
+
     // Relay result to everyone in the room
-    io.in(data.roomID).emit('evaluation_result', { 
-        evaluation, 
-        senderID: socket.id,
-        guess: data.guess 
+    io.in(data.roomID).emit('evaluation_result', {
+      evaluation,
+      senderID: socket.id,
+      guess: data.guess
     });
-    
+
     // Calculate combat metrics
-    const damage = evaluation.filter(e => e.state === 'correct').length * 20;
-    const gauge = evaluation.filter(e => e.state === 'present').length * 10;
-    
-    io.in(data.roomID).emit('damage_received', { damage, gauge });
+    const correctCount = evaluation.filter(e => e.state === 'correct').length;
+    const presentCount = evaluation.filter(e => e.state === 'present').length;
+    const damage = correctCount * 20;
+    const gauge = correctCount * 20 + presentCount * 10;
+
+    // Emit damage_received to opponents in the room
+    socket.to(data.roomID).emit('damage_received', { damage, senderID: socket.id });
+
+    // Emit gauge_received and damage confirmation to the sender
+    socket.emit('gauge_received', { gauge, damageDealt: damage });
   });
 
-  socket.on('request_rematch', (roomID) => {
-    // Reset room state for everyone
+  socket.on('request_rematch', (payload) => {
+    const roomID = typeof payload === 'string' ? payload : payload?.roomID;
+    if (!roomID) return;
+    const newSecretWord = getRandomSecretWord();
+    const existing = rooms.get(roomID) || {};
+    rooms.set(roomID, { ...existing, secretWord: newSecretWord });
     io.in(roomID).emit('rematch_started');
   });
 
