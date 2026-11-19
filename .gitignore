@@ -28,5 +28,11 @@ Thumbs.db
 .vitest
 coverage
 
+# Windows null device
+nul
+
+# Playwright test artifacts
+playwright-report/
+
 # Temporary tooling artifacts
 .hermes-tmp.*
