@@ -31,10 +31,12 @@ import { MasteryStatsModal } from './components/MasteryStatsModal';
 import { LeaderboardModal } from './components/LeaderboardModal';
 import { VictoryReveal } from './components/VictoryReveal';
 import { VictoryScreen } from './components/VictoryScreen';
+import { FloatingHUD } from './components/FloatingHUD';
+import { CinematicVictory } from './components/CinematicVictory';
 import { VectorBackground } from './components/VectorBackground';
 import { RowReticle } from './components/RowReticle';
 
-import { FloatingHUD } from './components/FloatingHUD';
+
 import { ArtifactSystem } from './components/ArtifactSystem';
 import { PlayerInventory, ARTIFACT_DATABASE, RARITY_CONFIG } from './game/artifacts';
 
@@ -76,6 +78,7 @@ export const App: React.FC = () => {
   const [showLeaderboard, setShowLeaderboard] = useState<boolean>(false);
   const [showArtifacts, setShowArtifacts] = useState<boolean>(false);
   const [isJolting, setIsJolting] = useState<boolean>(false);
+  const [isVictoryCinematic, setIsVictoryCinematic] = useState<boolean>(false);
 
   // Settings state
   const [colorBlindMode, setColorBlindMode] = useState<boolean>(false);
@@ -366,6 +369,7 @@ export const App: React.FC = () => {
     const isWon = formattedGuess === secretWord;
     if (isWon) {
       triggerVictory();
+      setIsVictoryCinematic(true);
     }
     const newGuesses = [...players[activePlayerIndex].guesses, { word: formattedGuess, evaluation }];
     const isOutOfAttempts = newGuesses.length >= 6;
@@ -657,7 +661,17 @@ export const App: React.FC = () => {
       } as React.CSSProperties}
     >
       <VectorBackground status={showConfetti ? 'WIN' : status} />
-      {activeMode && (
+      {isVictoryCinematic && (
+              <CinematicVictory
+                videoSource="/assets/victory-cinematic.mp4"
+                onComplete={() => setIsVictoryCinematic(false)}
+              />
+            )}
+            <FloatingHUD
+              streak={stats.currentStreak}
+              winRate={stats.gamesPlayed > 0 ? Math.round((stats.gamesWon / stats.gamesPlayed) * 100) : 100}
+            />
+            {activeMode && (
         <Header
                   mode={activeMode}
                   onOpenHelp={() => setIsHelpOpen(true)}
@@ -895,10 +909,7 @@ export const App: React.FC = () => {
               inventory={artifactInventory}
               onInventoryChange={setArtifactInventory}
             />
-            <FloatingHUD
-                          streak={stats.currentStreak}
-                          winRate={stats.gamesPlayed > 0 ? Math.round((stats.gamesWon / stats.gamesPlayed) * 100) : 100}
-                        />
+
     </div>
   );
 };

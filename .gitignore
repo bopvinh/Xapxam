@@ -36,3 +36,4 @@ playwright-report/
 
 # Temporary tooling artifacts
 .hermes-tmp.*
+public/assets/frames/
