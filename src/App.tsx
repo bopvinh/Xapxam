@@ -237,6 +237,7 @@ export const App: React.FC = () => {
 
   // Start single player
   const startSinglePlayerGame = (mode: GameMode) => {
+    setIsDefinitionOpen(false);
     const word = mode === 'DAILY' ? getDailySecretWord() : getRandomSecretWord();
     setSecretWord(word);
     
@@ -265,6 +266,7 @@ export const App: React.FC = () => {
     maxRounds: number;
     roomCode?: string;
   }) => {
+    setIsDefinitionOpen(false);
     setRoomCode(setupData.roomCode || "");
     setShowMultiplayerSetup(false);
     setMaxRounds(setupData.maxRounds);
