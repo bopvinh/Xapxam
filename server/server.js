@@ -1,5 +1,6 @@
 import { Server } from 'socket.io';
 import { createServer } from 'http';
+import { evaluateGuess } from '../src/game/engine.js';
 
 const httpServer = createServer();
 const io = new Server(httpServer, {
@@ -9,8 +10,16 @@ const io = new Server(httpServer, {
   }
 });
 
+const rooms = new Map();
+
 io.on('connection', (socket) => {
   console.log('Client connected:', socket.id);
+
+  socket.on('create', ({ roomID, secretWord }) => {
+    socket.join(roomID);
+    rooms.set(roomID, { secretWord });
+    console.log(`Socket ${socket.id} created room ${roomID}`);
+  });
 
   socket.on('join', (roomID) => {
     socket.join(roomID);
@@ -18,16 +27,23 @@ io.on('connection', (socket) => {
   });
 
   socket.on('guess', (data) => {
-    // Relay guess to others in the same room
-    socket.to(data.roomID).emit('guess_received', { ...data, senderID: socket.id });
+    const room = rooms.get(data.roomID);
+    if (!room) return;
+
+    const evaluation = evaluateGuess(data.guess, room.secretWord);
     
-    // Skill-based combat: calculate damage/gauge based on evaluation
-    const { evaluateGuess } = require('./engine.js'); // Assuming engine is available via build/CJS
-    const evaluation = evaluateGuess(data.guess, data.secretWord); // Need to pass secretWord
+    // Relay result to everyone in the room
+    io.in(data.roomID).emit('evaluation_result', { 
+        evaluation, 
+        senderID: socket.id,
+        guess: data.guess 
+    });
+    
+    // Calculate combat metrics
     const damage = evaluation.filter(e => e.state === 'correct').length * 20;
     const gauge = evaluation.filter(e => e.state === 'present').length * 10;
     
-    socket.to(data.roomID).emit('damage_received', { damage, gauge });
+    io.in(data.roomID).emit('damage_received', { damage, gauge });
   });
 
   socket.on('request_rematch', (roomID) => {

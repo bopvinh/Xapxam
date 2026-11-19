@@ -7,12 +7,10 @@ export function initPvPSocket(_roomID: string): Socket {
   return pvpSocket;
 }
 
-export function createRoom(): string {
-  const roomID = Math.random().toString(36).substring(2, 6).toUpperCase();
+export function createRoom(roomID: string, secretWord: string): void {
   if (pvpSocket) {
-    pvpSocket.emit('create', roomID);
+    pvpSocket.emit('create', { roomID, secretWord });
   }
-  return roomID;
 }
 
 export function joinRoom(roomID: string): void {
@@ -27,8 +25,8 @@ export function sendGuess(guess: string, roomID: string): void {
   }
 }
 
-export function onGuessReceived(callback: (data: { roomID: string; guess: string; senderID?: string }) => void): void {
+export function onEvaluationReceived(callback: (data: { evaluation: any; guess: string; senderID: string }) => void): void {
   if (pvpSocket) {
-    pvpSocket.on('guess_received', callback);
+    pvpSocket.on('evaluation_result', callback);
   }
 }
