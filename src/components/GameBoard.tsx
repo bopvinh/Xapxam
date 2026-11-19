@@ -1,5 +1,6 @@
 import React from 'react';
 import { GuessResult, LetterEvaluation, LetterState } from '../game/types';
+import { calculateRowCombo } from '../game/engine';
 
 interface GameBoardProps {
   guesses: GuessResult[];
@@ -71,9 +72,16 @@ export const GameBoard: React.FC<GameBoardProps> = ({
       );
     }
 
+    const combo = isSubmittedRow ? calculateRowCombo(guesses[r].evaluation) : null;
+
     rows.push(
       <div key={r} className={`board-row ${isCurrentRow ? 'active-row' : ''} ${isShake ? 'shake-row' : ''}`}>
         {cells}
+        {combo && (
+          <div className={`combo-popup ${combo.badgeClass}`}>
+            {combo.label}
+          </div>
+        )}
       </div>
     );
   }

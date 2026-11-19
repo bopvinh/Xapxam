@@ -181,3 +181,66 @@ export function validateHardModeGuess(
 
   return null;
 }
+
+/**
+ * Structured combo reward result for row evaluation.
+ */
+export interface RowComboResult {
+  tier: 'penta' | 'quad' | 'triple' | 'double' | 'synergy';
+  label: string;
+  bonusPoints: number;
+  badgeClass: string;
+}
+
+/**
+ * Calculates tactile combo rewards and arcade badges based on row letter matches.
+ */
+export function calculateRowCombo(evaluation: LetterEvaluation[]): RowComboResult | null {
+  if (!evaluation || evaluation.length !== 5) return null;
+  const correctCount = evaluation.filter(e => e.state === 'correct').length;
+  const presentCount = evaluation.filter(e => e.state === 'present').length;
+
+  if (correctCount === 5) {
+    return {
+      tier: 'penta',
+      label: '🌟 PENTA MATCH! +100',
+      bonusPoints: 100,
+      badgeClass: 'combo-penta'
+    };
+  }
+  if (correctCount === 4) {
+    return {
+      tier: 'quad',
+      label: '💥 QUAD MATCH! +50',
+      bonusPoints: 50,
+      badgeClass: 'combo-quad'
+    };
+  }
+  if (correctCount === 3) {
+    return {
+      tier: 'triple',
+      label: '⚡ TRIPLE MATCH! +30',
+      bonusPoints: 30,
+      badgeClass: 'combo-triple'
+    };
+  }
+  if (correctCount === 2) {
+    return {
+      tier: 'double',
+      label: '🔥 DOUBLE MATCH! +15',
+      bonusPoints: 15,
+      badgeClass: 'combo-double'
+    };
+  }
+  if (correctCount + presentCount >= 3) {
+    return {
+      tier: 'synergy',
+      label: '✨ SYNERGY! +10',
+      bonusPoints: 10,
+      badgeClass: 'combo-synergy'
+    };
+  }
+
+  return null;
+}
+
