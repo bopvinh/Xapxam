@@ -471,3 +471,19 @@ export const ArtifactSystem: React.FC<ArtifactSystemProps> = ({
     </div>
   );
 };
+
+export interface ComboBadgeProps {
+  comboCount: number;
+  multiplier: number;
+}
+
+export const ComboMultiplierBadge: React.FC<ComboBadgeProps> = ({ comboCount, multiplier }) => {
+  if (comboCount <= 1) return null;
+  return (
+    <div data-testid="combo-combustion-badge" className="combo-combustion-badge">
+      <span className="combo-fire">🔥</span>
+      <span className="combo-text">COMBO x{comboCount}</span>
+      <span className="combo-mult">({multiplier.toFixed(1)}x Multiplier)</span>
+    </div>
+  );
+};

@@ -1066,3 +1066,38 @@
     display: none;
   }
 }
+/* Combo Combustion Badge */
+.combo-combustion-badge {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: linear-gradient(135deg, #f59e0b, #ef4444);
+  color: #fff;
+  padding: 6px 14px;
+  border-radius: 9999px;
+  font-family: var(--font-mono, monospace);
+  font-weight: 800;
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  box-shadow: 0 4px 20px rgba(239, 68, 68, 0.4);
+  animation: combo-pulse 0.8s ease-in-out infinite alternate;
+  z-index: 50;
+  pointer-events: none;
+}
+
+@keyframes combo-pulse {
+  from { transform: scale(1); box-shadow: 0 4px 20px rgba(239, 68, 68, 0.4); }
+  to { transform: scale(1.08); box-shadow: 0 6px 28px rgba(245, 158, 11, 0.7); }
+}
+
+.combo-fire {
+  font-size: 1rem;
+  animation: fire-flicker 0.4s ease-in-out infinite alternate;
+}
+
+@keyframes fire-flicker {
+  from { transform: rotate(-5deg); }
+  to { transform: rotate(5deg); }
+}
