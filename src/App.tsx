@@ -31,10 +31,9 @@ import { MasteryStatsModal } from './components/MasteryStatsModal';
 import { LeaderboardModal } from './components/LeaderboardModal';
 import { VictoryReveal } from './components/VictoryReveal';
 import { VictoryScreen } from './components/VictoryScreen';
-import { FloatingHUD } from './components/FloatingHUD';
+
 import { CinematicVictory } from './components/CinematicVictory';
 import { VectorBackground } from './components/VectorBackground';
-import { RowReticle } from './components/RowReticle';
 
 
 import { ArtifactSystem } from './components/ArtifactSystem';
@@ -667,10 +666,6 @@ export const App: React.FC = () => {
                 onComplete={() => setIsVictoryCinematic(false)}
               />
             )}
-            <FloatingHUD
-              streak={stats.currentStreak}
-              winRate={stats.gamesPlayed > 0 ? Math.round((stats.gamesWon / stats.gamesPlayed) * 100) : 100}
-            />
             {activeMode && (
         <Header
                   mode={activeMode}
@@ -721,10 +716,9 @@ export const App: React.FC = () => {
           />
         )}
 
+
         {activeMode && !showMultiplayerSetup && !showScoreboard && activePlayer && (
           <div className="gameplay-area animate-scale" style={{ height: "calc(100vh - 75px)", display: "flex", flexDirection: "column", justifyContent: "space-between", alignItems: "center", overflow: "hidden", padding: "6px 0", boxSizing: "border-box" }}>
-            {/* Kinetic Row Reticle (Tactical Focus HUD) */}
-            <RowReticle activeRow={activePlayer.guesses.length} />
 
             {/* Kinetic Viewport Impact Layer (jolt effect) */}
             <div className={`viewport-impact-layer${isJolting ? ' viewport-impact-jolt' : ''}`} aria-hidden="true" />
@@ -742,10 +736,7 @@ export const App: React.FC = () => {
               />
             )}
 
-            {/* Activity Reticle (kinetic tracking HUD) */}
-            {activePlayer && status === 'PLAYING' && (
-              <RowReticle activeRow={activePlayer.guesses.length} />
-            )}
+
 
             {/* Game Grid / PvP Battle Board */}
             {activeMode === 'PARTY' ? (
@@ -831,8 +822,8 @@ export const App: React.FC = () => {
           />
         )}
               {/* Full-Screen AAA Victory Reveal Overlay */}
-        {status === 'ROUND_OVER' && activePlayer && activePlayer.solved && (
-          <VictoryReveal
+              {status === 'ROUND_OVER' && activePlayer && activePlayer.solved && !isVictoryCinematic && (
+                <VictoryReveal
             won={true}
             finalGuess={secretWord}
             finalEvals={
