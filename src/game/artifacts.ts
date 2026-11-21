@@ -581,3 +581,23 @@ export function upgradeArtifact(artifactId: string, inventory: PlayerInventory):
   inventory.artifacts[artifactId].level += 1;
   return true;
 }
+
+export interface ActiveArtifactResult {
+  success: boolean;
+  bonusPoints: number;
+  message: string;
+}
+
+export function activateActiveArtifact(artifactId: string, inventory: PlayerInventory): ActiveArtifactResult {
+  const owned = inventory.artifacts[artifactId];
+  const artifact = ARTIFACT_DATABASE.find(a => a.id === artifactId);
+  if (!owned || !artifact) {
+    return { success: false, bonusPoints: 0, message: 'Artifact not found' };
+  }
+  const bonus = owned.level * 15;
+  return {
+    success: true,
+    bonusPoints: bonus,
+    message: `Activated ${artifact.name}! +${bonus} Combo Synergy Bonus!`
+  };
+}
