@@ -101,6 +101,10 @@ export const App: React.FC = () => {
     const artifactInventory = compositeRecord.inventory;
 
     const setArtifactInventory = (newInv: PlayerInventory | ((prev: PlayerInventory) => PlayerInventory)) => {
+      if (isReadOnly) {
+        showToast('⚠️ Read-only mode: Cannot modify inventory.');
+        return;
+      }
       setCompositeRecord(prev => {
         const nextInv = typeof newInv === 'function' ? newInv(prev.inventory) : newInv;
         const updated: CompositeInventoryRecordV2 = { ...prev, inventory: nextInv };
@@ -113,15 +117,44 @@ export const App: React.FC = () => {
   const [activeSession, _setActiveSession] = useState<ActiveGameSessionRecord | null>(compositeRecord.activeSession);
 
   // Multi-tab locking
+  const [isReadOnly, setIsReadOnly] = useState(false);
+
   useEffect(() => {
+    const tabId = Math.random().toString(36).substring(7);
+    const lockKey = 'wpp_leader_key';
+
+    const checkLeader = () => {
+      const leader = localStorage.getItem(lockKey);
+      if (leader) {
+        const [id, time] = leader.split(':');
+        if (id !== tabId && Date.now() - parseInt(time) < 5000) {
+          setIsReadOnly(true);
+          return false;
+        }
+      }
+      return true;
+    };
+
     if ('locks' in navigator) {
       navigator.locks.request('wpp_inventory_lock', { ifAvailable: true }, async (lock) => {
         if (!lock) {
-          showToast('⚠️ Word++ active in another tab. Read-only mode.');
+          setIsReadOnly(true);
           return;
         }
         return new Promise(() => {}); // Hold lock for tab lifetime
       });
+    } else {
+      if (!checkLeader()) return;
+      const interval = setInterval(() => {
+        if (!checkLeader()) {
+          setIsReadOnly(true);
+          clearInterval(interval);
+        } else {
+          localStorage.setItem(lockKey, `${tabId}:${Date.now()}`);
+        }
+      }, 2000);
+      localStorage.setItem(lockKey, `${tabId}:${Date.now()}`);
+      return () => clearInterval(interval);
     }
   }, []);
 
@@ -684,6 +717,11 @@ export const App: React.FC = () => {
             {Array.from({ length: 30 }).map((_, i) => (
               <div key={i} className={`confetti-piece p-${i % 6}`} style={{ left: `${(i * 3.33) + 1}%`, animationDelay: `${(i % 5) * 0.2}s` }} />
             ))}
+          </div>
+        )}
+        {isReadOnly && (
+          <div className="toast-notification animate-fade-in" style={{ backgroundColor: 'var(--red)' }}>
+            ⚠️ Read-Only Mode: Active in another tab
           </div>
         )}
         {toastMessage && (
