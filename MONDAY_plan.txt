@@ -1,0 +1,12 @@
+# MONDAY's Technical Plan (Stage 2)
+
+Objective: Refactor CSS architecture to eliminate specificity wars.
+
+1. Audit global.css to remove trailing !important rules.
+2. Replace forced min-width on keyboard buttons with fluid layout.
+3. Validate TUESDAY's Grid approach with the existing game engine.
+4. Ensure all unit tests pass with the new layout.
+
+QA Criteria:
+- No layout-related !important.
+- 0 keyboard clipping on 390px width.

@@ -13,7 +13,9 @@ import {
 } from './game/engine';
 import { soundManager } from './game/audio';
 import { Header } from './components/Header';
-import { MainMenu } from './components/MainMenu';
+import { AIArenaSetup } from './components/AIArenaSetup';
+import { DuelResultPage } from './components/DuelResultPage';
+import { VictoryScreen } from './components/VictoryScreen';
 import { GameBoard } from './components/GameBoard';
 import { BattleBoard } from './components/BattleBoard';
 import { Keyboard } from './components/Keyboard';
@@ -30,14 +32,20 @@ import { ShareModal } from './components/ShareModal';
 import { MasteryStatsModal } from './components/MasteryStatsModal';
 import { LeaderboardModal } from './components/LeaderboardModal';
 import { VictoryReveal } from './components/VictoryReveal';
-import { VictoryScreen } from './components/VictoryScreen';
-
-import { CinematicVictory } from './components/CinematicVictory';
 import { VectorBackground } from './components/VectorBackground';
+import { RowReticle } from './components/RowReticle';
 
-
+// import { FloatingHUD } from './components/FloatingHUD';
 import { ArtifactSystem } from './components/ArtifactSystem';
-import { PlayerInventory, ARTIFACT_DATABASE, RARITY_CONFIG } from './game/artifacts';
+import { 
+  PlayerInventory, 
+  ARTIFACT_DATABASE, 
+  RARITY_CONFIG,
+  CompositeInventoryRecordV2,
+  loadCompositeInventory,
+  saveCompositeInventory,
+  ActiveGameSessionRecord
+} from './game/artifacts';
 
 const DEFAULT_STATS: PlayerStats = {
   gamesPlayed: 0,
@@ -77,7 +85,6 @@ export const App: React.FC = () => {
   const [showLeaderboard, setShowLeaderboard] = useState<boolean>(false);
   const [showArtifacts, setShowArtifacts] = useState<boolean>(false);
   const [isJolting, setIsJolting] = useState<boolean>(false);
-  const [isVictoryCinematic, setIsVictoryCinematic] = useState<boolean>(false);
 
   // Settings state
   const [colorBlindMode, setColorBlindMode] = useState<boolean>(false);
@@ -89,33 +96,74 @@ export const App: React.FC = () => {
     // Player Stats state
     const [stats, setStats] = useState<PlayerStats>(DEFAULT_STATS);
 
-    // Artifact System State
-    const [artifactInventory, setArtifactInventory] = useState<PlayerInventory>(() => {
-      const saved = localStorage.getItem('wordplusplus_artifacts');
-      if (saved) {
-        try {
-          return JSON.parse(saved);
-        } catch (e) {
-          console.error(e);
-        }
+    // Artifact System & Composite Storage State
+    const [compositeRecord, setCompositeRecord] = useState<CompositeInventoryRecordV2>(() => loadCompositeInventory());
+    const artifactInventory = compositeRecord.inventory;
+
+    const setArtifactInventory = (newInv: PlayerInventory | ((prev: PlayerInventory) => PlayerInventory)) => {
+      if (isReadOnly) {
+        showToast('⚠️ Read-only mode: Cannot modify inventory.');
+        return;
       }
-      return {
-        artifacts: {},
-        equipped: { weapon: null, armor: null, utility: null, trinket: null },
-        currency: 500, // Starting Lexicons
-        totalEarned: 500
-      };
-    });
+      setCompositeRecord(prev => {
+        const nextInv = typeof newInv === 'function' ? newInv(prev.inventory) : newInv;
+        const updated: CompositeInventoryRecordV2 = { ...prev, inventory: nextInv };
+        saveCompositeInventory(updated);
+        return updated;
+      });
+    };
 
-    // Persist artifact inventory
-    useEffect(() => {
-      localStorage.setItem('wordplusplus_artifacts', JSON.stringify(artifactInventory));
-    }, [artifactInventory]);
+  // Active Session State
+  const [activeSession, _setActiveSession] = useState<ActiveGameSessionRecord | null>(compositeRecord.activeSession);
 
-    // Core Game State
+  // Multi-tab locking
+  const [isReadOnly, setIsReadOnly] = useState(true);
+
+  useEffect(() => {
+    if ('locks' in navigator) {
+      navigator.locks.request('wpp_inventory_lock', { ifAvailable: true }, async (lock) => {
+        if (!lock) {
+          setIsReadOnly(true);
+          return;
+        }
+        setIsReadOnly(false);
+        return new Promise(() => {}); // Hold lock for tab lifetime
+      });
+    } else {
+      setIsReadOnly(true);
+    }
+  }, []);
+
+  // Use Active Session in UI
+  useEffect(() => {
+    if (activeSession) {
+      console.log('Restoring session:', activeSession.sessionId);
+    }
+  }, [activeSession]);
+
+  // Core Game State
   const [secretWord, setSecretWord] = useState<string>('');
   const [players, setPlayers] = useState<Player[]>([]);
   const [activePlayerIndex, setActivePlayerIndex] = useState<number>(0);
+
+  // Active Ability State (Whispering Quill)
+  const [revealedHints, setRevealedHints] = useState<string[]>([]);
+
+  const handleUseHint = () => {
+    if (status !== 'PLAYING' || !secretWord) return;
+    if (revealedHints.length >= 1) {
+      showToast('🪶 Whispering Quill hint already used this match!');
+      return;
+    }
+    const activePlayer = players[activePlayerIndex];
+    const currentGuessedLetters = activePlayer ? activePlayer.guesses.flatMap(g => g.word.split('')) : [];
+    const unrevealed = secretWord.toUpperCase().split('').filter((l: string) => !currentGuessedLetters.includes(l) && !revealedHints.includes(l));
+    const targetList = unrevealed.length > 0 ? unrevealed : secretWord.toUpperCase().split('');
+    const hintLetter = targetList[Math.floor(Math.random() * targetList.length)];
+    setRevealedHints(prev => [...prev, hintLetter]);
+    showToast(`🪶 Whispering Quill reveals: '${hintLetter}'`, 4000);
+    soundManager.playPop();
+  };
   const [currentGuess, setCurrentGuess] = useState<string>('');
   const [invalidRowIndex, setInvalidRowIndex] = useState<number | null>(null);
   const [status, setStatus] = useState<'PLAYING' | 'ROUND_OVER' | 'GAME_OVER'>('PLAYING');
@@ -240,6 +288,7 @@ export const App: React.FC = () => {
   // Start single player
   const startSinglePlayerGame = (mode: GameMode) => {
     setIsDefinitionOpen(false);
+    setRevealedHints([]);
     const word = mode === 'DAILY' ? getDailySecretWord() : getRandomSecretWord();
     setSecretWord(word);
     
@@ -368,7 +417,6 @@ export const App: React.FC = () => {
     const isWon = formattedGuess === secretWord;
     if (isWon) {
       triggerVictory();
-      setIsVictoryCinematic(true);
     }
     const newGuesses = [...players[activePlayerIndex].guesses, { word: formattedGuess, evaluation }];
     const isOutOfAttempts = newGuesses.length >= 6;
@@ -622,28 +670,7 @@ export const App: React.FC = () => {
   const activePlayer = players[activePlayerIndex] || null;
   const keyboardStates = activePlayer ? calculateKeyboardLetterStates(activePlayer.guesses) : {};
 
-  // Emoji share builder
-  const handleShareEmoji = () => {
-    if (!activePlayer) return;
-    const tileEmojis: Record<string, string> = {
-      correct: '🟩',
-      present: '🟨',
-      absent: '⬛'
-    };
-
-    const headerText = `Word++ (${activeMode}) ${activePlayer.solved ? activePlayer.attemptsUsed : 'X'}/6\n\n`;
-    const gridText = activePlayer.guesses
-      .map((g) => g.evaluation.map((e) => tileEmojis[e.state]).join(''))
-      .join('\n');
-
-    const fullShareText = headerText + gridText + '\n\nPlay at: Word++';
-    
-    navigator.clipboard.writeText(fullShareText).then(() => {
-      showToast('📋 Copied feedback grid to clipboard!');
-    }).catch(() => {
-      showToast('Failed to copy to clipboard');
-    });
-  };
+  // Emoji share builder (re-exposed for Result screen)
 
   const guessesLength = activePlayer ? activePlayer.guesses.length : 0;
   const tensionScale = activeMode ? 1 + Math.max(0, guessesLength - 3) * 0.015 : 1;
@@ -660,13 +687,7 @@ export const App: React.FC = () => {
       } as React.CSSProperties}
     >
       <VectorBackground status={showConfetti ? 'WIN' : status} />
-      {isVictoryCinematic && (
-              <CinematicVictory
-                videoSource="/assets/victory-cinematic.mp4"
-                onComplete={() => setIsVictoryCinematic(false)}
-              />
-            )}
-            {activeMode && (
+      {activeMode && (
         <Header
                   mode={activeMode}
                   onOpenHelp={() => setIsHelpOpen(true)}
@@ -694,6 +715,11 @@ export const App: React.FC = () => {
             ))}
           </div>
         )}
+        {isReadOnly && (
+          <div className="toast-notification animate-fade-in" style={{ backgroundColor: 'var(--red)' }}>
+            ⚠️ Read-Only Mode: Active in another tab
+          </div>
+        )}
         {toastMessage && (
           <div className="toast-notification animate-fade-in">
             {toastMessage}
@@ -701,10 +727,13 @@ export const App: React.FC = () => {
         )}
 
         {!activeMode && (
-          <MainMenu
-            onSelectMode={handleSelectMode}
-            onOpenHelp={() => setIsHelpOpen(true)}
-            onOpenStats={() => setIsStatsOpen(true)}
+          <AIArenaSetup
+            onStart={(_personality, useHardMode) => {
+              setActiveMode('CLASSIC');
+              setHardMode(useHardMode);
+              startSinglePlayerGame('CLASSIC');
+            }}
+            onBack={handleHomeClick}
           />
         )}
 
@@ -716,9 +745,10 @@ export const App: React.FC = () => {
           />
         )}
 
-
         {activeMode && !showMultiplayerSetup && !showScoreboard && activePlayer && (
           <div className="gameplay-area animate-scale" style={{ height: "calc(100vh - 75px)", display: "flex", flexDirection: "column", justifyContent: "space-between", alignItems: "center", overflow: "hidden", padding: "6px 0", boxSizing: "border-box" }}>
+            {/* Kinetic Row Reticle (Tactical Focus HUD) */}
+            <RowReticle activeRow={activePlayer.guesses.length} />
 
             {/* Kinetic Viewport Impact Layer (jolt effect) */}
             <div className={`viewport-impact-layer${isJolting ? ' viewport-impact-jolt' : ''}`} aria-hidden="true" />
@@ -736,7 +766,10 @@ export const App: React.FC = () => {
               />
             )}
 
-
+            {/* Activity Reticle (kinetic tracking HUD) */}
+            {activePlayer && status === 'PLAYING' && (
+              <RowReticle activeRow={activePlayer.guesses.length} />
+            )}
 
             {/* Game Grid / PvP Battle Board */}
             {activeMode === 'PARTY' ? (
@@ -759,30 +792,37 @@ export const App: React.FC = () => {
             )}
 
             {/* Loss reveal action panel */}
-            {status === 'ROUND_OVER' && !activePlayer.solved && (
-              <div className="reveal-wrapper">
-                <div className="reveal-actions-panel animate-scale">
-                  <p className="outcome-reveal">
-                    😔 Answer: {secretWord}
-                  </p>
-                  <div className="outcome-btns">
-                    <button
-                      className="btn-primary"
-                      onClick={() => startSinglePlayerGame(activeMode)}
-                    >
-                      Play Again
-                    </button>
-                    <button
-                      className="btn-secondary"
-                      onClick={() => setIsDefinitionOpen(true)}
-                    >
-                      📖 Meaning
-                    </button>
-                    <button className="btn-secondary" onClick={handleShareEmoji}>
-                      Share
-                    </button>
-                  </div>
-                </div>
+            {status === 'ROUND_OVER' && (
+              <DuelResultPage
+                players={players}
+                secretWord={secretWord}
+                selectedBoss={null}
+                onPlayAgain={() => startSinglePlayerGame(activeMode || 'CLASSIC')}
+                onMainMenu={handleHomeClick}
+                onMeaning={() => setIsDefinitionOpen(true)}
+              />
+            )}
+
+            {/* Active Ability Control: Whispering Quill */}
+            {artifactInventory.equipped.utility === 'whispering_quill' && status === 'PLAYING' && (
+              <div style={{ marginBottom: '8px', display: 'flex', justifyContent: 'center' }}>
+                <button
+                  className="btn-secondary"
+                  onClick={handleUseHint}
+                  disabled={revealedHints.length >= 1}
+                  style={{
+                    padding: '8px 16px',
+                    borderRadius: '20px',
+                    fontSize: '12px',
+                    fontWeight: 700,
+                    borderColor: 'rgba(99, 102, 241, 0.4)',
+                    background: 'rgba(99, 102, 241, 0.15)',
+                    color: '#818cf8',
+                    cursor: revealedHints.length >= 1 ? 'not-allowed' : 'pointer'
+                  }}
+                >
+                  🪶 Whispering Quill Hint {revealedHints.length >= 1 ? '(Used)' : '(1 Left)'}
+                </button>
               </div>
             )}
 
@@ -822,8 +862,8 @@ export const App: React.FC = () => {
           />
         )}
               {/* Full-Screen AAA Victory Reveal Overlay */}
-              {status === 'ROUND_OVER' && activePlayer && activePlayer.solved && !isVictoryCinematic && (
-                <VictoryReveal
+        {status === 'ROUND_OVER' && activePlayer && activePlayer.solved && (
+          <VictoryReveal
             won={true}
             finalGuess={secretWord}
             finalEvals={
@@ -900,7 +940,10 @@ export const App: React.FC = () => {
               inventory={artifactInventory}
               onInventoryChange={setArtifactInventory}
             />
-
+            {/* <FloatingHUD
+        streak={stats.currentStreak} 
+        winRate={stats.gamesPlayed > 0 ? Math.round((stats.gamesWon / stats.gamesPlayed) * 100) : 100} 
+      /> */}
     </div>
   );
 };

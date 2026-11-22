@@ -1,0 +1,18 @@
+# TUESDAY's Visual Redesign Proposal (Stage 2)
+
+Objective: Create a polished, responsive, and maintainable UI for Word++.
+
+1. CSS Layout: Use a responsive CSS grid for the gameplay-split-wrapper:
+   - grid-template-columns: 0.8fr 500px 1.2fr (Desktop/Large)
+   - Vertical stacking (Mobile).
+   - Use 'dvh' units for height.
+
+2. Component Styling:
+   - Board: Center-aligned, 6px border-radius, transparent backing.
+   - Keyboard: Right-aligned (Desktop), sharp 0px radius keys, fluid width.
+
+3. Specificity:
+   - No ' !important' for layout rules.
+   - Use utility-first scoped CSS where possible.
+
+Status: Proposal ready for MONDAY/WEDNESDAY review.
