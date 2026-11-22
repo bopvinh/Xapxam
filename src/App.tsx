@@ -14,6 +14,8 @@ import {
 import { soundManager } from './game/audio';
 import { Header } from './components/Header';
 import { AIArenaSetup } from './components/AIArenaSetup';
+import { DuelResultPage } from './components/DuelResultPage';
+import { VictoryScreen } from './components/VictoryScreen';
 import { GameBoard } from './components/GameBoard';
 import { BattleBoard } from './components/BattleBoard';
 import { Keyboard } from './components/Keyboard';
@@ -30,7 +32,6 @@ import { ShareModal } from './components/ShareModal';
 import { MasteryStatsModal } from './components/MasteryStatsModal';
 import { LeaderboardModal } from './components/LeaderboardModal';
 import { VictoryReveal } from './components/VictoryReveal';
-import { VictoryScreen } from './components/VictoryScreen';
 import { VectorBackground } from './components/VectorBackground';
 import { RowReticle } from './components/RowReticle';
 
@@ -619,28 +620,7 @@ export const App: React.FC = () => {
   const activePlayer = players[activePlayerIndex] || null;
   const keyboardStates = activePlayer ? calculateKeyboardLetterStates(activePlayer.guesses) : {};
 
-  // Emoji share builder
-  const handleShareEmoji = () => {
-    if (!activePlayer) return;
-    const tileEmojis: Record<string, string> = {
-      correct: '🟩',
-      present: '🟨',
-      absent: '⬛'
-    };
-
-    const headerText = `Word++ (${activeMode}) ${activePlayer.solved ? activePlayer.attemptsUsed : 'X'}/6\n\n`;
-    const gridText = activePlayer.guesses
-      .map((g) => g.evaluation.map((e) => tileEmojis[e.state]).join(''))
-      .join('\n');
-
-    const fullShareText = headerText + gridText + '\n\nPlay at: Word++';
-    
-    navigator.clipboard.writeText(fullShareText).then(() => {
-      showToast('📋 Copied feedback grid to clipboard!');
-    }).catch(() => {
-      showToast('Failed to copy to clipboard');
-    });
-  };
+  // Emoji share builder (re-exposed for Result screen)
 
   const guessesLength = activePlayer ? activePlayer.guesses.length : 0;
   const tensionScale = activeMode ? 1 + Math.max(0, guessesLength - 3) * 0.015 : 1;
@@ -757,31 +737,15 @@ export const App: React.FC = () => {
             )}
 
             {/* Loss reveal action panel */}
-            {status === 'ROUND_OVER' && !activePlayer.solved && (
-              <div className="reveal-wrapper">
-                <div className="reveal-actions-panel animate-scale">
-                  <p className="outcome-reveal">
-                    😔 Answer: {secretWord}
-                  </p>
-                  <div className="outcome-btns">
-                    <button
-                      className="btn-primary"
-                      onClick={() => startSinglePlayerGame(activeMode)}
-                    >
-                      Play Again
-                    </button>
-                    <button
-                      className="btn-secondary"
-                      onClick={() => setIsDefinitionOpen(true)}
-                    >
-                      📖 Meaning
-                    </button>
-                    <button className="btn-secondary" onClick={handleShareEmoji}>
-                      Share
-                    </button>
-                  </div>
-                </div>
-              </div>
+            {status === 'ROUND_OVER' && (
+              <DuelResultPage
+                players={players}
+                secretWord={secretWord}
+                selectedBoss={null}
+                onPlayAgain={() => startSinglePlayerGame(activeMode || 'CLASSIC')}
+                onMainMenu={handleHomeClick}
+                onMeaning={() => setIsDefinitionOpen(true)}
+              />
             )}
 
             {/* On-screen Keyboard */ }
