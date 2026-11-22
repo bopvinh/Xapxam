@@ -1,0 +1,12 @@
+# WEDNESDAY's Ergonomics Review (Stage 2)
+
+Objective: Ensure gameplay comfort.
+
+- Visual Hierarchy: Board must be the primary focus.
+- Keyboard: Accessible, readable keys, no overlap with grid.
+- Interactions: Animations must be performant, no UI blocking.
+
+Ergonomics Criteria:
+- No clipped 'P' or 'Q' keys.
+- Grid must not be obscured.
+- Touch-friendly sizing on mobile.
