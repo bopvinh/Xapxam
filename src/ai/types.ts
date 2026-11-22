@@ -5,9 +5,28 @@ import type { LetterEvaluation } from '../game/types';
 
 export type AIDifficulty = 'EASY' | 'NORMAL' | 'HARD';
 
+export type AIPersonalityId = 
+  | 'LEXICAL_DUELIST'
+  | 'SCRABBLE_WIZARD'
+  | 'CHAOS_JESTER'
+  | 'CRYPTIC_ORACLE'
+  | 'WORDMASTER_SUPREME';
+
+export interface AIPersonality {
+  id: AIPersonalityId;
+  name: string;
+  title: string;
+  icon: string;
+  difficulty: AIDifficulty;
+  description: string;
+  avatarColor: string;
+  quote: string;
+}
+
 export interface AIConfig {
   difficulty: AIDifficulty;
   seed: number;                 // deterministic seed for reproducible testing
+  personalityId?: AIPersonalityId;
   maxCandidates?: number;       // cap candidate pool for HARD search (performance)
   timeBudgetMs?: number;        // soft time budget for HARD search
 }
@@ -18,6 +37,7 @@ export interface AIMove {
   reasoning: string;            // human-readable explanation
   candidatesConsidered: number; // how many words were evaluated
   seed: number;                 // seed used (for reproducibility)
+  personalityName?: string;     // Boss personality label
 }
 
 export interface AIAssessment {

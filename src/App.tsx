@@ -13,7 +13,7 @@ import {
 } from './game/engine';
 import { soundManager } from './game/audio';
 import { Header } from './components/Header';
-import { MainMenu } from './components/MainMenu';
+import { AIArenaSetup } from './components/AIArenaSetup';
 import { GameBoard } from './components/GameBoard';
 import { BattleBoard } from './components/BattleBoard';
 import { Keyboard } from './components/Keyboard';
@@ -692,10 +692,13 @@ export const App: React.FC = () => {
         )}
 
         {!activeMode && (
-          <MainMenu
-            onSelectMode={handleSelectMode}
-            onOpenHelp={() => setIsHelpOpen(true)}
-            onOpenStats={() => setIsStatsOpen(true)}
+          <AIArenaSetup
+            onStart={(_personality, useHardMode) => {
+              setActiveMode('CLASSIC');
+              setHardMode(useHardMode);
+              startSinglePlayerGame('CLASSIC');
+            }}
+            onBack={handleHomeClick}
           />
         )}
 
