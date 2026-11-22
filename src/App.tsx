@@ -117,44 +117,20 @@ export const App: React.FC = () => {
   const [activeSession, _setActiveSession] = useState<ActiveGameSessionRecord | null>(compositeRecord.activeSession);
 
   // Multi-tab locking
-  const [isReadOnly, setIsReadOnly] = useState(false);
+  const [isReadOnly, setIsReadOnly] = useState(true);
 
   useEffect(() => {
-    const tabId = Math.random().toString(36).substring(7);
-    const lockKey = 'wpp_leader_key';
-
-    const checkLeader = () => {
-      const leader = localStorage.getItem(lockKey);
-      if (leader) {
-        const [id, time] = leader.split(':');
-        if (id !== tabId && Date.now() - parseInt(time) < 5000) {
-          setIsReadOnly(true);
-          return false;
-        }
-      }
-      return true;
-    };
-
     if ('locks' in navigator) {
       navigator.locks.request('wpp_inventory_lock', { ifAvailable: true }, async (lock) => {
         if (!lock) {
           setIsReadOnly(true);
           return;
         }
+        setIsReadOnly(false);
         return new Promise(() => {}); // Hold lock for tab lifetime
       });
     } else {
-      if (!checkLeader()) return;
-      const interval = setInterval(() => {
-        if (!checkLeader()) {
-          setIsReadOnly(true);
-          clearInterval(interval);
-        } else {
-          localStorage.setItem(lockKey, `${tabId}:${Date.now()}`);
-        }
-      }, 2000);
-      localStorage.setItem(lockKey, `${tabId}:${Date.now()}`);
-      return () => clearInterval(interval);
+      setIsReadOnly(true);
     }
   }, []);
 
