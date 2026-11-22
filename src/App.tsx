@@ -141,10 +141,29 @@ export const App: React.FC = () => {
     }
   }, [activeSession]);
 
-    // Core Game State
+  // Core Game State
   const [secretWord, setSecretWord] = useState<string>('');
   const [players, setPlayers] = useState<Player[]>([]);
   const [activePlayerIndex, setActivePlayerIndex] = useState<number>(0);
+
+  // Active Ability State (Whispering Quill)
+  const [revealedHints, setRevealedHints] = useState<string[]>([]);
+
+  const handleUseHint = () => {
+    if (status !== 'PLAYING' || !secretWord) return;
+    if (revealedHints.length >= 1) {
+      showToast('🪶 Whispering Quill hint already used this match!');
+      return;
+    }
+    const activePlayer = players[activePlayerIndex];
+    const currentGuessedLetters = activePlayer ? activePlayer.guesses.flatMap(g => g.word.split('')) : [];
+    const unrevealed = secretWord.toUpperCase().split('').filter((l: string) => !currentGuessedLetters.includes(l) && !revealedHints.includes(l));
+    const targetList = unrevealed.length > 0 ? unrevealed : secretWord.toUpperCase().split('');
+    const hintLetter = targetList[Math.floor(Math.random() * targetList.length)];
+    setRevealedHints(prev => [...prev, hintLetter]);
+    showToast(`🪶 Whispering Quill reveals: '${hintLetter}'`, 4000);
+    soundManager.playPop();
+  };
   const [currentGuess, setCurrentGuess] = useState<string>('');
   const [invalidRowIndex, setInvalidRowIndex] = useState<number | null>(null);
   const [status, setStatus] = useState<'PLAYING' | 'ROUND_OVER' | 'GAME_OVER'>('PLAYING');
@@ -269,6 +288,7 @@ export const App: React.FC = () => {
   // Start single player
   const startSinglePlayerGame = (mode: GameMode) => {
     setIsDefinitionOpen(false);
+    setRevealedHints([]);
     const word = mode === 'DAILY' ? getDailySecretWord() : getRandomSecretWord();
     setSecretWord(word);
     
@@ -781,6 +801,29 @@ export const App: React.FC = () => {
                 onMainMenu={handleHomeClick}
                 onMeaning={() => setIsDefinitionOpen(true)}
               />
+            )}
+
+            {/* Active Ability Control: Whispering Quill */}
+            {artifactInventory.equipped.utility === 'whispering_quill' && status === 'PLAYING' && (
+              <div style={{ marginBottom: '8px', display: 'flex', justifyContent: 'center' }}>
+                <button
+                  className="btn-secondary"
+                  onClick={handleUseHint}
+                  disabled={revealedHints.length >= 1}
+                  style={{
+                    padding: '8px 16px',
+                    borderRadius: '20px',
+                    fontSize: '12px',
+                    fontWeight: 700,
+                    borderColor: 'rgba(99, 102, 241, 0.4)',
+                    background: 'rgba(99, 102, 241, 0.15)',
+                    color: '#818cf8',
+                    cursor: revealedHints.length >= 1 ? 'not-allowed' : 'pointer'
+                  }}
+                >
+                  🪶 Whispering Quill Hint {revealedHints.length >= 1 ? '(Used)' : '(1 Left)'}
+                </button>
+              </div>
             )}
 
             {/* On-screen Keyboard */ }
