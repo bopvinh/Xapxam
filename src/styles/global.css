@@ -82,3 +82,12 @@ body {
     gap: 20px;
   }
 }
+/* Mobile Safe Area Fix */
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+  .app-container {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  .app-main-content {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
