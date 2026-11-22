@@ -125,7 +125,7 @@ export const ARTIFACT_DATABASE: Artifact[] = [
     name: "Consonant Crusher",
     description: "Consonants worth +3 points. 'Hard sounds hit harder.'",
     rarity: 'rare',
-    slot: 'weapon',
+    slot: 'trinket',
     effects: [{ type: 'consonant_bonus', value: 3 }],
     icon: '🔨',
     maxLevel: 3,
@@ -452,6 +452,17 @@ export interface ScoringContext {
   currentStreak: number;
   timeRemaining?: number;
   gameMode: string;
+  sessionId?: string;
+}
+
+export function getDeterministicRoll(sessionId: string, attempt: number, word: string): number {
+  const str = `${sessionId}:${attempt}:${word}`;
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    hash = (hash << 5) - hash + str.charCodeAt(i);
+    hash |= 0;
+  }
+  return Math.abs(hash % 100) / 100;
 }
 
 export function calculateArtifactScoreBonus(
@@ -460,9 +471,18 @@ export function calculateArtifactScoreBonus(
   equipped: EquippedArtifacts, 
   inventory: PlayerInventory
 ): { bonus: number; breakdown: string[] } {
+  // Mode Restriction: Artifacts are 100% disabled in DAILY, PARTY, TEAM, and FAST modes
+  if (['DAILY', 'PARTY', 'TEAM', 'FAST'].includes(context.gameMode)) {
+    return { bonus: 0, breakdown: [] };
+  }
+
   let totalMultiplier = 1;
-  let flatBonus = 0;
+  let flatBonusRaw = 0;
   const breakdown: string[] = [];
+
+  const synergies = getActiveSynergies(equipped);
+  const hasAlphabetMastery = synergies.some(s => s.id === 'vowel_consonant');
+  const letterMult = hasAlphabetMastery ? 1.5 : 1.0;
   
   // Get all equipped artifact effects
   const equippedArtifacts = Object.entries(equipped)
@@ -485,28 +505,31 @@ export function calculateArtifactScoreBonus(
             const count = effect.condition 
               ? context.word.split(effect.condition.split(':')[1]).length - 1
               : context.word.length;
-            flatBonus += count * effect.value;
-            breakdown.push(`${artifact.name}: +${count * effect.value} (letter bonus)`);
+            const val = count * effect.value * letterMult;
+            flatBonusRaw += val;
+            breakdown.push(`${artifact.name}: +${val.toFixed(1)} (letter bonus)`);
           }
           break;
           
         case 'vowel_bonus':
           const vowels = context.word.match(/[AEIOU]/gi)?.length || 0;
-          flatBonus += vowels * effect.value;
-          breakdown.push(`${artifact.name}: +${vowels * effect.value} (${vowels} vowels)`);
+          const vVal = vowels * effect.value * letterMult;
+          flatBonusRaw += vVal;
+          breakdown.push(`${artifact.name}: +${vVal.toFixed(1)} (${vowels} vowels)`);
           break;
           
         case 'consonant_bonus':
           const consonants = context.word.match(/[BCDFGHJKLMNPQRSTVWXYZ]/gi)?.length || 0;
-          flatBonus += consonants * effect.value;
-          breakdown.push(`${artifact.name}: +${consonants * effect.value} (${consonants} consonants)`);
+          const cVal = consonants * effect.value * letterMult;
+          flatBonusRaw += cVal;
+          breakdown.push(`${artifact.name}: +${cVal.toFixed(1)} (${consonants} consonants)`);
           break;
           
         case 'length_bonus':
           if (context.word.length >= 5) {
-            const bonus = Math.round(baseScore * (effect.value / 100) * (context.word.length - 4));
-            flatBonus += bonus;
-            breakdown.push(`${artifact.name}: +${bonus} (length bonus)`);
+            const bonus = baseScore * (effect.value / 100) * (context.word.length - 4);
+            flatBonusRaw += bonus;
+            breakdown.push(`${artifact.name}: +${bonus.toFixed(1)} (length bonus)`);
           }
           break;
           
@@ -515,7 +538,10 @@ export function calculateArtifactScoreBonus(
           if (effect.condition === 'attempts:1' && !context.isFirstGuess) shouldApply = false;
           if (effect.condition?.startsWith('chance:')) {
             const chance = parseInt(effect.condition.split(':')[1]);
-            shouldApply = Math.random() * 100 < chance;
+            const roll = context.sessionId 
+              ? getDeterministicRoll(context.sessionId, context.attemptNumber, context.word) * 100
+              : 50;
+            shouldApply = roll < chance;
           }
           if (shouldApply) {
             totalMultiplier *= effect.value;
@@ -534,23 +560,22 @@ export function calculateArtifactScoreBonus(
     }
   }
   
-  // Apply synergies
-  const synergies = getActiveSynergies(equipped);
+  // Apply synergies multipliers
   for (const synergy of synergies) {
     if (synergy.bonus.type === 'all_bonus') {
       totalMultiplier *= (1 + synergy.bonus.value / 100);
       breakdown.push(`${synergy.name}: +${synergy.bonus.value}% all effects`);
-    } else if (synergy.bonus.type === 'letter_bonus_mult') {
-      // This would multiply letter bonuses - handled in individual effects
-      breakdown.push(`${synergy.name}: +${synergy.bonus.value}% letter bonuses`);
     } else if (synergy.bonus.type === 'score_multiplier') {
       totalMultiplier *= synergy.bonus.value;
       breakdown.push(`${synergy.name}: x${synergy.bonus.value} final score`);
-    } else if (synergy.bonus.type === 'currency_bonus') {
-      breakdown.push(`${synergy.name}: +${synergy.bonus.value}% Lexicon earnings`);
     }
   }
   
+  // Global Score Multiplier Cap: Max 3.0x
+  totalMultiplier = Math.min(3.0, totalMultiplier);
+
+  // Single Aggregate Rounding for flat bonuses
+  const flatBonus = Math.round(flatBonusRaw);
   const finalScore = Math.round(baseScore * totalMultiplier + flatBonus);
   return { bonus: finalScore - baseScore, breakdown };
 }
@@ -580,4 +605,114 @@ export function upgradeArtifact(artifactId: string, inventory: PlayerInventory):
   inventory.currency -= cost;
   inventory.artifacts[artifactId].level += 1;
   return true;
+}
+
+export interface ClaimedPayoutRecord {
+  claimedAt: number;
+  sessionId: string;
+  gameMode: string;
+  lexiconsEarned: number;
+}
+
+export interface CompositeInventoryRecordV2 {
+  schemaVersion: 2;
+  inventory: PlayerInventory;
+  currentStreak: number;
+  activeSession: any | null;
+  claimedPayouts: Record<string, ClaimedPayoutRecord>;
+}
+
+export const DEFAULT_INVENTORY: PlayerInventory = {
+  artifacts: {},
+  equipped: { weapon: null, armor: null, utility: null, trinket: null },
+  currency: 500,
+  totalEarned: 500
+};
+
+export function loadCompositeInventory(): CompositeInventoryRecordV2 {
+  const savedV2 = localStorage.getItem('wordplusplus_inventory_v2');
+  if (savedV2) {
+    try {
+      const parsed = JSON.parse(savedV2) as CompositeInventoryRecordV2;
+      if (parsed.schemaVersion === 2 && parsed.inventory) {
+        return parsed;
+      }
+    } catch (e) {
+      console.error('Failed to parse wordplusplus_inventory_v2:', e);
+    }
+  }
+
+  // Legacy Migration Pathway
+  const legacySaved = localStorage.getItem('wordplusplus_artifacts');
+  let migratedInventory = DEFAULT_INVENTORY;
+  if (legacySaved) {
+    try {
+      localStorage.setItem('wordplusplus_artifacts_backup', legacySaved);
+      const parsedLegacy = JSON.parse(legacySaved);
+      if (parsedLegacy && typeof parsedLegacy === 'object') {
+        const cleanArtifacts: Record<string, { artifactId: string; level: number; obtainedAt: number }> = {};
+        if (parsedLegacy.artifacts && typeof parsedLegacy.artifacts === 'object') {
+          for (const [key, item] of Object.entries(parsedLegacy.artifacts)) {
+            const artDef = ARTIFACT_DATABASE.find(a => a.id === key);
+            if (artDef && item && typeof item === 'object') {
+              const lvl = Math.min((item as any).level || 1, artDef.maxLevel);
+              cleanArtifacts[key] = {
+                artifactId: key,
+                level: lvl,
+                obtainedAt: (item as any).obtainedAt || Date.now()
+              };
+            }
+          }
+        }
+        migratedInventory = {
+          artifacts: cleanArtifacts,
+          equipped: {
+            weapon: parsedLegacy.equipped?.weapon || null,
+            armor: parsedLegacy.equipped?.armor || null,
+            utility: parsedLegacy.equipped?.utility || null,
+            trinket: parsedLegacy.equipped?.trinket || null,
+          },
+          currency: typeof parsedLegacy.currency === 'number' ? parsedLegacy.currency : 500,
+          totalEarned: typeof parsedLegacy.totalEarned === 'number' ? parsedLegacy.totalEarned : 500,
+        };
+      }
+    } catch (e) {
+      console.error('Migration legacy parse failed:', e);
+    }
+  }
+
+  // Read current streak from stats
+  let streak = 0;
+  const savedStats = localStorage.getItem('wordplusplus_stats');
+  if (savedStats) {
+    try {
+      streak = JSON.parse(savedStats).currentStreak || 0;
+    } catch (e) {}
+  }
+
+  const newComposite: CompositeInventoryRecordV2 = {
+    schemaVersion: 2,
+    inventory: migratedInventory,
+    currentStreak: streak,
+    activeSession: null,
+    claimedPayouts: {}
+  };
+
+  try {
+    localStorage.setItem('wordplusplus_inventory_v2', JSON.stringify(newComposite));
+  } catch (e) {
+    console.warn('Storage write error during migration:', e);
+  }
+
+  return newComposite;
+}
+
+export function saveCompositeInventory(record: CompositeInventoryRecordV2): boolean {
+  try {
+    localStorage.setItem('wordplusplus_inventory_v2', JSON.stringify(record));
+    return true;
+  } catch (e) {
+    console.error('Failed to save composite inventory:', e);
+    return false;
+  }
 }

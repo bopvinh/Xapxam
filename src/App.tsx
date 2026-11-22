@@ -37,7 +37,14 @@ import { RowReticle } from './components/RowReticle';
 
 // import { FloatingHUD } from './components/FloatingHUD';
 import { ArtifactSystem } from './components/ArtifactSystem';
-import { PlayerInventory, ARTIFACT_DATABASE, RARITY_CONFIG } from './game/artifacts';
+import { 
+  PlayerInventory, 
+  ARTIFACT_DATABASE, 
+  RARITY_CONFIG,
+  CompositeInventoryRecordV2,
+  loadCompositeInventory,
+  saveCompositeInventory
+} from './game/artifacts';
 
 const DEFAULT_STATS: PlayerStats = {
   gamesPlayed: 0,
@@ -88,28 +95,18 @@ export const App: React.FC = () => {
     // Player Stats state
     const [stats, setStats] = useState<PlayerStats>(DEFAULT_STATS);
 
-    // Artifact System State
-    const [artifactInventory, setArtifactInventory] = useState<PlayerInventory>(() => {
-      const saved = localStorage.getItem('wordplusplus_artifacts');
-      if (saved) {
-        try {
-          return JSON.parse(saved);
-        } catch (e) {
-          console.error(e);
-        }
-      }
-      return {
-        artifacts: {},
-        equipped: { weapon: null, armor: null, utility: null, trinket: null },
-        currency: 500, // Starting Lexicons
-        totalEarned: 500
-      };
-    });
+    // Artifact System & Composite Storage State
+    const [compositeRecord, setCompositeRecord] = useState<CompositeInventoryRecordV2>(() => loadCompositeInventory());
+    const artifactInventory = compositeRecord.inventory;
 
-    // Persist artifact inventory
-    useEffect(() => {
-      localStorage.setItem('wordplusplus_artifacts', JSON.stringify(artifactInventory));
-    }, [artifactInventory]);
+    const setArtifactInventory = (newInv: PlayerInventory | ((prev: PlayerInventory) => PlayerInventory)) => {
+      setCompositeRecord(prev => {
+        const nextInv = typeof newInv === 'function' ? newInv(prev.inventory) : newInv;
+        const updated: CompositeInventoryRecordV2 = { ...prev, inventory: nextInv };
+        saveCompositeInventory(updated);
+        return updated;
+      });
+    };
 
     // Core Game State
   const [secretWord, setSecretWord] = useState<string>('');
