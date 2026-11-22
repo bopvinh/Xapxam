@@ -43,7 +43,8 @@ import {
   RARITY_CONFIG,
   CompositeInventoryRecordV2,
   loadCompositeInventory,
-  saveCompositeInventory
+  saveCompositeInventory,
+  ActiveGameSessionRecord
 } from './game/artifacts';
 
 const DEFAULT_STATS: PlayerStats = {
@@ -107,6 +108,29 @@ export const App: React.FC = () => {
         return updated;
       });
     };
+
+  // Active Session State
+  const [activeSession, _setActiveSession] = useState<ActiveGameSessionRecord | null>(compositeRecord.activeSession);
+
+  // Multi-tab locking
+  useEffect(() => {
+    if ('locks' in navigator) {
+      navigator.locks.request('wpp_inventory_lock', { ifAvailable: true }, async (lock) => {
+        if (!lock) {
+          showToast('⚠️ Word++ active in another tab. Read-only mode.');
+          return;
+        }
+        return new Promise(() => {}); // Hold lock for tab lifetime
+      });
+    }
+  }, []);
+
+  // Use Active Session in UI
+  useEffect(() => {
+    if (activeSession) {
+      console.log('Restoring session:', activeSession.sessionId);
+    }
+  }, [activeSession]);
 
     // Core Game State
   const [secretWord, setSecretWord] = useState<string>('');

@@ -614,11 +614,42 @@ export interface ClaimedPayoutRecord {
   lexiconsEarned: number;
 }
 
+export interface ActiveGameSessionRecord {
+  schemaVersion: 2;
+  sessionId: string;                   // UUID v4
+  gameMode: string;
+  hardMode: boolean;
+  obfuscatedSecretWord: string;        // Base64 obfuscated
+  guesses: any[];
+  currentGuess: string;
+  attemptsUsed: number;
+  maxAttempts: number;
+  roundNumber: number;
+  maxRounds: number;
+  selectedBossId: string | null;
+  startTime: number;
+  lastUpdated: number;
+  timerState?: {
+    remainingSeconds: number;
+    savedAtTimestamp: number;
+    isPaused: boolean;
+  };
+  revealedHints: string[];
+  equippedSnapshot: EquippedArtifacts;
+  triggeredEffects: {
+    mistakeShieldUsed: boolean;
+    whisperingQuillUsed: boolean;
+    perfectStrikeApplied: boolean;
+  };
+  randomSeedMap: Record<string, number>;
+  payoutState: 'NONE' | 'PENDING' | 'COMMITTED';
+}
+
 export interface CompositeInventoryRecordV2 {
   schemaVersion: 2;
   inventory: PlayerInventory;
   currentStreak: number;
-  activeSession: any | null;
+  activeSession: ActiveGameSessionRecord | null;
   claimedPayouts: Record<string, ClaimedPayoutRecord>;
 }
 
