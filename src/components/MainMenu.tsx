@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { GameMode } from '../game/types';
 import { soundManager } from '../game/audio';
+import { VectorBackground } from './VectorBackground';
 // import heroBgV2 from '../assets/hero-bg-v2.svg';
 
 interface MainMenuProps {
@@ -82,13 +83,7 @@ export const MainMenu: React.FC<MainMenuProps> = ({
   const [flippedTile, setFlippedTile] = useState<number | null>(null);
   const [dailyCountdown, setDailyCountdown] = useState<string>('00:00:00');
   const [socialFeedIndex, setSocialFeedIndex] = useState<number>(0);
-  const [showQuickStart, setShowQuickStart] = useState<boolean>(() => {
-    try {
-      return localStorage.getItem('wpp_quickstart_seen') !== '1';
-    } catch {
-      return true;
-    }
-  });
+  const [showQuickStart, setShowQuickStart] = useState<boolean>(false);
 
 
   // Daily UTC countdown & day progress calculation
@@ -236,18 +231,8 @@ export const MainMenu: React.FC<MainMenuProps> = ({
           <div className="main-menu-inner" style={{ transform: `perspective(1000px) rotateY(${mousePos.x * 0.1}deg) rotateX(${-mousePos.y * 0.1}deg)`, width:'100%', height:'100%', position:'relative', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
           <div className="main-menu-inner" style={{ transform: `perspective(1000px) rotateY(${mousePos.x * 0.1}deg) rotateX(${-mousePos.y * 0.1}deg)` }}>
               <div style={{ width:'100%', height:'100%', position:'relative', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-          {/* ── Premium SVG Hero Background ───────────────────────── */}
-          <div 
-            className="hero-svg-bg" 
-            style={{ 
-              position: 'absolute', 
-              inset: 0, 
-              zIndex: 0, 
-              pointerEvents: 'none',
-              opacity: 0.6
-            }} 
-            
-          />
+          {/* ── Living vector backdrop (shared with the game board) ── */}
+          <VectorBackground status="PLAYING" />
           {/* ── Precision Vector Corner Reticle Brackets ───────── */}
           <div className="vector-corner-tl" aria-hidden="true" />
           <div className="vector-corner-tr" aria-hidden="true" />
