@@ -13,7 +13,7 @@ import {
 } from './game/engine';
 import { soundManager } from './game/audio';
 import { Header } from './components/Header';
-import { AIArenaSetup } from './components/AIArenaSetup';
+import { MainMenu } from './components/MainMenu';
 import { DuelResultPage } from './components/DuelResultPage';
 import { VictoryScreen } from './components/VictoryScreen';
 import { GameBoard } from './components/GameBoard';
@@ -727,13 +727,21 @@ export const App: React.FC = () => {
         )}
 
         {!activeMode && (
-          <AIArenaSetup
-            onStart={(_personality, useHardMode) => {
-              setActiveMode('CLASSIC');
-              setHardMode(useHardMode);
-              startSinglePlayerGame('CLASSIC');
+          <MainMenu
+            onSelectMode={(mode: GameMode) => {
+              if (mode === 'AI_ARENA') {
+                setActiveMode('CLASSIC');
+                startSinglePlayerGame('CLASSIC');
+              } else if (mode === 'PARTY' || mode === 'FAST' || mode === 'TEAM') {
+                setActiveMode(mode);
+                setShowMultiplayerSetup(true);
+              } else {
+                setActiveMode(mode);
+                startSinglePlayerGame(mode);
+              }
             }}
-            onBack={handleHomeClick}
+            onOpenHelp={() => setIsHelpOpen(true)}
+            onOpenStats={() => setIsStatsOpen(true)}
           />
         )}
 
@@ -771,6 +779,18 @@ export const App: React.FC = () => {
               <RowReticle activeRow={activePlayer.guesses.length} />
             )}
 
+            {/* Loss reveal action panel — single-player only (multiplayer renders its own board/summary). */}
+            {status === 'ROUND_OVER' && players.length === 1 && (
+              <DuelResultPage
+                players={players}
+                secretWord={secretWord}
+                selectedBoss={null}
+                onPlayAgain={() => startSinglePlayerGame(activeMode || 'CLASSIC')}
+                onMainMenu={handleHomeClick}
+                onMeaning={() => setIsDefinitionOpen(true)}
+              />
+            )}
+
             {/* Game Grid / PvP Battle Board */}
             {activeMode === 'PARTY' ? (
               <BattleBoard
@@ -788,18 +808,6 @@ export const App: React.FC = () => {
                 currentGuess={currentGuess}
                 invalidRowIndex={invalidRowIndex}
                 colorBlindMode={colorBlindMode}
-              />
-            )}
-
-            {/* Loss reveal action panel */}
-            {status === 'ROUND_OVER' && (
-              <DuelResultPage
-                players={players}
-                secretWord={secretWord}
-                selectedBoss={null}
-                onPlayAgain={() => startSinglePlayerGame(activeMode || 'CLASSIC')}
-                onMainMenu={handleHomeClick}
-                onMeaning={() => setIsDefinitionOpen(true)}
               />
             )}
 

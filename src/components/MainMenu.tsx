@@ -31,6 +31,13 @@ const MODES: ModeConfig[] = [
     tagColor: '#818cf8',
   },
   {
+    mode: 'AI_ARENA',
+    label: 'AI Boss Arena',
+    description: 'Duel against cunning AI personalities.',
+    tag: 'BOSS',
+    tagColor: '#f43f5e',
+  },
+  {
     mode: 'DAILY',
     label: 'Daily Challenge',
     description: 'Same word for everyone. Keep streak!',
@@ -74,8 +81,14 @@ export const MainMenu: React.FC<MainMenuProps> = ({
 }) => {
   const [flippedTile, setFlippedTile] = useState<number | null>(null);
   const [dailyCountdown, setDailyCountdown] = useState<string>('00:00:00');
-  const [dayProgress, setDayProgress] = useState<number>(0);
   const [socialFeedIndex, setSocialFeedIndex] = useState<number>(0);
+  const [showQuickStart, setShowQuickStart] = useState<boolean>(() => {
+    try {
+      return localStorage.getItem('wpp_quickstart_seen') !== '1';
+    } catch {
+      return true;
+    }
+  });
 
 
   // Daily UTC countdown & day progress calculation
@@ -83,16 +96,12 @@ export const MainMenu: React.FC<MainMenuProps> = ({
     const calcCountdown = () => {
       const now = new Date();
       const tomorrow = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + 1));
-      const startOfDay = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
-      const totalDayMs = 86400000;
-      const elapsedMs = now.getTime() - startOfDay.getTime();
       const diffMs = Math.max(0, tomorrow.getTime() - now.getTime());
       
       const h = String(Math.floor(diffMs / 3600000)).padStart(2, '0');
       const m = String(Math.floor((diffMs % 3600000) / 60000)).padStart(2, '0');
       const s = String(Math.floor((diffMs % 60000) / 1000)).padStart(2, '0');
       setDailyCountdown(`${h}:${m}:${s}`);
-      setDayProgress(Math.min(100, Math.max(0, (elapsedMs / totalDayMs) * 100)));
     };
     calcCountdown();
     const interval = setInterval(calcCountdown, 1000);
@@ -187,11 +196,11 @@ export const MainMenu: React.FC<MainMenuProps> = ({
     };
 
   const tiles = [
-    { letter: 'W', state: 'correct', color: '#22d3a0', rot: -12, y: 6 },
-    { letter: 'O', state: 'present', color: '#f59e0b', rot: -6, y: 2 },
-    { letter: 'R', state: 'absent', color: '#818cf8', rot: 0, y: 0 },
-    { letter: 'D', state: 'correct', color: '#22d3a0', rot: 6, y: 2 },
-    { letter: '++', state: 'brand', color: '#06b6d4', rot: 12, y: 6 },
+    { letter: 'W', rot: -25, y: 24, color: '#6366f1' },
+    { letter: 'O', rot: -12, y: 8, color: '#818cf8' },
+    { letter: 'R', rot: 0, y: 0, color: '#06b6d4' },
+    { letter: 'D', rot: 12, y: 8, color: '#22d3a0' },
+    { letter: '++', rot: 25, y: 24, color: '#f59e0b' },
   ];
 
   const socialMessages = [
@@ -249,7 +258,7 @@ export const MainMenu: React.FC<MainMenuProps> = ({
                   <section className="hero-section" aria-label="Game title" style={{ padding: '4px 0' }}>
                     {/* ── 3D Fanned WORD++ Title Logo ─────────────────────────── */}
                     <div className="hero-fanned-title-container" aria-label="WORD++ Title Logo">
-                      {tiles.map(({ letter, color, rot, y }, idx) => (
+                      {tiles.map(({ letter, rot, y, color }, idx) => (
                         <div
                           key={idx}
                           className={`hero-fanned-tile ${flippedTile === idx ? 'tile-flip' : ''}`}
@@ -257,18 +266,87 @@ export const MainMenu: React.FC<MainMenuProps> = ({
                           onMouseEnter={() => soundManager.playPop()}
                           title="Click to flip WORD++ tile!"
                           style={{
-                            borderColor: color,
-                            boxShadow: `0 10px 25px rgba(0, 0, 0, 0.5), 0 0 16px ${color}55`,
                             transform: `rotate(${rot}deg) translateY(${y}px)`,
-                            '--tile-color': color
+                            '--rot-base': `${rot}deg`,
+                            '--y-base': `${y}px`,
+                            '--tile-color': color,
+                            animationDelay: `${idx * 0.15}s`
                           } as React.CSSProperties}
                         >
-                          <span className="hero-tile-letter">{letter}</span>
+                          <span className="hero-tile-letter" style={{ color }}>{letter}</span>
                         </div>
                       ))}
                     </div>
                     <p className="hero-subtitle" style={{ marginTop: '2px', letterSpacing: '3px' }}>The Ultimate Word Challenge</p>
                   </section>
+
+                  {/* ── First-run quick start (one-time, dismissible) ── */}
+                  {showQuickStart ? (
+                    <div
+                      className="quickstart-panel"
+                      role="dialog"
+                      aria-label="First-run quick start"
+                    >
+                      <div className="quickstart-icon">🧭</div>
+                      <p className="quickstart-title">New around here?</p>
+                      <p className="quickstart-body">
+                        Guessing is easy — these are the two fastest keys to start:
+                      </p>
+                      <div className="quickstart-keys">
+                        <button
+                          type="button"
+                          className="quickstart-key quickstart-key-primary"
+                          onClick={() => {
+                            soundManager.playFlip();
+                            onSelectMode('CLASSIC');
+                            setShowQuickStart(false);
+                          }}
+                        >
+                          <kbd>SPACE</kbd>
+                          <span>Classic</span>
+                        </button>
+                        <button
+                          type="button"
+                          className="quickstart-key quickstart-key-secondary"
+                          onClick={() => {
+                            soundManager.playFlip();
+                            onSelectMode('DAILY');
+                            setShowQuickStart(false);
+                          }}
+                        >
+                          <kbd>D</kbd>
+                          <span>Daily</span>
+                        </button>
+                      </div>
+                      <p className="quickstart-hint">
+                        Still here? Hold any mode card until the ring reaches 100%, then release to start.
+                      </p>
+                      <div className="quickstart-actions">
+                        <button
+                          type="button"
+                          className="btn-secondary quickstart-dismiss"
+                          onClick={() => {
+                            localStorage.setItem('wpp_quickstart_seen', '1');
+                            setShowQuickStart(false);
+                          }}
+                        >
+                          Not right now
+                        </button>
+                        <button
+                          type="button"
+                          className="btn-primary quickstart-try"
+                          onClick={() => {
+                            soundManager.playFlip();
+                            onSelectMode('CLASSIC');
+                            setShowQuickStart(false);
+                            localStorage.setItem('wpp_quickstart_seen', '1');
+                          }}
+                        >
+                          Try Classic
+                        </button>
+                      </div>
+                    </div>
+                  ) : null}
 
       {/* ── Featured Modes: Spotlight Pair (Classic & Daily) + Compact Secondary ── */}
       <div>
@@ -313,18 +391,12 @@ export const MainMenu: React.FC<MainMenuProps> = ({
                         } as React.CSSProperties}
                       >
                         <div className="card-body" style={{ width: '100%' }}>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', justifyContent: 'space-between' }}>
+                          <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                               <span className="mode-accent-dot" style={{ background: tagColor, boxShadow: `0 0 6px ${tagColor}` }} />
                               <h3 style={{ fontSize: '14px', margin: 0 }}>{label}</h3>
-                              {isDaily && (
-                                <span className="daily-pulse-badge">FEATURED</span>
-                              )}
                             </div>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                              {isDaily && (
-                                <kbd style={{ fontSize: '9px', padding: '1px 4px', background: 'rgba(245,158,11,0.2)', border: '1px solid #f59e0b', borderRadius: '3px', color: '#f59e0b', fontWeight: 800 }}>D</kbd>
-                              )}
                               {isClassic && (
                                 <kbd style={{ fontSize: '9px', padding: '1px 4px', background: 'rgba(129,140,248,0.2)', border: '1px solid #818cf8', borderRadius: '3px', color: '#818cf8', fontWeight: 800 }}>SPACE</kbd>
                               )}
@@ -333,18 +405,17 @@ export const MainMenu: React.FC<MainMenuProps> = ({
                               </span>
                             </div>
                           </div>
-                          <p style={{ fontSize: '11px', margin: '4px 0 0 0', opacity: 0.85 }}>{description}</p>
                           {isDaily && (
-                            <div style={{ marginTop: '6px' }}>
-                              <div className="daily-timer-ticker" style={{ margin: '0 0 4px 0', fontSize: '10px' }}>
-                                <span>⏳ Resets in {dailyCountdown}</span>
-                              </div>
-                              <div style={{ width: '100%', height: '3px', background: 'rgba(255,255,255,0.08)', borderRadius: '2px', overflow: 'hidden' }}>
-                                <div style={{ width: `${dayProgress}%`, height: '100%', background: 'linear-gradient(90deg, #f59e0b, #fde047)', transition: 'width 1s linear' }} />
-                              </div>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginTop: '4px' }}>
+                              <span className="daily-pulse-badge">FEATURED</span>
+                              <kbd style={{ fontSize: '9px', padding: '1px 4px', background: 'rgba(245,158,11,0.2)', border: '1px solid #f59e0b', borderRadius: '3px', color: '#f59e0b', fontWeight: 800 }}>D</kbd>
+                              <span className="mode-category-tag" style={{ color: tagColor, borderColor: tagColor, background: `${tagColor}18`, fontSize: '9px' }}>
+                                {tag}
+                              </span>
                             </div>
                           )}
-                          {/* Hold-to-charge overlay */}
+                          <p style={{ fontSize: '11px', margin: '4px 0 0 0', opacity: 0.85 }}>{description}</p>
+                          {/* Hold-to-charge overlay */ }
                           {isCharging || isReady ? (
                             <div style={{ position: 'relative' }}>
                               <div className="charge-ring" />
