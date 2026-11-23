@@ -32,8 +32,10 @@ import { ShareModal } from './components/ShareModal';
 import { MasteryStatsModal } from './components/MasteryStatsModal';
 import { LeaderboardModal } from './components/LeaderboardModal';
 import { VictoryReveal } from './components/VictoryReveal';
+import { CinematicVictory } from './components/CinematicVictory';
 import { VectorBackground } from './components/VectorBackground';
 import { RowReticle } from './components/RowReticle';
+import { FirstRoundGuide } from './components/FirstRoundGuide';
 
 // import { FloatingHUD } from './components/FloatingHUD';
 import { ArtifactSystem } from './components/ArtifactSystem';
@@ -84,7 +86,12 @@ export const App: React.FC = () => {
   const [showMastery, setShowMastery] = useState<boolean>(false);
   const [showLeaderboard, setShowLeaderboard] = useState<boolean>(false);
   const [showArtifacts, setShowArtifacts] = useState<boolean>(false);
+
+  const [showVictoryCinematic, setShowVictoryCinematic] = useState<boolean>(false);
+
   const [isJolting, setIsJolting] = useState<boolean>(false);
+
+
 
   // Settings state
   const [colorBlindMode, setColorBlindMode] = useState<boolean>(false);
@@ -234,6 +241,8 @@ export const App: React.FC = () => {
   // Trigger Victory FX & Confetti
   const triggerVictory = () => {
     soundManager.playWin();
+    soundManager.playFanfare();
+    soundManager.playHaptic();
     setShowConfetti(true);
     setTimeout(() => {
       setShowConfetti(false);
@@ -417,6 +426,8 @@ export const App: React.FC = () => {
     const isWon = formattedGuess === secretWord;
     if (isWon) {
       triggerVictory();
+      // Play the cinematic victory takeover before the round-over reveal
+      setShowVictoryCinematic(true);
     }
     const newGuesses = [...players[activePlayerIndex].guesses, { word: formattedGuess, evaluation }];
     const isOutOfAttempts = newGuesses.length >= 6;
@@ -668,6 +679,19 @@ export const App: React.FC = () => {
   };
 
   const activePlayer = players[activePlayerIndex] || null;
+
+  // One-time orientation overlay for the player's first Classic/Daily round.
+  // Shown once per browser session (tracked via `wpp_frg_seen`) so it never
+  // interrupts a returning player mid-game, and only while a fresh solo round
+  // is being played (board up, no setup panel, no scoreboard, no artifacts).
+  const showFirstRoundGuide =
+    !localStorage.getItem('wpp_frg_seen') &&
+    (activeMode === 'CLASSIC' || activeMode === 'DAILY') &&
+    !!activePlayer &&
+    !showMultiplayerSetup &&
+    !showScoreboard &&
+    !showArtifacts;
+
   const keyboardStates = activePlayer ? calculateKeyboardLetterStates(activePlayer.guesses) : {};
 
   // Emoji share builder (re-exposed for Result screen)
@@ -755,6 +779,13 @@ export const App: React.FC = () => {
 
         {activeMode && !showMultiplayerSetup && !showScoreboard && activePlayer && (
           <div className="gameplay-area animate-scale" style={{ height: "calc(100vh - 75px)", display: "flex", flexDirection: "column", justifyContent: "space-between", alignItems: "center", overflow: "hidden", padding: "6px 0", boxSizing: "border-box" }}>
+            {showFirstRoundGuide && (
+              <FirstRoundGuide
+                isOpen
+                onComplete={() => localStorage.setItem('wpp_frg_seen', '1')}
+                onClose={() => undefined}
+              />
+            )}
             {/* Kinetic Row Reticle (Tactical Focus HUD) */}
             <RowReticle activeRow={activePlayer.guesses.length} />
 
@@ -890,6 +921,14 @@ export const App: React.FC = () => {
           />
         )}
       </main>
+
+      {/* Cinematic victory takeover — full-screen win video before the reveal */}
+      {showVictoryCinematic && (
+        <CinematicVictory
+          videoSource="/assets/victory-cinematic.mp4"
+          onComplete={() => setShowVictoryCinematic(false)}
+        />
+      )}
 
       {/* Modals */}
       <HelpModal isOpen={isHelpOpen} onClose={() => setIsHelpOpen(false)} />

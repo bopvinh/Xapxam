@@ -255,6 +255,43 @@ class SoundManager {
       console.error(e);
     }
   }
+
+  // Resonant chord fanfare for victories
+  public playFanfare() {
+    if (!this.enabled) return;
+    try {
+      this.initCtx();
+      if (!this.ctx) return;
+      const notes = [523.25, 659.25, 783.99, 1046.5, 783.99, 659.25]; // C5 E5 G5 C6 G5 E5
+      notes.forEach((freq, idx) => {
+        if (!this.ctx) return;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(freq, this.ctx.currentTime + idx * 0.1);
+        gain.gain.setValueAtTime(0.18, this.ctx.currentTime + idx * 0.1);
+        gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + idx * 0.1 + 0.55);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(this.ctx.currentTime + idx * 0.1);
+        osc.stop(this.ctx.currentTime + idx * 0.1 + 0.55);
+      });
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  // Tactile mobile feedback (vibration) on instant feedback moments
+  public playHaptic() {
+    if (!this.enabled) return;
+    try {
+      if (navigator.vibrate) {
+        navigator.vibrate(10);
+      }
+    } catch (e) {
+      // Vibration API unavailable — no-op
+    }
+  }
 }
 
 export const soundManager = new SoundManager();
