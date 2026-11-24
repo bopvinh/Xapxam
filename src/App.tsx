@@ -958,17 +958,9 @@ export const App: React.FC = () => {
               />
             )}
 
-            {/* Loss reveal action panel — single-player only (multiplayer renders its own board/summary). */}
-            {status === 'ROUND_OVER' && players.length === 1 && (
-              <DuelResultPage
-                players={players}
-                secretWord={secretWord}
-                selectedBoss={null}
-                onPlayAgain={() => startSinglePlayerGame(activeMode || 'CLASSIC')}
-                onMainMenu={handleHomeClick}
-                onMeaning={() => setIsDefinitionOpen(true)}
-              />
-            )}
+            {/* Single-player result screens: VictoryReveal (win) and GameOverReveal
+                (loss), both rendered at the app root below, own the full round-over
+                presentation. DuelResultPage is the AI Boss Arena duel result only */}
 
             {/* Game Grid / PvP Battle Board */}
             {activeMode === 'PARTY' ? (
