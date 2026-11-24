@@ -560,7 +560,7 @@ export const App: React.FC = () => {
     setPlayers(updatedPlayers);
     setCurrentGuess('');
 
-    // AI Boss Arena: human submits a guess, then hand off to the AI immediately without delay/thinking overlay
+    // AI Boss Arena: human submits a guess, then run AI turn after human reveal completes
     if (activeMode === 'AI_ARENA') {
       if (isWon || isOutOfAttempts) {
         setStatus('ROUND_OVER');
@@ -568,7 +568,20 @@ export const App: React.FC = () => {
         setShowScoreboard(true);
         return;
       }
-      runAITurn(newGuesses);
+      
+      // Delay AI sequence until after human tiles finish their staggered reveal (~600-800ms)
+      setTimeout(() => {
+        setIsAiThinking(true);
+        if (aiTimer) clearTimeout(aiTimer);
+        
+        const timer = setTimeout(() => {
+          setIsAiThinking(false);
+          runAITurn(newGuesses);
+        }, 1200); // "Thinking" for 1.2s
+        
+        setAiTimer(timer);
+      }, 800);
+      
       return;
     }
 
