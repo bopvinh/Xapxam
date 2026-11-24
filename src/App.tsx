@@ -709,11 +709,13 @@ export const App: React.FC = () => {
       handleSubmitGuess();
     } else if (key === 'BACKSPACE' || key === 'DEL') {
       setCurrentGuess((prev) => prev.slice(0, -1));
+      soundManager.playDelete();
     } else if (/^[A-Z]$/i.test(key)) {
       if (currentGuess.length < 5) {
         const upperKey = key.toUpperCase();
         setCurrentGuess((prev) => prev + upperKey);
         setLastPressedKey(upperKey);
+        soundManager.playPop();
         setTimeout(() => setLastPressedKey(null), 10);
       }
     }
