@@ -12,7 +12,7 @@ export default defineConfig({
     sourcemap: true,
   },
   test: {
-    include: ['tests/**/*.test.ts', 'src/**/*.test.ts'],
+    include: ['tests/**/*.test.ts', 'tests/**/*.test.tsx', 'src/**/*.test.ts', 'src/**/*.test.tsx'],
     exclude: ['node_modules', 'whitefish/node_modules'],
     globals: true,
     environment: 'jsdom',
