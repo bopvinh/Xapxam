@@ -77,3 +77,52 @@ test('board tiles grow on large viewports', async ({ page }) => {
   // Pre-fix this was a hardcoded 54px on every viewport.
   expect(cellHeight).toBeGreaterThan(54)
 })
+// PARTY mode shares the same playfield but adds the combat HUD above the board.
+// The HUD is a fixed-height sibling, so the board must not be squeezed by it.
+test('PARTY mode board stays readable next to the combat HUD', async ({ page }) => {
+  for (const vp of [
+    { name: 'desktop-1080p', width: 1920, height: 1080 },
+    { name: 'laptop-900', width: 1440, height: 900 },
+  ]) {
+    await page.setViewportSize({ width: vp.width, height: vp.height })
+    await page.goto('/')
+    await page.getByRole('button', { name: /multiplayer party/i }).click()
+    await expect(page.locator('.setup-form')).toBeVisible()
+
+    const playerInputs = page.locator('.player-row input[type="text"]')
+    const count = await playerInputs.count()
+    for (let i = 0; i < count; i++) {
+      await playerInputs.nth(i).fill(`Player ${i + 1}`)
+    }
+    const secret = page.locator('.secret-word-input')
+    if (await secret.count()) await secret.fill('CRANE')
+    await page.locator('.setup-form button[type="submit"]').click()
+
+    await expect(page.locator('.pvp-combat-hud')).toBeVisible()
+    await expect(page.locator('.board-cell').first()).toBeVisible()
+
+    const metrics = await page.evaluate(() => {
+      const hud = document.querySelector('.pvp-combat-hud')!.getBoundingClientRect()
+      const board = document.querySelector('.game-board-container')!.getBoundingClientRect()
+      const kbd = document.querySelector('.keyboard-container')!.getBoundingClientRect()
+      const cell = document.querySelector('.board-cell') as HTMLElement
+      return {
+        docH: document.documentElement.scrollHeight,
+        vh: window.innerHeight,
+        hudBottom: hud.bottom,
+        boardTop: board.top,
+        boardBottom: board.bottom,
+        kbdBottom: kbd.bottom,
+        cellHeight: cell.offsetHeight,
+      }
+    })
+
+    expect(metrics.docH, `no page overflow at ${vp.name}`).toBeLessThanOrEqual(metrics.vh + 1)
+    expect(metrics.kbdBottom, `keyboard inside viewport at ${vp.name}`)
+      .toBeLessThanOrEqual(metrics.vh + 1)
+    expect(metrics.boardTop, `board sits below the HUD at ${vp.name}`)
+      .toBeGreaterThanOrEqual(metrics.hudBottom - 1)
+    expect(metrics.cellHeight, `tiles readable beside HUD at ${vp.name}`)
+      .toBeGreaterThanOrEqual(44)
+  }
+})

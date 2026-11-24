@@ -88,11 +88,13 @@ centring, scrim and z-index.
 
 - `npx tsc --noEmit` clean.
 - `npx vitest run` — **77 passed / 0 failed**.
-- `npx playwright test` — 11 passed, 2 pre-existing failures (`ai-arena-reveal`,
+- `npx playwright test` — 12 passed, 2 pre-existing failures (`ai-arena-reveal`,
   `floating-hud`) that also fail on a clean checkout of this branch, i.e. not caused here.
-- New `e2e/responsive-playfield.spec.ts` (7 tests) asserts no page overflow, keyboard and board
+- New `e2e/responsive-playfield.spec.ts` (8 tests) asserts no page overflow, keyboard and board
   fully inside the viewport, gap board->keyboard < 80 px, and tile growth above the old 54 px
-  at six viewports.
+  at six viewports. An additional test drives PARTY mode (which renders `BattleBoard` and its
+  combat HUD inside the same playfield) at two desktop sizes and asserts the HUD stays above the
+  board rather than squeezing it, tiles keep the 44 px floor, and the keyboard stays in view.
 - Live geometry after the change:
 
 | Viewport | cell height | gap board->keyboard | viewport overflow |
