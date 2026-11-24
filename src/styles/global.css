@@ -4601,3 +4601,87 @@ button:focus-visible {
   .backdrop-corner-brackets { inset: 16px; }
   .backdrop-corner { width: 20px; height: 20px; }
 }
+
+/* ── Tile Burst & Shockwave Juice Effects ────────────────── */
+.tile-burst-effect {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: visible;
+  z-index: 5;
+}
+
+.tile-shockwave {
+  position: absolute;
+  inset: 0;
+  border-radius: var(--radius-sm);
+  border: 2px solid currentColor;
+  opacity: 0;
+  transform: scale(0.8);
+  animation: shockwave-expand 0.6s cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
+}
+
+.tile-shockwave.correct {
+  color: var(--correct);
+}
+
+.tile-shockwave.present {
+  color: var(--present);
+}
+
+@keyframes shockwave-expand {
+  0% {
+    transform: scale(0.8);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(1.4);
+    opacity: 0;
+  }
+}
+
+.tile-particle-spore {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.tile-particle-spore.correct {
+  background: var(--correct);
+  box-shadow: 0 0 8px var(--correct);
+}
+
+.tile-particle-spore.present {
+  background: var(--present);
+  box-shadow: 0 0 8px var(--present);
+}
+
+.tile-particle-spore.p1 { animation: spore-fly-1 0.6s ease-out forwards; }
+.tile-particle-spore.p2 { animation: spore-fly-2 0.6s ease-out forwards; }
+.tile-particle-spore.p3 { animation: spore-fly-3 0.6s ease-out forwards; }
+.tile-particle-spore.p4 { animation: spore-fly-4 0.6s ease-out forwards; }
+
+@keyframes spore-fly-1 {
+  0% { transform: translate(0, 0) scale(1.5); opacity: 1; }
+  100% { transform: translate(-28px, -28px) scale(0); opacity: 0; }
+}
+
+@keyframes spore-fly-2 {
+  0% { transform: translate(0, 0) scale(1.5); opacity: 1; }
+  100% { transform: translate(28px, -28px) scale(0); opacity: 0; }
+}
+
+@keyframes spore-fly-3 {
+  0% { transform: translate(0, 0) scale(1.5); opacity: 1; }
+  100% { transform: translate(-28px, 28px) scale(0); opacity: 0; }
+}
+
+@keyframes spore-fly-4 {
+  0% { transform: translate(0, 0) scale(1.5); opacity: 1; }
+  100% { transform: translate(28px, 28px) scale(0); opacity: 0; }
+}
