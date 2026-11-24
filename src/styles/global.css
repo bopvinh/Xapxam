@@ -483,8 +483,7 @@ button:focus-visible {
    ============================================================ */
 .toast-notification {
   position: fixed;
-  bottom: 24px;
-  top: auto;
+  top: 24px;
   left: 50%;
   transform: translateX(-50%);
   background: var(--text-primary);
@@ -493,14 +492,14 @@ button:focus-visible {
   border-radius: var(--radius-pill);
   font-weight: 700;
   font-size: var(--text-sm);
-  z-index: 1000;
+  z-index: 9999;
   box-shadow: var(--shadow-lg);
   white-space: nowrap;
-  animation: toast-slide-bottom 0.3s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+  animation: toast-slide-top 0.3s cubic-bezier(0.25, 1, 0.5, 1) forwards;
 }
 
-@keyframes toast-slide-bottom {
-  0% { opacity: 0; transform: translateX(-50%) translateY(24px); }
+@keyframes toast-slide-top {
+  0% { opacity: 0; transform: translateX(-50%) translateY(-24px); }
   100% { opacity: 1; transform: translateX(-50%) translateY(0); }
 }
 
@@ -3436,15 +3435,14 @@ button:focus-visible {
 /* ── Tactical Keyboard Enhancements (Change #3) ───────────────── */
 .keyboard-container {
   position: relative;
-  padding: 16px;
-  width: 95%;
+  padding: 0 12px;
+  width: 100%;
   max-width: 900px;
   margin: 0 auto;
   background: rgba(13, 17, 23, 0.4);
   border: 1px solid rgba(99, 102, 241, 0.15);
   border-radius: var(--radius-lg);
   backdrop-filter: blur(8px);
-  overflow: hidden;
 }
 
 .keyboard-container::before {
@@ -3480,7 +3478,6 @@ button:focus-visible {
   background: linear-gradient(135deg, var(--bg-elevated), var(--bg-card));
   animation: rainbow-cycle 8s linear infinite;
   height: 64px;
-  min-width: 44px;
   font-size: 18px;
 }
 
@@ -4120,4 +4117,206 @@ button:focus-visible {
   animation: key-spin-3d 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
+/* ── Streak Ember (live streak indicator on the single-player board) ── */
+.streak-ember {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: 9999px;
+  background: rgba(245, 158, 11, 0.10);
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  color: #fbbf24;
+  font-family: var(--font-display);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+  box-shadow: 0 0 12px rgba(245, 158, 11, 0.25);
+  animation: streak-flame-pulse 2.4s ease-in-out infinite;
+}
+
+.streak-ember--flame {
+  animation-duration: 1s;
+  animation-name: streak-flame-pulse--flame;
+  box-shadow: 0 0 20px rgba(245, 158, 11, 0.45), 0 0 60px rgba(245, 158, 11, 0.15);
+}
+
+.streak-ember__icon {
+  font-size: 13px;
+  line-height: 1;
+}
+
+.streak-ember__count {
+  line-height: 1;
+}
+
+@keyframes streak-flame-pulse {
+  0%, 100% {
+    box-shadow: 0 0 8px rgba(245, 158, 11, 0.25);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(245, 158, 11, 0.5);
+    transform: scale(1.04);
+  }
+}
+
+@keyframes streak-flame-pulse--flame {
+  0%, 100% {
+    box-shadow: 0 0 16px rgba(245, 158, 11, 0.35), 0 0 40px rgba(245, 158, 11, 0.12);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: 0 0 28px rgba(245, 158, 11, 0.55), 0 0 70px rgba(245, 158, 11, 0.2);
+    transform: scale(1.06);
+  }
+}
+
+/* ── AI Arena — Persistent Boss HUD ────────────────────────── */
+.ai-arena-hud {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  max-width: 350px;
+  padding: 8px 16px;
+  background: rgba(13, 17, 23, 0.7);
+  border: 1px solid rgba(244, 63, 94, 0.4);
+  border-radius: 12px;
+  margin-bottom: 12px;
+  color: #fff;
+  font-family: var(--font-display);
+}
+
+.boss-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.boss-icon {
+  font-size: 18px;
+}
+
+.boss-name {
+  font-weight: 700;
+  font-size: 14px;
+  color: #f43f5e;
+}
+
+.diff-badge {
+  font-size: 9px;
+  font-weight: 800;
+  padding: 2px 6px;
+  border-radius: 4px;
+  text-transform: uppercase;
+}
+
+.diff-badge.easy { background: rgba(56, 189, 248, 0.2); color: #38bdf8; }
+.diff-badge.normal { background: rgba(168, 85, 247, 0.2); color: #a855f7; }
+.diff-badge.hard { background: rgba(245, 158, 11, 0.2); color: #f59e0b; }
+
+.boss-thinking-card {
+  text-align: center;
+  padding: 36px 44px;
+  border-radius: 24px;
+  background: linear-gradient(145deg, #1e2534, #161b24);
+  border: 1px solid rgba(99, 102, 241, 0.35);
+  box-shadow: 0 0 60px rgba(99, 102, 241, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+.boss-icon {
+  font-size: 44px;
+  animation: float 2.4s ease-in-out infinite;
+  display: inline-block;
+  filter: drop-shadow(0 0 12px rgba(99, 102, 241, 0.3));
+}
+
+.boss-message {
+  font-size: 20px;
+  font-weight: 800;
+  color: #818cf8;
+  margin-top: 10px;
+  letter-spacing: 1.5px;
+}
+
+.boss-sub {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 6px;
+}
+
+.boss-progress-ring {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  border: 3px solid var(--border-subtle);
+  border-top-color: #818cf8;
+  animation: spin 0.9s linear infinite;
+  position: relative;
+}
+
+.boss-progress-ring::after {
+  content: '';
+  position: absolute;
+  inset: 4px;
+  border-radius: 50%;
+  border: 2px solid var(--border-subtle);
+}
+
+.boss-progress-fill {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  border-top-color: #22d3a0;
+  transform-origin: center center;
+}
+
+/* ── AI Arena — boss move reveal ────────────────────────────────────── */
+.ai-reveal-label {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: #818cf8;
+  margin-bottom: 8px;
+}
+
+.ai-guess-row {
+  margin-top: 12px;
+  opacity: 0;
+  animation: fade-in-up 0.25s ease-out forwards;
+}
+
+.ai-guess-row .ai-reveal-label {
+  color: #fbbf24;
+}
+
+.tile-spark {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.tile-spark .spark {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.85);
+  animation: spark-fly 0.5s ease-out forwards;
+}
+
+.tile-spark .spark.p1 { left: 10%; top: 10%; animation-delay: 0.05s; }
+.tile-spark .spark.p2 { left: 90%; top: 30%; animation-delay: 0.12s; }
+.tile-spark .spark.p3 { left: 20%; top: 90%; animation-delay: 0.18s; }
+.tile-spark .spark.p4 { left: 80%; top: 75%; animation-delay: 0.24s; }
+
+@keyframes spark-fly {
+  0% { transform: translate(0, 0) scale(1); opacity: 1; }
+  100% { transform: translate(22px, -22px) scale(0); opacity: 0; }
+}
 

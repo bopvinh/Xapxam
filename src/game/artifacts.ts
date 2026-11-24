@@ -455,6 +455,17 @@ export interface ScoringContext {
   sessionId?: string;
 }
 
+export function activateActiveArtifact(artifactId: string, inventory: PlayerInventory): { success: boolean; bonusPoints: number } {
+  const artifact = ARTIFACT_DATABASE.find(a => a.id === artifactId);
+  if (!artifact || !inventory.artifacts[artifactId]) {
+    return { success: false, bonusPoints: 0 };
+  }
+  
+  // Basic implementation: return a bonus based on artifact base value
+  const bonus = Math.round(artifact.baseValue * 0.1);
+  return { success: true, bonusPoints: bonus };
+}
+
 export function getDeterministicRoll(sessionId: string, attempt: number, word: string): number {
   const str = `${sessionId}:${attempt}:${word}`;
   let hash = 0;

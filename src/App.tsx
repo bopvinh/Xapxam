@@ -2,7 +2,8 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { io } from 'socket.io-client';
 import './styles/global.css';
 import './styles/artifact-system.css';
-import { GameMode, Player, PlayerStats, LetterState } from './game/types';
+import { GameMode, Player, PlayerStats, LetterState, LetterEvaluation, GuessResult } from './game/types';
+import type { AIPersonality, AIContext } from './ai/types';
 import {
   evaluateGuess,
   isValidWord,
@@ -22,8 +23,11 @@ import { Keyboard } from './components/Keyboard';
 import { HelpModal } from './components/HelpModal';
 import { StatsModal } from './components/StatsModal';
 import { DefinitionModal } from './components/DefinitionModal';
+import { AIArenaSetup } from './components/AIArenaSetup';
 import { MultiplayerSetup } from './components/MultiplayerSetup';
 import { Scoreboard } from './components/Scoreboard';
+import { makeAIMove } from './ai';
+import { GUESS_WORDS, SECRET_WORDS } from './game/wordlist';
 import { Timer } from './components/Timer';
 import { DailyChestModal } from './components/DailyChestModal';
 import { WordMentorModal } from './components/WordMentorModal';
@@ -34,10 +38,10 @@ import { LeaderboardModal } from './components/LeaderboardModal';
 import { VictoryReveal } from './components/VictoryReveal';
 import { CinematicVictory } from './components/CinematicVictory';
 import { VectorBackground } from './components/VectorBackground';
-import { RowReticle } from './components/RowReticle';
+import { StreakEmber } from './components/StreakEmber';
 import { FirstRoundGuide } from './components/FirstRoundGuide';
 
-// import { FloatingHUD } from './components/FloatingHUD';
+import { FloatingHUD } from './components/FloatingHUD';
 import { ArtifactSystem } from './components/ArtifactSystem';
 import { 
   PlayerInventory, 
@@ -86,6 +90,14 @@ export const App: React.FC = () => {
   const [showMastery, setShowMastery] = useState<boolean>(false);
   const [showLeaderboard, setShowLeaderboard] = useState<boolean>(false);
   const [showArtifacts, setShowArtifacts] = useState<boolean>(false);
+  const [aiArenaPersonality, setAIArenaPersonality] = useState<AIPersonality | null>(null);
+  const [aiArenaHardMode, setAIArenaHardMode] = useState<boolean>(false);
+  const [aiArenaStatus, setAIArenaStatus] = useState<'idle' | 'playing' | 'over'>('idle');
+  const [aiTimer, setAiTimer] = useState<ReturnType<typeof setTimeout> | null>(null);
+  const [isAiThinking, setIsAiThinking] = useState<boolean>(false);
+  const [aiJudgement, setAiJudgement] = useState<'revealing' | null>(null);
+  const [aiGuess, setAiGuess] = useState<string | null>(null);
+  const [aiEvaluation, setAiEvaluation] = useState<LetterEvaluation[] | null>(null);
 
   const [showVictoryCinematic, setShowVictoryCinematic] = useState<boolean>(false);
 
@@ -288,6 +300,11 @@ export const App: React.FC = () => {
     if (mode === 'CLASSIC' || mode === 'DAILY') {
       setShowMultiplayerSetup(false);
       startSinglePlayerGame(mode);
+    } else if (mode === 'AI_ARENA') {
+      // AI Boss Arena opens its own boss-selection setup, not the multiplayer room flow.
+      setShowMultiplayerSetup(false);
+      setShowScoreboard(false);
+      setShowArtifacts(false);
     } else {
       // For MULTIPLAYER setup
       setShowMultiplayerSetup(true);
@@ -317,6 +334,101 @@ export const App: React.FC = () => {
     setStatus('PLAYING');
     setShowScoreboard(false);
     setIsTimerActive(false);
+  };
+
+  const startAIArena = (personality: AIPersonality, hardMode: boolean) => {
+    const word = getRandomSecretWord();
+    const human: Player = {
+      id: 'human',
+      name: 'You',
+      isHost: false,
+      guesses: [],
+      score: 0,
+      solved: false,
+      attemptsUsed: 0
+    };
+    const ai: Player = {
+      id: 'ai',
+      name: personality.name,
+      isHost: false,
+      guesses: [],
+      score: 0,
+      solved: false,
+      attemptsUsed: 0
+    };
+    setPlayers([human, ai]);
+    setSecretWord(word);
+    setAIArenaPersonality(personality);
+    setAIArenaHardMode(hardMode);
+    setAIArenaStatus('playing');
+    setStatus('PLAYING');
+    setCurrentGuess('');
+    setShowScoreboard(false);
+    setActivePlayerIndex(0);
+    setAiJudgement(null);
+    setAiGuess(null);
+    setAiEvaluation(null);
+    if (aiTimer) {
+      clearTimeout(aiTimer);
+      setAiTimer(null);
+    }
+  };
+
+  /** AI Boss Arena: resolve the AI's guess from the shared word + feedback. */
+  const runAITurn = (humanGuesses: GuessResult[]) => {
+    setIsAiThinking(false);
+    if (status !== 'PLAYING' || aiArenaStatus !== 'playing') return;
+    const ai = players.find((p) => p.id === 'ai');
+    if (!ai || ai.solved) return;
+
+    const previousGuesses = [...humanGuesses, ...ai.guesses];
+    const ctx: AIContext = {
+      previousGuesses,
+      validWords: GUESS_WORDS,
+      secretWords: SECRET_WORDS,
+      hardMode: aiArenaHardMode,
+      attemptsRemaining: 6 - ai.guesses.length,
+    };
+    const move = makeAIMove(ctx, {
+      difficulty: aiArenaPersonality?.difficulty || 'EASY',
+      seed: Date.now(),
+      personalityId: aiArenaPersonality?.id,
+    });
+
+    const evals = evaluateGuess(move.word, secretWord);
+    const aiWon = move.word === secretWord;
+
+    // Kick off the boss's tile-by-tile reveal.
+    setAiJudgement('revealing');
+    setAiGuess(move.word);
+    setAiEvaluation(evals);
+
+    setPlayers(prev => prev.map(p =>
+      p.id === 'ai'
+        ? { ...p, guesses: [...p.guesses, { word: move.word, evaluation: evals }], solved: aiWon, attemptsUsed: p.guesses.length + 1 }
+        : p
+    ));
+
+    evals.forEach((item, idx) => {
+      setTimeout(() => {
+        if (item.state === 'correct') soundManager.playCorrect();
+        else if (item.state === 'present') soundManager.playPresent();
+        else soundManager.playAbsent();
+      }, idx * 120 + 250);
+    });
+
+    // Clear the reveal after the tile sounds have played plus a short tail.
+    setTimeout(() => {
+      setAiJudgement(null);
+      setAiGuess(null);
+      setAiEvaluation(null);
+    }, evals.length * 120 + 250 + 450);
+
+    if (aiWon) {
+      setStatus('ROUND_OVER');
+      setAIArenaStatus('over');
+      setShowScoreboard(true);
+    }
   };
 
   // Handle Setup Complete
@@ -460,6 +572,23 @@ export const App: React.FC = () => {
     setPlayers(updatedPlayers);
     setCurrentGuess('');
 
+    // AI Boss Arena: human submits a guess, then hand off to the AI.
+    if (activeMode === 'AI_ARENA') {
+      if (isWon) {
+        setStatus('ROUND_OVER');
+        setAIArenaStatus('over');
+        setShowScoreboard(true);
+        return;
+      }
+      setIsAiThinking(true);
+      if (aiTimer) {
+        clearTimeout(aiTimer);
+        setAiTimer(null);
+      }
+      setAiTimer(setTimeout(() => runAITurn(newGuesses), 950));
+      return;
+    }
+
     // Single Player Modes
         if (activeMode === 'CLASSIC' || activeMode === 'DAILY') {
           if (isWon) {
@@ -601,6 +730,12 @@ export const App: React.FC = () => {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [handleKeyPress]);
 
+  useEffect(() => {
+    return () => {
+      if (aiTimer) clearTimeout(aiTimer);
+    };
+  }, [aiTimer]);
+
   // Timed Mode Timeout handler
   const handleTimeout = () => {
     showToast("⏰ Time's up! Attempt consumed.");
@@ -711,24 +846,24 @@ export const App: React.FC = () => {
       } as React.CSSProperties}
     >
       <VectorBackground status={showConfetti ? 'WIN' : status} />
-      {activeMode && (
+      {activeMode && (activeMode !== 'AI_ARENA' || aiArenaStatus === 'playing') && (
         <Header
-                  mode={activeMode}
-                  onOpenHelp={() => setIsHelpOpen(true)}
-                  onOpenStats={() => setIsStatsOpen(true)}
-                  onOpenArtifacts={() => setShowArtifacts(true)}
-                  onHomeClick={handleHomeClick}
-                  colorBlindMode={colorBlindMode}
-                  onToggleColorBlind={handleToggleColorBlind}
-                  hardMode={hardMode}
-                  onToggleHardMode={handleToggleHardMode}
-                  soundEnabled={soundEnabled}
-                  onToggleSound={handleToggleSound}
-                  artifactCurrency={artifactInventory.currency}
-                  roomCode={roomCode}
-                  activePlayerName={players.length > 1 && activePlayer ? activePlayer.name : undefined}
-                  roundInfo={players.length > 1 ? `Round ${roundNumber} of ${maxRounds}` : undefined}
-                />
+                mode={activeMode}
+                onOpenHelp={() => setIsHelpOpen(true)}
+                onOpenStats={() => setIsStatsOpen(true)}
+                onOpenArtifacts={() => setShowArtifacts(true)}
+                onHomeClick={handleHomeClick}
+                colorBlindMode={colorBlindMode}
+                onToggleColorBlind={handleToggleColorBlind}
+                hardMode={hardMode}
+                onToggleHardMode={handleToggleHardMode}
+                soundEnabled={soundEnabled}
+                onToggleSound={handleToggleSound}
+                artifactCurrency={artifactInventory.currency}
+                roomCode={roomCode}
+                activePlayerName={players.length > 1 && activePlayer ? activePlayer.name : undefined}
+                roundInfo={players.length > 1 ? `Round ${roundNumber} of ${maxRounds}` : undefined}
+              />
       )}
 
       <main className="app-main-content">
@@ -754,8 +889,7 @@ export const App: React.FC = () => {
           <MainMenu
             onSelectMode={(mode: GameMode) => {
               if (mode === 'AI_ARENA') {
-                setActiveMode('CLASSIC');
-                startSinglePlayerGame('CLASSIC');
+                setActiveMode('AI_ARENA');
               } else if (mode === 'PARTY' || mode === 'FAST' || mode === 'TEAM') {
                 setActiveMode(mode);
                 setShowMultiplayerSetup(true);
@@ -777,8 +911,41 @@ export const App: React.FC = () => {
           />
         )}
 
+        {activeMode === 'AI_ARENA' && aiArenaStatus === 'idle' && !showMultiplayerSetup && !showScoreboard && (
+          <AIArenaSetup
+            onStart={(personality, hardMode) => startAIArena(personality, hardMode)}
+            onBack={handleHomeClick}
+          />
+        )}
+
         {activeMode && !showMultiplayerSetup && !showScoreboard && activePlayer && (
-          <div className="gameplay-area animate-scale" style={{ height: "calc(100vh - 75px)", display: "flex", flexDirection: "column", justifyContent: "space-between", alignItems: "center", overflow: "hidden", padding: "6px 0", boxSizing: "border-box" }}>
+              <div className="gameplay-area animate-scale" style={{ height: "calc(100vh - 85px)", display: "flex", flexDirection: "column", justifyContent: "space-between", alignItems: "center", overflow: "hidden", padding: "6px 0", boxSizing: "border-box" }}>
+                {isAiThinking && (
+                  <div className="boss-thinking-overlay">
+                    <div className="boss-thinking-card">
+                      <div className="boss-icon">🧠</div>
+                      <h2 className="boss-message">THE BOSS IS THINKING...</h2>
+                      <div className="boss-progress-ring">
+                        <div className="boss-progress-fill" />
+                      </div>
+                      <p className="boss-sub">Calculating optimum move...</p>
+                    </div>
+                  </div>
+                )}
+                {activeMode === 'AI_ARENA' && aiArenaPersonality && (
+              <div className="ai-arena-hud">
+                <div className="boss-info">
+                  <span className="boss-icon">{aiArenaPersonality.icon}</span>
+                  <span className="boss-name">{aiArenaPersonality.name}</span>
+                </div>
+                <span className={`diff-badge ${aiArenaPersonality.difficulty.toLowerCase()}`}>
+                  {aiArenaPersonality.difficulty}
+                </span>
+              </div>
+            )}
+            {activePlayer && status === 'PLAYING' && stats.currentStreak > 0 && (
+              <StreakEmber streak={stats.currentStreak} />
+            )}
             {showFirstRoundGuide && (
               <FirstRoundGuide
                 isOpen
@@ -786,13 +953,8 @@ export const App: React.FC = () => {
                 onClose={() => undefined}
               />
             )}
-            {/* Kinetic Row Reticle (Tactical Focus HUD) */}
-            <RowReticle activeRow={activePlayer.guesses.length} />
-
             {/* Kinetic Viewport Impact Layer (jolt effect) */}
             <div className={`viewport-impact-layer${isJolting ? ' viewport-impact-jolt' : ''}`} aria-hidden="true" />
-
-
 
             {/* Timer for Timed Mode */}
             {activeMode === 'TIMED' && (
@@ -803,11 +965,6 @@ export const App: React.FC = () => {
                 onTimeout={handleTimeout}
                 isActive={isTimerActive && status === 'PLAYING'}
               />
-            )}
-
-            {/* Activity Reticle (kinetic tracking HUD) */}
-            {activePlayer && status === 'PLAYING' && (
-              <RowReticle activeRow={activePlayer.guesses.length} />
             )}
 
             {/* Loss reveal action panel — single-player only (multiplayer renders its own board/summary). */}
@@ -839,6 +996,9 @@ export const App: React.FC = () => {
                 currentGuess={currentGuess}
                 invalidRowIndex={invalidRowIndex}
                 colorBlindMode={colorBlindMode}
+                aiJudgement={aiJudgement}
+                aiGuess={aiGuess}
+                aiEvaluation={aiEvaluation}
               />
             )}
 
@@ -987,10 +1147,10 @@ export const App: React.FC = () => {
               inventory={artifactInventory}
               onInventoryChange={setArtifactInventory}
             />
-            {/* <FloatingHUD
-        streak={stats.currentStreak} 
-        winRate={stats.gamesPlayed > 0 ? Math.round((stats.gamesWon / stats.gamesPlayed) * 100) : 100} 
-      /> */}
+            <FloatingHUD
+              streak={stats.currentStreak} 
+              winRate={stats.gamesPlayed > 0 ? Math.round((stats.gamesWon / stats.gamesPlayed) * 100) : 100} 
+            />
     </div>
   );
 };

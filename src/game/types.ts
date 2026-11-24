@@ -1,4 +1,4 @@
-export type GameMode = 'CLASSIC' | 'DAILY' | 'PARTY' | 'FAST' | 'TIMED' | 'TEAM';
+export type GameMode = 'CLASSIC' | 'DAILY' | 'PARTY' | 'FAST' | 'TIMED' | 'TEAM' | 'AI_ARENA';
 
 export type LetterState = 'correct' | 'present' | 'absent' | 'empty';
 

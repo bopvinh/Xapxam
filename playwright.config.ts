@@ -17,10 +17,7 @@ export default defineConfig({
       use: { ...devices['Desktop Chrome'] },
     },
   ],
-  webServer: {
-    command: 'npm run dev -- --port 5175',
-    url: 'http://localhost:5175',
-    reuseExistingServer: !process.env.CI,
-    timeout: 120 * 1000,
-  },
+  // Web server is started externally (see "npm run dev -- --port 5175").
+  // Do NOT auto-start the dev server here, or it conflicts with the running
+  // instance on port 5175 and tears down the browser context before each test.
 });

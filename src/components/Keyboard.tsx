@@ -27,6 +27,7 @@ export const Keyboard: React.FC<KeyboardProps> = ({
   lastPressedKey
 }) => {
   const [activeSpinKey, setActiveSpinKey] = useState<string | null>(null);
+  const [pressedKey, setPressedKey] = useState<string | null>(null);
 
   React.useEffect(() => {
     if (lastPressedKey) {
@@ -62,6 +63,7 @@ export const Keyboard: React.FC<KeyboardProps> = ({
             const state = isSpecial ? '' : letterStates[key] || '';
             const isEnter = key === 'ENTER';
             const isSpinning = activeSpinKey === key;
+            const isPressed = pressedKey === key;
 
             let label: React.ReactNode = key;
             if (key === 'ENTER') {
@@ -88,8 +90,13 @@ export const Keyboard: React.FC<KeyboardProps> = ({
               <button
                 key={key}
                 type="button"
-                className={`key-btn ${isSpecial ? 'special-key' : ''} ${state} ${isEnter && isSubmitting ? 'enter-shockwave-source' : ''} ${isSpinning ? 'is-spinning' : ''}`}
+                className={`key-btn ${isSpecial ? 'special-key' : ''} ${state} ${isEnter && isSubmitting ? 'enter-shockwave-source' : ''} ${isSpinning ? 'is-spinning' : ''} ${isPressed ? 'key-pressed' : ''}`}
                 onClick={() => handleClick(key)}
+                onMouseDown={() => setPressedKey(key)}
+                onMouseUp={() => setPressedKey(null)}
+                onMouseLeave={() => setPressedKey(null)}
+                onTouchStart={() => setPressedKey(key)}
+                onTouchEnd={() => setPressedKey(null)}
                 disabled={disabled}
               >
                 <span className="key-label">{label}</span>

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 interface CinematicVictoryProps {
   videoSource: string;
@@ -7,6 +7,7 @@ interface CinematicVictoryProps {
 
 export const CinematicVictory: React.FC<CinematicVictoryProps> = ({ videoSource, onComplete }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
+  const [skipped, setSkipped] = useState(false);
 
   useEffect(() => {
     if (videoRef.current) {
@@ -16,6 +17,13 @@ export const CinematicVictory: React.FC<CinematicVictoryProps> = ({ videoSource,
       });
     }
   }, [onComplete]);
+
+  const handleSkip = () => {
+    if (!skipped) {
+      setSkipped(true);
+      onComplete();
+    }
+  };
 
   return (
     <div
@@ -43,6 +51,27 @@ export const CinematicVictory: React.FC<CinematicVictoryProps> = ({ videoSource,
           objectFit: 'cover',
         }}
       />
+      <button
+        onClick={handleSkip}
+        style={{
+          position: 'absolute',
+          bottom: '30px',
+          right: '30px',
+          padding: '10px 24px',
+          background: 'rgba(255, 255, 255, 0.2)',
+          border: '1px solid rgba(255, 255, 255, 0.4)',
+          borderRadius: '999px',
+          color: '#fff',
+          fontWeight: 800,
+          fontSize: '14px',
+          cursor: 'pointer',
+          backdropFilter: 'blur(8px)',
+          zIndex: 10001,
+          transition: 'background 0.2s',
+        }}
+      >
+        SKIP INTRO ⏭
+      </button>
     </div>
   );
 };

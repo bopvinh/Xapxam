@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { GameMode } from '../game/types';
 import { soundManager } from '../game/audio';
-import { VectorBackground } from './VectorBackground';
 // import heroBgV2 from '../assets/hero-bg-v2.svg';
 
 interface MainMenuProps {
@@ -55,14 +54,14 @@ const MODES: ModeConfig[] = [
   {
     mode: 'FAST',
     label: 'Fast Mode',
-    description: 'Solve first to end round and score point.',
+    description: 'Solve first to end round and score points.',
     tag: 'SPEED',
     tagColor: '#facc15',
   },
   {
     mode: 'TIMED',
     label: 'Timed Mode',
-    description: 'Beat the 60 or 90s countdown clock!',
+    description: 'Beat the 60- or 90-second countdown clock!',
     tag: 'TIMED',
     tagColor: '#f43f5e',
   },
@@ -229,10 +228,6 @@ export const MainMenu: React.FC<MainMenuProps> = ({
     return (
         <div className="main-menu-container animate-scale">
           <div className="main-menu-inner" style={{ transform: `perspective(1000px) rotateY(${mousePos.x * 0.1}deg) rotateX(${-mousePos.y * 0.1}deg)`, width:'100%', height:'100%', position:'relative', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-          <div className="main-menu-inner" style={{ transform: `perspective(1000px) rotateY(${mousePos.x * 0.1}deg) rotateX(${-mousePos.y * 0.1}deg)` }}>
-              <div style={{ width:'100%', height:'100%', position:'relative', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-          {/* ── Living vector backdrop (shared with the game board) ── */}
-          <VectorBackground status="PLAYING" />
           {/* ── Precision Vector Corner Reticle Brackets ───────── */}
           <div className="vector-corner-tl" aria-hidden="true" />
           <div className="vector-corner-tr" aria-hidden="true" />
@@ -394,9 +389,6 @@ export const MainMenu: React.FC<MainMenuProps> = ({
                             <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginTop: '4px' }}>
                               <span className="daily-pulse-badge">FEATURED</span>
                               <kbd style={{ fontSize: '9px', padding: '1px 4px', background: 'rgba(245,158,11,0.2)', border: '1px solid #f59e0b', borderRadius: '3px', color: '#f59e0b', fontWeight: 800 }}>D</kbd>
-                              <span className="mode-category-tag" style={{ color: tagColor, borderColor: tagColor, background: `${tagColor}18`, fontSize: '9px' }}>
-                                {tag}
-                              </span>
                             </div>
                           )}
                           <p style={{ fontSize: '11px', margin: '4px 0 0 0', opacity: 0.85 }}>{description}</p>
@@ -431,7 +423,5 @@ export const MainMenu: React.FC<MainMenuProps> = ({
       </div>
       </div>
     </div>
-        </div>
-          </div>
   );
 };

@@ -7,6 +7,10 @@ interface GameBoardProps {
   maxGuesses?: number;
   invalidRowIndex?: number | null; // For shake animation
   colorBlindMode?: boolean;
+  /** AI Arena: the boss's last move being revealed (drives the tile-by-tile reveal). */
+  aiJudgement?: 'revealing' | null;
+  aiGuess?: string | null;
+  aiEvaluation?: LetterEvaluation[] | null;
 }
 
 export const GameBoard: React.FC<GameBoardProps> = ({
@@ -14,7 +18,10 @@ export const GameBoard: React.FC<GameBoardProps> = ({
   currentGuess,
   maxGuesses = 6,
   invalidRowIndex = null,
-  colorBlindMode = false
+  colorBlindMode = false,
+  aiJudgement = null,
+  aiGuess = null,
+  aiEvaluation = null
 }) => {
   const rows: JSX.Element[] = [];
 
@@ -92,6 +99,30 @@ export const GameBoard: React.FC<GameBoardProps> = ({
   return (
     <div className="game-board-container">
       <div className="game-board">
+        {/* AI Arena: the boss's move, revealed tile-by-tile with a spark. */}
+        {aiJudgement === 'revealing' && aiGuess != null && aiEvaluation != null && (
+          <div className="board-row ai-guess-row">
+            <div className="ai-reveal-label">THE BOSS PLAYS</div>
+            {aiGuess.split('').map((letter, c) => {
+              const evalRes = aiEvaluation[c];
+              const state: LetterState = evalRes.state;
+              return (
+                <div
+                  key={c}
+                  className={`board-cell ${state} has-letter submitted`}
+                >
+                  <span className="letter-text">{letter}</span>
+                  <div className="tile-spark" aria-hidden="true">
+                    <span className="spark p1" />
+                    <span className="spark p2" />
+                    <span className="spark p3" />
+                    <span className="spark p4" />
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
         {rows}
       </div>
     </div>

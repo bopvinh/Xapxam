@@ -140,6 +140,12 @@ export const FloatingHUD: React.FC<FloatingHUDProps> = ({ streak, winRate }) => 
           from { opacity: 0; transform: translateX(30px); }
           to { opacity: 1; transform: translateX(0); }
         }
+
+        @media (max-width: 800px) {
+          .floating-hud-root {
+            display: none;
+          }
+        }
       `}</style>
 
       <div className="live-indicator">
