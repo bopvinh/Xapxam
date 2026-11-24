@@ -910,7 +910,7 @@ export const App: React.FC = () => {
         )}
 
         {activeMode && !showMultiplayerSetup && !showScoreboard && activePlayer && (
-              <div className="gameplay-area animate-scale" style={{ height: "calc(100vh - 85px)", display: "flex", flexDirection: "column", justifyContent: "space-between", alignItems: "center", overflow: "hidden", padding: "6px 0", boxSizing: "border-box" }}>
+              <div className="gameplay-area animate-scale">
                 {isAiThinking && (
                   <div className="boss-thinking-overlay">
                     <div className="boss-thinking-card">

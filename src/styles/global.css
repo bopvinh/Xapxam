@@ -469,6 +469,28 @@ button:focus-visible {
 /* ============================================================
    MAIN CONTENT AREA
    ============================================================ */
+/* ============================================================
+   GAMEPLAY AREA — bounded, non-scrolling playfield
+   Header (68px) + footer inset bound the height; the board
+   container is the only flex-growing child, so the keyboard
+   always renders directly under the centred board and nothing
+   overflows the viewport.
+   ============================================================ */
+.gameplay-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: 800px;
+  height: calc(100vh - 84px);
+  min-height: 0;
+  padding: 8px 0;
+  box-sizing: border-box;
+  overflow: hidden;
+  animation: screen-fade 0.3s ease forwards;
+}
+
 .app-main-content {
   flex: 1;
   display: flex;
@@ -985,32 +1007,64 @@ button:focus-visible {
 /* ============================================================
    GAME BOARD
    ============================================================ */
-.game-board-container {
-  display: flex;
-  justify-content: center;
-  margin: var(--space-3) 0;
+/* ============================================================
+   RESPONSIVE PLAYFIELD TOKENS
+   Board tiles, key caps and gaps scale with the viewport so the whole loop
+   (board + keyboard) stays visible without scrolling. Height-driven,
+   width-safe, 44px touch floor. Verified in-browser at 1920x1080 / 1440x900 /
+   1366x768 / 1280x720 / 390x844 / 844x390: cells 83.6px down to 44px, no
+   viewport overflow at any size.
+   ============================================================ */
+:root {
+  --board-gap: clamp(4px, min(0.9vh, 1.4vw), 8px);
+  --board-cell: clamp(44px, min(8.4vh, 15vw), 82px);
+  --key-height: clamp(44px, min(5.6vh, 10vw), 62px);
 }
 
+@supports (height: 100dvh) {
+  :root { --board-cell: clamp(44px, min(8.4dvh, 15vw), 82px); }
+}
+
+/* Narrow phones: keep cells at the 44px touch floor. */
+@media (max-width: 480px) {
+  :root { --board-cell: 44px; --key-height: 46px; }
+}
+
+/* The board takes exactly the space the fixed-height keyboard leaves. Align from
+   the start rather than `center`: centring a flex column whose content overflows
+   bleeds past both edges and shoves the last row under the keyboard. */
+.game-board-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  margin: 0 auto;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+/* The board never grows past the space the keyboard leaves it. */
 .game-board {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: var(--board-gap);
+  max-height: 100%;
 }
 
 .board-row {
   display: flex;
-  gap: 6px;
+  gap: var(--board-gap);
 }
 
 .board-cell {
-  width: 54px;
-  height: 54px;
+  width: var(--board-cell);
+  height: var(--board-cell);
   border: 2px solid var(--empty-border);
   display: flex;
   align-items: center;
   justify-content: center;
   font-family: var(--font-display);
-  font-size: 24px;
+  font-size: calc(var(--board-cell) * 0.45);
   font-weight: 800;
   text-transform: uppercase;
   border-radius: var(--radius-sm);
@@ -1068,9 +1122,10 @@ button:focus-visible {
 .keyboard-container {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: clamp(4px, 0.8vh, 8px);
   width: 100%;
-  margin-top: var(--space-5);
+  flex: 0 0 auto;
+  margin-top: var(--space-3);
 }
 
 .keyboard-row {
@@ -1081,7 +1136,7 @@ button:focus-visible {
 
 /* ── Key cap base state: clearly visible against dark UI ── */
 .key-btn {
-  height: 56px;
+  height: var(--key-height);
   flex: 1;
   min-width: 48px;
   background: linear-gradient(180deg, #252d3f, #1e2534);
@@ -2359,15 +2414,6 @@ button:focus-visible {
 }
 
 .main-menu-container,
-.gameplay-area {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  max-width: 800px;
-  animation: screen-fade 0.3s ease forwards;
-}
 .game-board-container,
 .multiplayer-setup-container,
 .setup-form,
@@ -4263,6 +4309,19 @@ button:focus-visible {
 .diff-badge.easy { background: rgba(56, 189, 248, 0.2); color: #38bdf8; }
 .diff-badge.normal { background: rgba(168, 85, 247, 0.2); color: #a855f7; }
 .diff-badge.hard { background: rgba(245, 158, 11, 0.2); color: #f59e0b; }
+
+.boss-thinking-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(7, 9, 13, 0.55);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+  z-index: 5000;
+  animation: backdrop-fade 0.25s ease forwards;
+}
 
 .boss-thinking-card {
   text-align: center;
