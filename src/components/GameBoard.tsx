@@ -54,7 +54,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
       cells.push(
         <div
           key={c}
-          className={`board-cell ${state} ${char ? 'has-letter' : ''} ${isSubmittedRow ? 'submitted animate-flip tile-enhance-enter' : ''} ${isCurrentRow ? 'active-tile animate-stagger-enter' : ''}`}
+          className={`board-cell ${state} ${char ? 'has-letter' : 'empty-slot'} ${isSubmittedRow ? 'submitted animate-flip tile-enhance-enter' : ''} ${isCurrentRow ? 'active-tile animate-stagger-enter' : ''}`}
         >
           {/* Custom tactical vector corner ticks to elevate visual cosmetics */}
           <svg className="tile-vector-accent" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">

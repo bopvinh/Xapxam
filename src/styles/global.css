@@ -80,9 +80,10 @@
   background: linear-gradient(145deg, #1e222d, #141721) !important;
   border: 2px solid var(--tile-color, #6366f1) !important;
   border-radius: 12px !important;
-  font-family: 'Cinzel', serif !important;
-  font-weight: 900;
+  font-family: var(--font-display) !important;
+  font-weight: 800;
   font-size: 2.2rem;
+  text-transform: uppercase;
   transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.4s ease, border-color 0.4s ease !important;
   cursor: pointer;
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.6), inset 0 2px 4px rgba(255, 255, 255, 0.15), 0 0 20px var(--tile-color, #6366f1) !important;
@@ -373,7 +374,7 @@ button:focus-visible {
 }
 
 .logo-title {
-  font-family: 'Cinzel', serif !important;
+  font-family: var(--font-display) !important;
   font-weight: 800;
   font-size: 22px;
   cursor: pointer;
@@ -1015,12 +1016,22 @@ button:focus-visible {
   border-radius: var(--radius-sm);
   position: relative;
   user-select: none;
-  transition: border-color 0.15s ease, background-color 0.15s ease;
+  transition: border-color 0.15s ease, background-color 0.15s ease, box-shadow 0.15s ease;
+  background: #161b24;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.02);
+}
+
+.board-cell.empty-slot {
+  border-style: dashed;
+  border-color: rgba(141, 158, 196, 0.18);
+  background: #111621;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.03);
 }
 
 .board-cell.has-letter {
   border-color: var(--text-secondary);
   animation: scale-up 0.15s ease-out;
+  box-shadow: 0 0 8px rgba(141, 158, 196, 0.15);
 }
 
 .board-cell.correct {
@@ -1052,31 +1063,34 @@ button:focus-visible {
 }
 
 /* ============================================================
-   KEYBOARD
+   KEYBOARD — Premium illuminated key caps
    ============================================================ */
 .keyboard-container {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
   width: 100%;
-  margin-top: var(--space-4);
+  margin-top: var(--space-5);
 }
 
 .keyboard-row {
   display: flex;
   justify-content: center;
-  gap: 5px;
+  gap: 6px;
 }
 
+/* ── Key cap base state: clearly visible against dark UI ── */
 .key-btn {
-  height: 50px;
+  height: 56px;
   flex: 1;
-  background: var(--bg-elevated);
-  border: var(--border-subtle);
+  min-width: 48px;
+  background: linear-gradient(180deg, #252d3f, #1e2534);
+  border: 1px solid rgba(255, 255, 255, 0.10);
   border-radius: var(--radius-sm);
   color: var(--text-primary);
-  font-weight: 700;
+  font-weight: 800;
   font-size: var(--text-sm);
+  letter-spacing: 0.4px;
   cursor: pointer;
   user-select: none;
   display: flex;
@@ -1085,17 +1099,33 @@ button:focus-visible {
   text-transform: uppercase;
   transition: var(--transition-fast);
   font-family: var(--font-display);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12), 0 2px 8px rgba(0, 0, 0, 0.45);
+  position: relative;
+  overflow: hidden;
 }
 
-.key-btn:hover { background: var(--bg-elevated-2); }
-@keyframes key-pop {
-  0% { transform: scale(1); }
-  50% { transform: scale(0.92); }
-  100% { transform: scale(1); }
+/* Subtle top highlight for a tactile, pressed-plastic look */
+.key-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 40%;
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.10), transparent);
+  pointer-events: none;
+}
+
+.key-btn:hover {
+  background: linear-gradient(180deg, #344054, #2d364d);
+  border-color: rgba(255, 255, 255, 0.22);
+  transform: translateY(-1px);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.16), 0 4px 14px rgba(0, 0, 0, 0.5);
 }
 
 .key-btn:active {
-  animation: key-pop 0.1s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transform: translateY(0);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3), 0 1px 4px rgba(0, 0, 0, 0.4);
 }
 
 .key-btn.special-key {
@@ -1104,37 +1134,66 @@ button:focus-visible {
   letter-spacing: 0.3px;
 }
 
+/* ── Active key state: pulsing glow when a key is pressed ── */
+.key-btn.is-spinning {
+  animation: key-pop 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes key-pop {
+  0% { transform: scale(1); }
+  50% { transform: scale(0.93); }
+  100% { transform: scale(1); }
+}
+
+/* ── Correct / present / absent key states ── */
 .key-btn.correct {
-  background: var(--correct);
+  background: linear-gradient(180deg, var(--correct), #0e7a5f);
   border-color: var(--correct);
   color: white;
-  box-shadow: 0 0 8px rgba(34,211,160,0.25);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.3), 0 0 14px rgba(34, 211, 160, 0.35);
 }
 
 .key-btn.present {
-  background: var(--present);
+  background: linear-gradient(180deg, var(--present), #b45309);
   border-color: var(--present);
   color: white;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.3), 0 0 14px rgba(245, 158, 11, 0.35);
 }
 
 .key-btn.absent {
-  background: var(--absent);
-  border-color: var(--absent);
-  color: var(--text-muted);
-  opacity: 0.7;
+  background: linear-gradient(180deg, #2a3448, #232b39);
+  border-color: rgba(255, 255, 255, 0.06);
+  color: #cbd5e1;
+  opacity: 1;
   position: relative;
   overflow: hidden;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 2px 6px rgba(0, 0, 0, 0.4);
 }
 
-/* ── Keyboard Key Disintegration ── */
+.key-btn.absent:hover {
+  background: linear-gradient(180deg, #374151, #2d364d);
+  color: var(--text-primary);
+}
+
+/* ── Disabled / submitting state ── */
+.key-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* ── Keyboard key label ── */
 .key-label {
   display: flex;
   align-items: center;
   justify-content: center;
   width: 100%;
   height: 100%;
+  pointer-events: none;
 }
 
+/* ── Absent key disintegration ── */
 .key-btn.absent .key-label {
   animation: key-label-disintegrate 0.6s ease-out forwards;
   animation-delay: 0.4s;
@@ -1146,6 +1205,7 @@ button:focus-visible {
   100% { transform: scale(0.85); opacity: 0.4; filter: blur(1.2px); }
 }
 
+/* ── Particle burst on absent keys ── */
 .key-particle-container {
   position: absolute;
   inset: 0;
@@ -1172,6 +1232,25 @@ button:focus-visible {
 @keyframes key-particle-burst {
   0% { transform: translate(0, 0) scale(1.5); opacity: 1; }
   100% { transform: translate(var(--x), var(--y)) scale(0); opacity: 0; }
+}
+
+/* ── Responsive keyboard sizing ── */
+@media (max-width: 480px) {
+  .keyboard-container {
+    gap: 5px;
+    margin-top: var(--space-3);
+  }
+  .keyboard-row {
+    gap: 4px;
+  }
+  .key-btn {
+    height: 48px;
+    min-width: 42px;
+    font-size: 12px;
+  }
+  .keyboard-row:last-child .key-btn.special-key {
+    min-width: 56px;
+  }
 }
 
 /* ============================================================
@@ -2153,32 +2232,6 @@ button:focus-visible {
   100% { transform: scale(1); }
 }
 
-.key-btn {
-  transition: background-color 0.4s cubic-bezier(0.4, 0, 0.2, 1),
-              border-color 0.4s cubic-bezier(0.4, 0, 0.2, 1),
-              color 0.4s cubic-bezier(0.4, 0, 0.2, 1),
-              transform 0.15s ease,
-              box-shadow 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.key-btn.correct {
-  animation: key-pulse-correct 0.3s cubic-bezier(0.25, 1, 0.5, 1) both;
-  transition-delay: 0.4s;
-  animation-delay: 0.4s;
-}
-
-.key-btn.present {
-  animation: key-pulse-present 0.3s cubic-bezier(0.25, 1, 0.5, 1) both;
-  transition-delay: 0.4s;
-  animation-delay: 0.4s;
-}
-
-.key-btn.absent {
-  animation: key-pulse-absent 0.3s cubic-bezier(0.25, 1, 0.5, 1) both;
-  transition-delay: 0.4s;
-  animation-delay: 0.4s;
-}
-
 /* ── Button & Card Spring Animations ──────────────────────── */
 .btn-primary, .btn-secondary, .btn-danger, .btn-play-now {
   transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
@@ -2881,9 +2934,10 @@ button:focus-visible {
 }
 
 .hero-tile-letter {
-  font-family: 'Cinzel', 'Outfit', var(--font-display);
+  font-family: var(--font-display) !important;
   font-size: 30px;
-  font-weight: 900;
+  font-weight: 800;
+  text-transform: uppercase;
   color: #ffffff !important;
   text-shadow: 0 0 12px var(--tile-color, #6366f1), 0 2px 4px rgba(0, 0, 0, 0.9);
   letter-spacing: -0.5px;
@@ -3503,48 +3557,6 @@ button:focus-visible {
 @keyframes key-glow-pulse {
   0%, 100% { filter: brightness(1) saturate(1); }
   50% { filter: brightness(1.2) saturate(1.5); }
-}
-
-.key-btn {
-  position: relative;
-  overflow: hidden;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  background: linear-gradient(135deg, var(--bg-elevated), var(--bg-card));
-  animation: rainbow-cycle 8s linear infinite;
-  height: 64px;
-  font-size: 18px;
-}
-
-.key-btn:hover {
-  animation: key-glow-pulse 1s infinite alternate;
-  border-width: 2px;
-}
-
-.key-btn.correct {
-  border-color: rgba(34, 211, 160, 0.9);
-  box-shadow: 0 0 20px rgba(34, 211, 160, 0.6), inset 0 0 12px rgba(34, 211, 160, 0.4);
-  animation: none;
-}
-
-.key-btn.present {
-  border-color: rgba(245, 158, 11, 0.9);
-  box-shadow: 0 0 20px rgba(245, 158, 11, 0.6), inset 0 0 12px rgba(245, 158, 11, 0.4);
-  animation: none;
-}
-
-.key-btn::after {
-  content: "";
-  position: absolute;
-  top: 0; left: 0; width: 100%; height: 100%;
-  background: linear-gradient(45deg, transparent 45%, rgba(255,255,255,0.05) 50%, transparent 55%);
-  background-size: 200% 200%;
-  transition: background-position 0.4s ease;
-  pointer-events: none;
-}
-
-.key-btn:hover::after {
-  background-position: 100% 100%;
 }
 
 @keyframes key-scan {

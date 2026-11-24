@@ -876,7 +876,7 @@ export const App: React.FC = () => {
           </div>
         )}
         {isReadOnly && (
-          <div className="toast-notification animate-fade-in" style={{ backgroundColor: 'var(--red)' }}>
+          <div className="toast-notification animate-fade-in" style={{ backgroundColor: 'rgba(244, 63, 94, 0.12)', color: '#fca5a5', border: '1px solid rgba(244, 63, 94, 0.35)' }}>
             ⚠️ Read-Only Mode: Active in another tab
           </div>
         )}
@@ -1026,7 +1026,18 @@ export const App: React.FC = () => {
           </div>
         )}
 
-        {activeMode && showScoreboard && (
+        {activeMode === 'AI_ARENA' && status === 'ROUND_OVER' && (
+          <DuelResultPage
+            players={players}
+            secretWord={secretWord}
+            selectedBoss={aiArenaPersonality}
+            onPlayAgain={() => startAIArena(aiArenaPersonality!, aiArenaHardMode)}
+            onMainMenu={handleHomeClick}
+            onMeaning={() => setIsDefinitionOpen(true)}
+          />
+        )}
+
+        {activeMode && activeMode !== 'AI_ARENA' && showScoreboard && (
           <Scoreboard
             players={players}
             mode={activeMode}
@@ -1049,7 +1060,7 @@ export const App: React.FC = () => {
           />
         )}
               {/* Full-Screen AAA Victory Reveal Overlay */}
-        {status === 'ROUND_OVER' && activePlayer && activePlayer.solved && (
+        {status === 'ROUND_OVER' && activeMode !== 'AI_ARENA' && activePlayer && activePlayer.solved && (
           <VictoryReveal
             won={true}
             finalGuess={secretWord}
