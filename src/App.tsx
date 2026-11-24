@@ -38,10 +38,8 @@ import { LeaderboardModal } from './components/LeaderboardModal';
 import { VictoryReveal } from './components/VictoryReveal';
 import { CinematicVictory } from './components/CinematicVictory';
 import { VectorBackground } from './components/VectorBackground';
-import { StreakEmber } from './components/StreakEmber';
 import { FirstRoundGuide } from './components/FirstRoundGuide';
 
-import { FloatingHUD } from './components/FloatingHUD';
 import { ArtifactSystem } from './components/ArtifactSystem';
 import { 
   PlayerInventory, 
@@ -848,22 +846,25 @@ export const App: React.FC = () => {
       <VectorBackground status={showConfetti ? 'WIN' : status} />
       {activeMode && (activeMode !== 'AI_ARENA' || aiArenaStatus === 'playing') && (
         <Header
-                mode={activeMode}
-                onOpenHelp={() => setIsHelpOpen(true)}
-                onOpenStats={() => setIsStatsOpen(true)}
-                onOpenArtifacts={() => setShowArtifacts(true)}
-                onHomeClick={handleHomeClick}
-                colorBlindMode={colorBlindMode}
-                onToggleColorBlind={handleToggleColorBlind}
-                hardMode={hardMode}
-                onToggleHardMode={handleToggleHardMode}
-                soundEnabled={soundEnabled}
-                onToggleSound={handleToggleSound}
-                artifactCurrency={artifactInventory.currency}
-                roomCode={roomCode}
-                activePlayerName={players.length > 1 && activePlayer ? activePlayer.name : undefined}
-                roundInfo={players.length > 1 ? `Round ${roundNumber} of ${maxRounds}` : undefined}
-              />
+                        mode={activeMode}
+                        onOpenHelp={() => setIsHelpOpen(true)}
+                        onOpenStats={() => setIsStatsOpen(true)}
+                        onOpenArtifacts={() => setShowArtifacts(true)}
+                        onHomeClick={handleHomeClick}
+                        onOpenDailyChest={() => setShowDailyChest(true)}
+                        onOpenLeaderboard={() => setShowLeaderboard(true)}
+                        onOpenBlitz={() => setShowBlitz(true)}
+                        colorBlindMode={colorBlindMode}
+                        onToggleColorBlind={handleToggleColorBlind}
+                        hardMode={hardMode}
+                        onToggleHardMode={handleToggleHardMode}
+                        soundEnabled={soundEnabled}
+                        onToggleSound={handleToggleSound}
+                        artifactCurrency={artifactInventory.currency}
+                        roomCode={roomCode}
+                        activePlayerName={players.length > 1 && activePlayer ? activePlayer.name : undefined}
+                        roundInfo={players.length > 1 ? `Round ${roundNumber} of ${maxRounds}` : undefined}
+                      />
       )}
 
       <main className="app-main-content">
@@ -932,20 +933,7 @@ export const App: React.FC = () => {
                     </div>
                   </div>
                 )}
-                {activeMode === 'AI_ARENA' && aiArenaPersonality && (
-              <div className="ai-arena-hud">
-                <div className="boss-info">
-                  <span className="boss-icon">{aiArenaPersonality.icon}</span>
-                  <span className="boss-name">{aiArenaPersonality.name}</span>
-                </div>
-                <span className={`diff-badge ${aiArenaPersonality.difficulty.toLowerCase()}`}>
-                  {aiArenaPersonality.difficulty}
-                </span>
-              </div>
-            )}
-            {activePlayer && status === 'PLAYING' && stats.currentStreak > 0 && (
-              <StreakEmber streak={stats.currentStreak} />
-            )}
+
             {showFirstRoundGuide && (
               <FirstRoundGuide
                 isOpen
@@ -1147,10 +1135,7 @@ export const App: React.FC = () => {
               inventory={artifactInventory}
               onInventoryChange={setArtifactInventory}
             />
-            <FloatingHUD
-              streak={stats.currentStreak} 
-              winRate={stats.gamesPlayed > 0 ? Math.round((stats.gamesWon / stats.gamesPlayed) * 100) : 100} 
-            />
+
     </div>
   );
 };

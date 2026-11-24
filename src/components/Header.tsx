@@ -7,6 +7,9 @@ interface HeaderProps {
   onOpenStats: () => void;
   onOpenArtifacts: () => void;
   onHomeClick: () => void;
+  onOpenDailyChest?: () => void;
+  onOpenLeaderboard?: () => void;
+  onOpenBlitz?: () => void;
   colorBlindMode: boolean;
   onToggleColorBlind: () => void;
   hardMode: boolean;
@@ -84,6 +87,35 @@ const StatsIcon: React.FC = () => (
   </svg>
 );
 
+/** Gift / daily chest icon with pulsing animation */
+const DailyChestIcon: React.FC<{ pulsing?: boolean }> = ({ pulsing = false }) => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+    strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"
+    className={pulsing ? 'daily-chest-pulse' : ''}>
+    <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+    <circle cx="12" cy="12" r="3" />
+  </svg>
+);
+
+/** Trophy / leaderboard icon */
+const LeaderboardIcon: React.FC = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+    strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <path d="M6 9v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V9" />
+    <path d="M6 9L12 7l6 2" />
+    <path d="M16 14v4" />
+    <path d="M8 14v4" />
+  </svg>
+);
+
+/** Zap / fast mode icon */
+const FastModeIcon: React.FC = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+    strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <polygon points="5 3 19 12 5 21 5 3" />
+  </svg>
+);
+
 /** Format the mode label for display */
 function formatMode(mode: GameMode): string {
   return mode.replace('_', ' ');
@@ -95,6 +127,9 @@ export const Header: React.FC<HeaderProps> = ({
   onOpenStats,
   onOpenArtifacts,
   onHomeClick,
+  onOpenDailyChest,
+  onOpenLeaderboard,
+  onOpenBlitz,
   colorBlindMode,
   onToggleColorBlind,
   hardMode,
@@ -172,16 +207,49 @@ export const Header: React.FC<HeaderProps> = ({
       </div>
 
       {/* ── Right: settings cluster ───────────────────────── */}
-            <div className="header-right" role="toolbar" aria-label="Game settings">
-              <button
-                className="icon-btn artifact-btn"
-                onClick={onOpenArtifacts}
-                title={`Artifacts (${artifactCurrency.toLocaleString()} Lexicons)`}
-                aria-label={`Open Artifact System (${artifactCurrency.toLocaleString()} Lexicons)`}
-              >
-                <span className="artifact-btn-icon">🎒</span>
-                <span className="artifact-btn-count">{artifactCurrency.toLocaleString()}</span>
-              </button>
+                  <div className="header-right" role="toolbar" aria-label="Game settings">
+                    {onOpenDailyChest && (
+                      <button
+                        className="icon-btn daily-chest-btn"
+                        onClick={onOpenDailyChest}
+                        title="Open Daily Chest"
+                        aria-label="Open Daily Chest - Claim your daily reward"
+                      >
+                        <DailyChestIcon pulsing />
+                      </button>
+                    )}
+
+                    {onOpenLeaderboard && (
+                      <button
+                        className="icon-btn leaderboard-btn"
+                        onClick={onOpenLeaderboard}
+                        title="Leaderboard"
+                        aria-label="View Leaderboard"
+                      >
+                        <LeaderboardIcon />
+                      </button>
+                    )}
+
+                    {onOpenBlitz && (
+                      <button
+                        className="icon-btn blitz-btn"
+                        onClick={onOpenBlitz}
+                        title="Speed Blitz"
+                        aria-label="Start Speed Blitz mode"
+                      >
+                        <FastModeIcon />
+                      </button>
+                    )}
+
+                    <button
+                      className="icon-btn artifact-btn"
+                      onClick={onOpenArtifacts}
+                      title={`Artifacts (${artifactCurrency.toLocaleString()} Lexicons)`}
+                      aria-label={`Open Artifact System (${artifactCurrency.toLocaleString()} Lexicons)`}
+                    >
+                      <span className="artifact-btn-icon">🎒</span>
+                      <span className="artifact-btn-count">{artifactCurrency.toLocaleString()}</span>
+                    </button>
 
               <button
                 className={`icon-btn toggle-sound-btn${soundEnabled ? ' active' : ''}`}
