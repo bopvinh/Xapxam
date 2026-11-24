@@ -1,0 +1,230 @@
+/* ============================================================
+   FIRST-ROUND GUIDE — orientation overlay
+   ============================================================ */
+
+.frg-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: calc(var(--space-4) + 12px);
+  background: rgba(7, 9, 13, 0.72);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  animation: frg-fade-in 0.25s ease both;
+}
+
+.frg-panel {
+  width: 100%;
+  max-width: 440px;
+  background: var(--bg-card);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-lg);
+  padding: var(--space-6) var(--space-5);
+  box-shadow: var(--shadow-xl);
+  animation: frg-slide-up 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+.frg-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.frg-title {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: var(--text-base);
+  letter-spacing: 0.5px;
+  color: var(--accent-bright);
+  text-transform: uppercase;
+}
+
+.frg-close {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 30px;
+  line-height: 1;
+  cursor: pointer;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm);
+  transition: var(--transition-fast);
+}
+
+.frg-close:hover {
+  color: var(--text-primary);
+  background: var(--bg-glass);
+}
+
+.frg-step {
+  position: relative;
+  padding: var(--space-4) 0 var(--space-5);
+}
+
+.frg-step-num {
+  position: absolute;
+  top: var(--space-2);
+  left: calc(var(--space-2) * -1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--bg-elevated);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.frg-step-index {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 13px;
+  color: var(--text-muted);
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.frg-step-track {
+  width: 2px;
+  height: 60px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 2px;
+  margin-top: 14px;
+}
+
+.frg-step-track::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 0;
+  width: 2px;
+  height: 0%;
+  background: var(--accent);
+  border-radius: 2px;
+  transform: translateX(-50%);
+  transition: height 0.3s ease;
+}
+
+.frg-step.frg-step-active .frg-step-track {
+  height: 100%;
+}
+
+.frg-step-title {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: var(--text-lg);
+  color: var(--text-primary);
+  margin: 4px 0 8px 0;
+  letter-spacing: 0.3px;
+}
+
+.frg-step-body {
+  font-size: var(--text-sm);
+  line-height: 1.6;
+  color: var(--text-secondary);
+  margin: 0 0 var(--space-2);
+}
+
+.frg-step-hint {
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+  font-style: italic;
+  margin: 0;
+}
+
+.frg-dots {
+  display: flex;
+  justify-content: center;
+  gap: 7px;
+  margin: var(--space-5) 0 var(--space-4);
+}
+
+.frg-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--bg-elevated);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+
+.frg-dot:hover {
+  background: var(--bg-glass-hover);
+}
+
+.frg-dot-active {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+.frg-actions {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.frg-btn {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--text-sm);
+  padding: 9px 18px;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: var(--transition);
+  border: none;
+}
+
+.frg-btn-primary {
+  background: var(--accent);
+  color: white;
+  box-shadow: 0 2px 12px rgba(99, 102, 241, 0.35);
+}
+
+.frg-btn-primary:hover {
+  background: var(--accent-bright);
+  transform: translateY(-1px);
+}
+
+.frg-btn-ghost {
+  background: transparent;
+  color: var(--text-secondary);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.frg-btn-ghost:hover {
+  color: var(--text-primary);
+  background: var(--bg-glass-hover);
+  border-color: rgba(255, 255, 255, 0.16);
+}
+
+@keyframes frg-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes frg-slide-up {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .frg-overlay,
+  .frg-panel,
+  .frg-step-track {
+    animation-duration: 0.01ms !important;
+  }
+}

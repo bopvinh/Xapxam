@@ -75,9 +75,6 @@ export const VictoryReveal: React.FC<VictoryRevealProps> = ({
       {/* ── Screen Flash Burst ──────────────────────────────── */}
       {showFlash && <div className="mvc2-flash-overlay" aria-hidden="true" />}
 
-      {/* ── Rotating God Rays Sunburst Backdrop ────────────── */}
-      <div className="aaa-god-rays" aria-hidden="true" />
-
       {/* ── Callout Banner ─────────────────────────────────── */}
       {showPerfect && (
         <div className="mvc2-perfect-banner" aria-hidden="true">
@@ -94,10 +91,10 @@ export const VictoryReveal: React.FC<VictoryRevealProps> = ({
           <span className="aaa-medal-sub">{attemptsUsed}/6 GUESSES</span>
         </div>
 
-        <h1 className="aaa-victory-title">WORD SOLVED!</h1>
+        <h1 className="aaa-victory-title" style={{ display: 'none' }}>ROUND COMPLETE</h1>
 
         {/* 3D Metallic Beveled Word Tiles */}
-        <div className="aaa-word-tiles-row">
+        <div className="aaa-word-tiles-row" style={{ marginTop: '0', marginBottom: '16px' }}>
           {finalEvals.map((ev, idx) => (
             <div
               key={idx}

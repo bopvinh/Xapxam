@@ -9,10 +9,10 @@ import {
   generateShopOffers,
   getActiveSynergies,
   calculateArtifactScoreBonus,
+  activateActiveArtifact,
   PlayerInventory,
   EquippedArtifacts,
-  ScoringContext,
-  activateActiveArtifact
+  ScoringContext
 } from '../../src/game/artifacts';
 
 describe('Artifact RPG Engine', () => {

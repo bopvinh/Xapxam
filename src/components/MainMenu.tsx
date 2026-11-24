@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { GameMode } from '../game/types';
 import { soundManager } from '../game/audio';
+import { MainMenuVectorBackdrop } from './MainMenuVectorBackdrop';
 // import heroBgV2 from '../assets/hero-bg-v2.svg';
 
 interface MainMenuProps {
@@ -185,9 +186,10 @@ export const MainMenu: React.FC<MainMenuProps> = ({
       setChargeProgress(0);
     };
 
-    const handleHover = () => {
-      soundManager.playHover();
-    };
+    const handleHover = (color: string) => {
+              soundManager.playHover();
+              setHoveredModeColor(color);
+            };
 
   const tiles = [
     { letter: 'W', rot: -25, y: 24, color: '#6366f1' },
@@ -213,7 +215,8 @@ export const MainMenu: React.FC<MainMenuProps> = ({
   ];
 
     const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
-    // const [heroTileMousePos, setHeroTileMousePos] = useState({ x: 0, y: 0 });
+        const [hoveredModeColor, setHoveredModeColor] = useState<string | null>(null);
+        // const [heroTileMousePos, setHeroTileMousePos] = useState({ x: 0, y: 0 });
 
     useEffect(() => {
       const handleMouseMove = (e: MouseEvent) => {
@@ -226,8 +229,9 @@ export const MainMenu: React.FC<MainMenuProps> = ({
     }, []);
 
     return (
-        <div className="main-menu-container animate-scale">
-          <div className="main-menu-inner" style={{ transform: `perspective(1000px) rotateY(${mousePos.x * 0.1}deg) rotateX(${-mousePos.y * 0.1}deg)`, width:'100%', height:'100%', position:'relative', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+            <div className="main-menu-container animate-scale">
+              <MainMenuVectorBackdrop mousePos={mousePos} hoveredModeColor={hoveredModeColor} />
+              <div className="main-menu-inner" style={{ transform: `perspective(1000px) rotateY(${mousePos.x * 0.1}deg) rotateX(${-mousePos.y * 0.1}deg)`, width:'100%', height:'100%', position:'relative', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
           {/* ── Precision Vector Corner Reticle Brackets ───────── */}
           <div className="vector-corner-tl" aria-hidden="true" />
           <div className="vector-corner-tr" aria-hidden="true" />
@@ -348,28 +352,28 @@ export const MainMenu: React.FC<MainMenuProps> = ({
                     const isReady = chargeState === 'ready' && chargeTargetMode === mode;
                     return (
                       <button
-                        key={mode}
-                        className={`menu-card ${isDaily ? 'daily-highlight-card' : ''} ${isCharging ? 'charging' : ''} ${isReady ? 'ready' : ''}`}
-                        onMouseDown={(e) => {
-                          e.preventDefault();
-                          startCharge(mode);
-                        }}
-                        onMouseUp={cancelCharge}
-                        onMouseLeave={cancelCharge}
-                        onClick={() => {
-                          if (!isCharging) {
-                            soundManager.playFlip();
-                            onSelectMode(mode);
-                          }
-                        }}
-                        onMouseEnter={handleHover}
-                        role="button"
-                        aria-label={mode === 'CLASSIC' ? 'Play Classic mode' : `${label} — ${description}`}
-                        style={{
-                          '--card-accent': tagColor,
-                          padding: '10px 14px',
-                        } as React.CSSProperties}
-                      >
+                                              key={mode}
+                                              className={`menu-card ${isDaily ? 'daily-highlight-card' : ''} ${isCharging ? 'charging' : ''} ${isReady ? 'ready' : ''}`}
+                                              onMouseDown={(e) => {
+                                                                                              e.preventDefault();
+                                                                                              startCharge(mode);
+                                                                                            }}
+                                                                                            onMouseUp={cancelCharge}
+                                                                                            onMouseLeave={cancelCharge}
+                                                                                            onMouseEnter={() => handleHover(tagColor)}
+                                                                                            onClick={() => {
+                                                                                              if (!isCharging) {
+                                                                                                soundManager.playFlip();
+                                                                                                onSelectMode(mode);
+                                                                                              }
+                                                                                            }}
+                                                                                            role="button"
+                                              aria-label={mode === 'CLASSIC' ? 'Play Classic mode' : `${label} — ${description}`}
+                                              style={{
+                                                '--card-accent': tagColor,
+                                                padding: '10px 14px',
+                                              } as React.CSSProperties}
+                                            >
                         <div className="card-body" style={{ width: '100%' }}>
                           <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
