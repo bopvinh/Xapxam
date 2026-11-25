@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { io } from 'socket.io-client';
 import './styles/global.css';
 import './styles/artifact-system.css';
-import { GameMode, Player, PlayerStats, LetterState, LetterEvaluation, GuessResult } from './game/types';
+import { GameMode, Player, PlayerStats, LetterState, GuessResult } from './game/types';
 import type { AIPersonality, AIContext } from './ai/types';
 import {
   evaluateGuess,
@@ -93,10 +93,6 @@ export const App: React.FC = () => {
   const [aiArenaHardMode, setAIArenaHardMode] = useState<boolean>(false);
   const [aiArenaStatus, setAIArenaStatus] = useState<'idle' | 'playing' | 'over'>('idle');
   const [aiTimer, setAiTimer] = useState<ReturnType<typeof setTimeout> | null>(null);
-  const [isAiThinking, setIsAiThinking] = useState<boolean>(false);
-  const [aiJudgement, setAiJudgement] = useState<'revealing' | null>(null);
-  const [aiGuess, setAiGuess] = useState<string | null>(null);
-  const [aiEvaluation, setAiEvaluation] = useState<LetterEvaluation[] | null>(null);
 
   const [showVictoryCinematic, setShowVictoryCinematic] = useState<boolean>(false);
 
@@ -354,28 +350,25 @@ export const App: React.FC = () => {
     setCurrentGuess('');
     setShowScoreboard(false);
     setActivePlayerIndex(0);
-    setAiJudgement(null);
-    setAiGuess(null);
-    setAiEvaluation(null);
     if (aiTimer) {
       clearTimeout(aiTimer);
       setAiTimer(null);
     }
   };
 
-  /** AI Boss Arena: resolve the AI's guess from the shared word + feedback. */
-  const runAITurn = (humanGuesses: GuessResult[]) => {
+  const runAITurn = (humanGuesses: GuessResult[], currentAiGuesses?: GuessResult[]) => {
     if (status !== 'PLAYING' || aiArenaStatus !== 'playing') return;
     const ai = players.find((p) => p.id === 'ai');
-    if (!ai || ai.solved) return;
+    const aiGuesses = currentAiGuesses || ai?.guesses || [];
+    if (!ai || ai.solved || aiGuesses.length >= 6) return;
 
-    const previousGuesses = [...humanGuesses, ...ai.guesses];
+    const previousGuesses = [...humanGuesses, ...aiGuesses];
     const ctx: AIContext = {
       previousGuesses,
       validWords: GUESS_WORDS,
       secretWords: SECRET_WORDS,
       hardMode: aiArenaHardMode,
-      attemptsRemaining: 6 - ai.guesses.length,
+      attemptsRemaining: 6 - aiGuesses.length,
     };
     const move = makeAIMove(ctx, {
       difficulty: aiArenaPersonality?.difficulty || 'EASY',
@@ -386,36 +379,38 @@ export const App: React.FC = () => {
     const evals = evaluateGuess(move.word, secretWord);
     const aiWon = move.word === secretWord;
 
-    // Kick off the boss's tile-by-tile reveal.
-    setAiJudgement('revealing');
-    setAiGuess(move.word);
-    setAiEvaluation(evals);
+    const updatedGuesses = [...aiGuesses, { word: move.word, evaluation: evals }];
+    const aiOutOfAttempts = updatedGuesses.length >= 6;
 
+    // Update player guesses
     setPlayers(prev => prev.map(p =>
       p.id === 'ai'
-        ? { ...p, guesses: [...p.guesses, { word: move.word, evaluation: evals }], solved: aiWon, attemptsUsed: p.guesses.length + 1 }
+        ? { ...p, guesses: updatedGuesses, solved: aiWon, attemptsUsed: updatedGuesses.length }
         : p
     ));
 
+    // Staggered flip sounds
     evals.forEach((item, idx) => {
       setTimeout(() => {
         if (item.state === 'correct') soundManager.playCorrect();
         else if (item.state === 'present') soundManager.playPresent();
         else soundManager.playAbsent();
-      }, idx * 120 + 250);
+      }, idx * 120);
     });
 
-    // Clear the reveal after the tile sounds have played plus a short tail.
-    setTimeout(() => {
-      setAiJudgement(null);
-      setAiGuess(null);
-      setAiEvaluation(null);
-    }, evals.length * 120 + 250 + 450);
-
-    if (aiWon) {
-      setStatus('ROUND_OVER');
-      setAIArenaStatus('over');
-      setShowScoreboard(true);
+    // Check game-over condition
+    if (aiWon || aiOutOfAttempts) {
+      setTimeout(() => {
+        setStatus('ROUND_OVER');
+        setAIArenaStatus('over');
+        setShowScoreboard(true);
+      }, 1500); // Let final flip cascade resolve
+    } else {
+      // Loop: schedule next guess after current guess flip cascade resolves
+      const nextTurnTimer = setTimeout(() => {
+        runAITurn(humanGuesses, updatedGuesses);
+      }, 2200); // 2.2s delay between guesses (600ms stagger + 1.6s pause)
+      setAiTimer(nextTurnTimer);
     }
   };
 
@@ -560,28 +555,21 @@ export const App: React.FC = () => {
     setPlayers(updatedPlayers);
     setCurrentGuess('');
 
-    // AI Boss Arena: human submits a guess, then run AI turn after human reveal completes
+    // AI Boss Arena: human submits a guess.
+    // Sequential Flow: Human finishes their game completely before the AI begins.
     if (activeMode === 'AI_ARENA') {
       if (isWon || isOutOfAttempts) {
-        setStatus('ROUND_OVER');
-        setAIArenaStatus('over');
-        setShowScoreboard(true);
-        return;
+        // Human is finished. Transition to the AI's turn after a short delay.
+        setTimeout(() => {
+          setActivePlayerIndex(1); // Switch view to AI board
+          
+          // Brief pause before AI starts its turn sequence
+          setTimeout(() => {
+            runAITurn(newGuesses, []);
+          }, 1000);
+        }, 1000); // Wait for human's final tile reveals
       }
-      
-      // Delay AI sequence until after human tiles finish their staggered reveal (~600-800ms)
-      setTimeout(() => {
-        setIsAiThinking(true);
-        if (aiTimer) clearTimeout(aiTimer);
-        
-        const timer = setTimeout(() => {
-          setIsAiThinking(false);
-          runAITurn(newGuesses);
-        }, 1200); // "Thinking" for 1.2s
-        
-        setAiTimer(timer);
-      }, 800);
-      
+      // Regardless, return early so the AI doesn't move mid-human-game.
       return;
     }
 
@@ -811,7 +799,6 @@ export const App: React.FC = () => {
     setIsTimerActive(false);
     setStatus('PLAYING');
     setAIArenaStatus('idle');
-    setIsAiThinking(false);
   };
 
   const activePlayer = players[activePlayerIndex] || null;
@@ -867,6 +854,7 @@ export const App: React.FC = () => {
                         roomCode={roomCode}
                         activePlayerName={players.length > 1 && activePlayer ? activePlayer.name : undefined}
                         roundInfo={players.length > 1 ? `Round ${roundNumber} of ${maxRounds}` : undefined}
+                        streak={players.length === 1 ? stats.currentStreak : 0}
                       />
       )}
 
@@ -922,21 +910,8 @@ export const App: React.FC = () => {
           />
         )}
 
-        {activeMode && !showMultiplayerSetup && !showScoreboard && activePlayer && (
+        {activeMode && !showMultiplayerSetup && !showScoreboard && activePlayer && (activeMode !== 'AI_ARENA' || aiArenaStatus !== 'idle') && (
               <div className="gameplay-area animate-scale">
-                {isAiThinking && (
-                  <div className="boss-thinking-overlay">
-                    <div className="boss-thinking-card">
-                      <div className="boss-icon">🧠</div>
-                      <h2 className="boss-message">THE BOSS IS THINKING...</h2>
-                      <div className="boss-progress-ring">
-                        <div className="boss-progress-fill" />
-                      </div>
-                      <p className="boss-sub">Calculating optimum move...</p>
-                    </div>
-                  </div>
-                )}
-
             {showFirstRoundGuide && (
               <FirstRoundGuide
                 isOpen
@@ -979,9 +954,6 @@ export const App: React.FC = () => {
                 currentGuess={currentGuess}
                 invalidRowIndex={invalidRowIndex}
                 colorBlindMode={colorBlindMode}
-                aiJudgement={aiJudgement}
-                aiGuess={aiGuess}
-                aiEvaluation={aiEvaluation}
               />
             )}
 
