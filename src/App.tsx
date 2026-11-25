@@ -36,6 +36,7 @@ import { ShareModal } from './components/ShareModal';
 import { MasteryStatsModal } from './components/MasteryStatsModal';
 import { LeaderboardModal } from './components/LeaderboardModal';
 import { VictoryReveal } from './components/VictoryReveal';
+import { GameOverReveal } from './components/GameOverReveal';
 import { CinematicVictory } from './components/CinematicVictory';
 import { VectorBackground } from './components/VectorBackground';
 import { FirstRoundGuide } from './components/FirstRoundGuide';
@@ -133,22 +134,12 @@ export const App: React.FC = () => {
   // Active Session State
   const [activeSession, _setActiveSession] = useState<ActiveGameSessionRecord | null>(compositeRecord.activeSession);
 
-  // Multi-tab locking
-  const [isReadOnly, setIsReadOnly] = useState(true);
+  // Multi-tab locking (Disabled - Read-Only mode permanently off)
+  const [isReadOnly, setIsReadOnly] = useState(false);
 
   useEffect(() => {
-    if ('locks' in navigator) {
-      navigator.locks.request('wpp_inventory_lock', { ifAvailable: true }, async (lock) => {
-        if (!lock) {
-          setIsReadOnly(true);
-          return;
-        }
-        setIsReadOnly(false);
-        return new Promise(() => {}); // Hold lock for tab lifetime
-      });
-    } else {
-      setIsReadOnly(true);
-    }
+    // Read-only mode disabled per user request
+    setIsReadOnly(false);
   }, []);
 
   // Use Active Session in UI
@@ -374,7 +365,6 @@ export const App: React.FC = () => {
 
   /** AI Boss Arena: resolve the AI's guess from the shared word + feedback. */
   const runAITurn = (humanGuesses: GuessResult[]) => {
-    setIsAiThinking(false);
     if (status !== 'PLAYING' || aiArenaStatus !== 'playing') return;
     const ai = players.find((p) => p.id === 'ai');
     if (!ai || ai.solved) return;
@@ -570,20 +560,15 @@ export const App: React.FC = () => {
     setPlayers(updatedPlayers);
     setCurrentGuess('');
 
-    // AI Boss Arena: human submits a guess, then hand off to the AI.
+    // AI Boss Arena: human submits a guess, then hand off to the AI immediately without delay/thinking overlay
     if (activeMode === 'AI_ARENA') {
-      if (isWon) {
+      if (isWon || isOutOfAttempts) {
         setStatus('ROUND_OVER');
         setAIArenaStatus('over');
         setShowScoreboard(true);
         return;
       }
-      setIsAiThinking(true);
-      if (aiTimer) {
-        clearTimeout(aiTimer);
-        setAiTimer(null);
-      }
-      setAiTimer(setTimeout(() => runAITurn(newGuesses), 950));
+      runAITurn(newGuesses);
       return;
     }
 
@@ -811,6 +796,9 @@ export const App: React.FC = () => {
     setShowMultiplayerSetup(false);
     setShowScoreboard(false);
     setIsTimerActive(false);
+    setStatus('PLAYING');
+    setAIArenaStatus('idle');
+    setIsAiThinking(false);
   };
 
   const activePlayer = players[activePlayerIndex] || null;
@@ -832,7 +820,7 @@ export const App: React.FC = () => {
   // Emoji share builder (re-exposed for Result screen)
 
   const guessesLength = activePlayer ? activePlayer.guesses.length : 0;
-  const tensionScale = activeMode ? 1 + Math.max(0, guessesLength - 3) * 0.015 : 1;
+  const tensionScale = activeMode && activeMode !== 'AI_ARENA' ? 1 + Math.max(0, guessesLength - 3) * 0.015 : 1;
 
   return (
     <div 
@@ -1071,6 +1059,28 @@ export const App: React.FC = () => {
             }
             mode={activeMode || 'CLASSIC'}
             attemptsUsed={activePlayer.attemptsUsed}
+            streak={stats.currentStreak}
+            winRate={
+              stats.gamesPlayed > 0
+                ? Math.round((stats.gamesWon / stats.gamesPlayed) * 100)
+                : 100
+            }
+            onPlayAgain={() => startSinglePlayerGame(activeMode || 'CLASSIC')}
+            onMeaning={() => setIsDefinitionOpen(true)}
+          />
+        )}
+
+        {/* Full-screen AAA Game Over reveal for single-player losses */}
+        {status === 'ROUND_OVER' && activeMode !== 'AI_ARENA' && activePlayer && !activePlayer.solved && (
+          <GameOverReveal
+            won={false}
+            finalGuess={secretWord}
+            finalEvals={
+              activePlayer.guesses[activePlayer.guesses.length - 1]?.evaluation ?? []
+            }
+            mode={activeMode || 'CLASSIC'}
+            attemptsUsed={activePlayer.attemptsUsed}
+            secretWord={secretWord}
             streak={stats.currentStreak}
             winRate={
               stats.gamesPlayed > 0
