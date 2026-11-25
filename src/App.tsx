@@ -37,6 +37,7 @@ import { MasteryStatsModal } from './components/MasteryStatsModal';
 import { LeaderboardModal } from './components/LeaderboardModal';
 import { VictoryReveal } from './components/VictoryReveal';
 import { GameOverReveal } from './components/GameOverReveal';
+import { AIVersusScreen } from './components/AIVersusScreen';
 import { CinematicVictory } from './components/CinematicVictory';
 import { VectorBackground } from './components/VectorBackground';
 import { FirstRoundGuide } from './components/FirstRoundGuide';
@@ -94,6 +95,7 @@ export const App: React.FC = () => {
   const [aiArenaStatus, setAIArenaStatus] = useState<'idle' | 'playing' | 'over'>('idle');
   const [aiTimer, setAiTimer] = useState<ReturnType<typeof setTimeout> | null>(null);
 
+  const [showAIVersus, setShowAIVersus] = useState<boolean>(false);
   const [showVictoryCinematic, setShowVictoryCinematic] = useState<boolean>(false);
 
   const [isJolting, setIsJolting] = useState<boolean>(false);
@@ -346,6 +348,8 @@ export const App: React.FC = () => {
     setAIArenaPersonality(personality);
     setAIArenaHardMode(hardMode);
     setAIArenaStatus('playing');
+    // Show VERSUS screen first
+    setShowAIVersus(true);
     setStatus('PLAYING');
     setCurrentGuess('');
     setShowScoreboard(false);
@@ -1075,6 +1079,15 @@ export const App: React.FC = () => {
         <CinematicVictory
           videoSource="/assets/victory-cinematic.mp4"
           onComplete={() => setShowVictoryCinematic(false)}
+        />
+      )}
+
+      {/* AI Arena Arcade VERSUS Intro */}
+      {showAIVersus && aiArenaPersonality && (
+        <AIVersusScreen
+          boss={aiArenaPersonality}
+          hardMode={aiArenaHardMode}
+          onComplete={() => setShowAIVersus(false)}
         />
       )}
 

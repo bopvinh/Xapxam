@@ -1,0 +1,195 @@
+/* ============================================================
+   WORD++ — AI VERSUS SCREEN
+   High-impact arcade intro takeover for AI Boss Arena matches.
+   ============================================================ */
+
+.versus-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  background: radial-gradient(circle at center, #0d1117 0%, #07090d 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  animation: versus-fade-in 0.3s ease-out both;
+}
+
+@keyframes versus-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.versus-content {
+  width: 100%;
+  max-width: 1000px;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(20px, 8vw, 80px);
+  position: relative;
+  padding: 0 40px;
+}
+
+/* ── Sliding "VS" Emblem ─────────────────────────────────── */
+.vs-emblem {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(5);
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 120px;
+  font-style: italic;
+  color: #fff;
+  opacity: 0;
+  z-index: 10;
+  text-shadow: 0 0 40px rgba(255, 255, 255, 0.4), 4px 4px 0 #f43f5e;
+  animation: vs-impact 0.6s cubic-bezier(0.1, 0.8, 0.3, 1.1) 0.4s forwards;
+  pointer-events: none;
+}
+
+@keyframes vs-impact {
+  0% { transform: translate(-50%, -50%) scale(8); opacity: 0; }
+  70% { transform: translate(-50%, -50%) scale(0.9); opacity: 1; }
+  100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+}
+
+/* ── Fighter Cards ────────────────────────────────────────── */
+.fighter-card {
+  flex: 1;
+  height: 480px;
+  background: linear-gradient(145deg, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.95));
+  border: 3px solid var(--fighter-color, #6366f1);
+  border-radius: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 30px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), 0 0 30px var(--fighter-glow, rgba(99, 102, 241, 0.2));
+  transform-style: preserve-3d;
+  position: relative;
+  overflow: hidden;
+}
+
+.fighter-card.player {
+  animation: fighter-slide-left 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+.fighter-card.boss {
+  animation: fighter-slide-right 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+@keyframes fighter-slide-left {
+  from { transform: translateX(-150%) rotateY(20deg) scale(0.8); opacity: 0; }
+  to { transform: translateX(0) rotateY(15deg) scale(1); opacity: 1; }
+}
+
+@keyframes fighter-slide-right {
+  from { transform: translateX(150%) rotateY(-20deg) scale(0.8); opacity: 0; }
+  to { transform: translateX(0) rotateY(-15deg) scale(1); opacity: 1; }
+}
+
+.fighter-icon {
+  font-size: 100px;
+  margin-bottom: 20px;
+  filter: drop-shadow(0 0 20px var(--fighter-color));
+  animation: fighter-float 3s ease-in-out infinite alternate;
+}
+
+@keyframes fighter-float {
+  from { transform: translateY(0) scale(1); }
+  to { transform: translateY(-15px) scale(1.05); }
+}
+
+.fighter-name {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 32px;
+  color: #fff;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin-bottom: 4px;
+  text-align: center;
+}
+
+.fighter-title {
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--fighter-color);
+  text-transform: uppercase;
+  letter-spacing: 4px;
+  margin-bottom: 20px;
+}
+
+/* ── Taunt Box ────────────────────────────────────────────── */
+.taunt-container {
+  width: 100%;
+  background: rgba(0, 0, 0, 0.4);
+  padding: 16px;
+  border-radius: 12px;
+  border-left: 4px solid var(--fighter-color);
+  opacity: 0;
+  animation: taunt-reveal 0.5s ease-out 1.2s forwards;
+}
+
+@keyframes taunt-reveal {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.taunt-text {
+  font-style: italic;
+  color: #e2e8f0;
+  font-size: 15px;
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* ── Footer ────────────────────────────────────────────────── */
+.versus-footer {
+  position: absolute;
+  bottom: 40px;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+}
+
+.skip-hint {
+  font-size: 12px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  animation: blink 2s infinite;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 1; }
+}
+
+@media (max-width: 768px) {
+  .versus-content {
+    flex-direction: column;
+    gap: 30px;
+  }
+  .fighter-card {
+    height: 300px;
+    width: 100%;
+    transform: none !important;
+    animation: fighter-slide-up 0.5s ease-out both;
+  }
+  @keyframes fighter-slide-up {
+    from { transform: translateY(50px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+  .vs-emblem {
+    font-size: 60px;
+  }
+  .fighter-icon { font-size: 60px; }
+  .fighter-name { font-size: 24px; }
+}
