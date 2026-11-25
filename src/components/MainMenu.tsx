@@ -232,13 +232,7 @@ export const MainMenu: React.FC<MainMenuProps> = ({
             <div className="main-menu-container animate-scale">
               <MainMenuVectorBackdrop mousePos={mousePos} hoveredModeColor={hoveredModeColor} />
               <div className="main-menu-inner" style={{ transform: `perspective(1000px) rotateY(${mousePos.x * 0.1}deg) rotateX(${-mousePos.y * 0.1}deg)`, width:'100%', height:'100%', position:'relative', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-          {/* ── Precision Vector Corner Reticle Brackets ───────── */}
-          <div className="vector-corner-tl" aria-hidden="true" />
-          <div className="vector-corner-tr" aria-hidden="true" />
-          <div className="vector-corner-bl" aria-hidden="true" />
-          <div className="vector-corner-br" aria-hidden="true" />
-
-            {/* ── Hero ─────────────────────────────────────────── */}
+          {/* ── Hero ─────────────────────────────────────────── */}
                   <section className="hero-section" aria-label="Game title" style={{ padding: '4px 0' }}>
                     {/* ── 3D Fanned WORD++ Title Logo ─────────────────────────── */}
                     <div className="hero-fanned-title-container" aria-label="WORD++ Title Logo">

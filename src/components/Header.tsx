@@ -1,5 +1,6 @@
 import React from 'react';
 import { GameMode } from '../game/types';
+import { StreakEmber } from './StreakEmber';
 
 interface HeaderProps {
   mode: GameMode | null;
@@ -20,6 +21,8 @@ interface HeaderProps {
   activePlayerName?: string;
   roundInfo?: string;
   roomCode?: string;
+  /** Current solo win streak; shows a live streak badge in the badge-row. */
+  streak?: number;
 }
 
 /** Home icon */
@@ -140,6 +143,7 @@ export const Header: React.FC<HeaderProps> = ({
   activePlayerName,
   roundInfo,
   roomCode,
+  streak = 0,
 }) => {
   return (
     <header className="app-header" role="banner">
@@ -202,6 +206,11 @@ export const Header: React.FC<HeaderProps> = ({
           <div className="badge-row" aria-live="polite">
             <span className="mode-badge">{formatMode(mode)}</span>
             {hardMode && <span className="hard-badge" aria-label="Hard mode active">HARD</span>}
+            {streak > 0 && (
+              <span className="streak-ember-hud">
+                <StreakEmber streak={streak} flare={streak >= 3} />
+              </span>
+            )}
           </div>
         )}
       </div>
